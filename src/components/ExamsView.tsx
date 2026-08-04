@@ -792,28 +792,31 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
                       </p>
                     )}
 
-                    <div className="space-y-3 pt-2">
+                    <div className="space-y-3.5 pt-2">
                       {questionsToUse[currentQuestionIdx].options.map((opt, oIdx) => {
                         const isSelected = userAnswers[currentQuestionIdx] === oIdx;
+                        const isOptArabic = /[\u0600-\u06FF]/.test(opt);
                         return (
                           <button
                             key={oIdx}
                             onClick={() => handleSelectOption(currentQuestionIdx, oIdx)}
-                            className={`w-full text-left p-4 rounded-2xl text-sm sm:text-base font-semibold transition-all flex items-center justify-between border ${
+                            className={`w-full text-left p-4 sm:p-5 rounded-2xl transition-all flex items-center justify-between border ${
                               isSelected
                                 ? 'bg-emerald-600 text-white font-extrabold border-emerald-600 shadow-md scale-[1.01]'
-                                : 'bg-slate-50 dark:bg-slate-800/60 text-slate-900 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-slate-800'
+                                : 'bg-slate-50 dark:bg-slate-800/60 text-slate-950 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-slate-800'
                             }`}
                           >
-                            <div className="flex items-center space-x-3">
-                              <span className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center shrink-0 ${
-                                isSelected ? 'bg-white text-emerald-700' : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
+                            <div className="flex items-center space-x-3.5 w-full">
+                              <span className={`w-8 h-8 rounded-full text-sm font-black flex items-center justify-center shrink-0 ${
+                                isSelected ? 'bg-white text-emerald-800 font-extrabold' : 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100'
                               }`}>
                                 {['ক', 'খ', 'গ', 'ঘ'][oIdx]}
                               </span>
-                              <span>{opt}</span>
+                              <span className={isOptArabic ? 'font-arabic text-right w-full text-xl sm:text-2xl font-bold leading-[2.2]' : 'text-left font-bold text-base sm:text-lg lg:text-xl leading-relaxed'}>
+                                {opt}
+                              </span>
                             </div>
-                            {isSelected && <CheckCircle2 className="w-5 h-5 text-white" />}
+                            {isSelected && <CheckCircle2 className="w-6 h-6 text-white shrink-0 ml-2" />}
                           </button>
                         );
                       })}

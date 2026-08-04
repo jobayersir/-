@@ -370,11 +370,11 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                           className={
                             isArabicLine
                               ? isUstad
-                                ? 'text-right text-emerald-950 dark:text-emerald-100 text-2xl sm:text-3xl lg:text-4xl font-bold py-2 leading-[2.2]'
-                                : 'text-right text-white text-2xl sm:text-3xl lg:text-4xl font-bold py-2 leading-[2.2]'
+                                ? 'text-right text-emerald-950 dark:text-emerald-100 text-xl sm:text-2xl font-bold py-1 leading-[2.0]'
+                                : 'text-right text-white text-xl sm:text-2xl font-bold py-1 leading-[2.0]'
                               : isUstad
-                              ? 'text-left text-slate-950 dark:text-emerald-50 text-lg sm:text-xl lg:text-2xl font-semibold sm:font-bold leading-[1.95]'
-                              : 'text-left text-white text-lg sm:text-xl lg:text-2xl font-semibold leading-[1.85]'
+                              ? 'text-left text-slate-900 dark:text-emerald-50 text-sm sm:text-base font-medium leading-relaxed'
+                              : 'text-left text-white text-sm sm:text-base font-medium leading-relaxed'
                           }
                         >
                           {formattedText}
@@ -490,16 +490,16 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
               placeholder={isRecording ? 'আপনার কথা শুনছি...' : 'উস্তাদ এআই-কে জিজ্ঞেস করুন...'}
-              className="flex-1 px-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-base sm:text-lg lg:text-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+              className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
             />
 
             {/* Send Button */}
             <button
               type="submit"
               disabled={loading || (!inputPrompt.trim() && !attachedImage)}
-              className="px-5 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base sm:text-lg shadow-md disabled:opacity-40 transition-all flex items-center space-x-1.5"
+              className="px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md disabled:opacity-40 transition-all flex items-center space-x-1.5"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4" />
               <span className="hidden sm:inline">পাঠান</span>
             </button>
           </form>

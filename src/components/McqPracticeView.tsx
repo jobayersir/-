@@ -430,16 +430,16 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                           if (examSubmitted && mode === 'exam') return;
                           setUserAnswers((prev) => ({ ...prev, [qIdx]: optIdx }));
                         }}
-                        className={`w-full p-4 rounded-2xl border flex items-center justify-between text-base sm:text-lg transition-all text-left ${btnStyle}`}
+                        className={`w-full p-4 sm:p-5 rounded-2xl border flex items-center justify-between transition-all text-left ${btnStyle}`}
                       >
-                        <div className="flex items-center space-x-3 w-full">
-                          <span className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0">
+                        <div className="flex items-center space-x-3.5 w-full">
+                          <span className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-950 dark:text-slate-100 font-black text-sm sm:text-base flex items-center justify-center shrink-0">
                             {['ক', 'খ', 'গ', 'ঘ'][optIdx]}
                           </span>
                           <span
                             dir={isOptArabic ? 'rtl' : 'ltr'}
                             style={isOptArabic ? { fontFamily: getArabicFontFamily(arabicFont) } : undefined}
-                            className={isOptArabic ? 'font-arabic text-right w-full text-lg sm:text-xl font-bold leading-[2.1]' : 'text-left font-semibold text-base sm:text-lg leading-relaxed'}
+                            className={isOptArabic ? 'font-arabic text-right w-full text-2xl sm:text-3xl font-bold leading-[2.2]' : 'text-left font-bold text-lg sm:text-xl lg:text-2xl leading-relaxed'}
                           >
                             {formattedOpt}
                           </span>
@@ -447,8 +447,8 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
 
                         {showResult && (
                           <div className="shrink-0 ml-2">
-                            {isCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />}
-                            {isSelected && !isCorrect && <XCircle className="w-5 h-5 text-rose-600 shrink-0" />}
+                            {isCorrect && <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />}
+                            {isSelected && !isCorrect && <XCircle className="w-6 h-6 text-rose-600 shrink-0" />}
                           </div>
                         )}
                       </button>
