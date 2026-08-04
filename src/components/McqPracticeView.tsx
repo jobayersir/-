@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MCQQuestion, PostCadre, SubjectCategory } from '../types';
 import { QUESTION_BANK } from '../data/questionBank';
+import { formatArabicText, getArabicFontFamily } from '../utils/arabic';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -391,12 +392,10 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                   {q.questionArabic && (
                     <div
                       dir="rtl"
-                      style={{ fontFamily: arabicFont }}
-                      className={`text-lg sm:text-xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/60 dark:bg-emerald-950/40 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right ${
-                        !harakatVisible ? 'select-none' : ''
-                      }`}
+                      style={{ fontFamily: getArabicFontFamily(arabicFont) }}
+                      className="text-lg sm:text-xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/60 dark:bg-emerald-950/40 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right"
                     >
-                      {q.questionArabic}
+                      {formatArabicText(q.questionArabic, harakatVisible)}
                     </div>
                   )}
                 </div>
@@ -421,6 +420,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                     }
 
                     const isOptArabic = /[\u0600-\u06FF]/.test(opt);
+                    const formattedOpt = isOptArabic ? formatArabicText(opt, harakatVisible) : opt;
 
                     return (
                       <button
@@ -435,8 +435,12 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                           <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center shrink-0">
                             {['ক', 'খ', 'গ', 'ঘ'][optIdx]}
                           </span>
-                          <span dir={isOptArabic ? 'rtl' : 'ltr'} className={isOptArabic ? 'font-arabic text-right w-full text-sm' : 'text-left'}>
-                            {opt}
+                          <span
+                            dir={isOptArabic ? 'rtl' : 'ltr'}
+                            style={isOptArabic ? { fontFamily: getArabicFontFamily(arabicFont) } : undefined}
+                            className={isOptArabic ? 'font-arabic text-right w-full text-sm' : 'text-left'}
+                          >
+                            {formattedOpt}
                           </span>
                         </div>
 
@@ -532,12 +536,10 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
             {currentQ.questionArabic && (
               <p
                 dir="rtl"
-                style={{ fontFamily: arabicFont }}
-                className={`text-xl sm:text-2xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/50 dark:bg-emerald-950/30 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right ${
-                  !harakatVisible ? 'select-none' : ''
-                }`}
+                style={{ fontFamily: getArabicFontFamily(arabicFont) }}
+                className="text-xl sm:text-2xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/50 dark:bg-emerald-950/30 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right"
               >
-                {currentQ.questionArabic}
+                {formatArabicText(currentQ.questionArabic, harakatVisible)}
               </p>
             )}
           </div>
@@ -562,6 +564,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
               }
 
               const isOptArabic = /[\u0600-\u06FF]/.test(opt);
+              const formattedOpt = isOptArabic ? formatArabicText(opt, harakatVisible) : opt;
 
               return (
                 <button
@@ -573,8 +576,12 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                     <span className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
                       {['ক', 'খ', 'গ', 'ঘ'][optIdx]}
                     </span>
-                    <span dir={isOptArabic ? 'rtl' : 'ltr'} className={isOptArabic ? 'font-arabic text-right w-full' : 'text-left'}>
-                      {opt}
+                    <span
+                      dir={isOptArabic ? 'rtl' : 'ltr'}
+                      style={isOptArabic ? { fontFamily: getArabicFontFamily(arabicFont) } : undefined}
+                      className={isOptArabic ? 'font-arabic text-right w-full' : 'text-left'}
+                    >
+                      {formattedOpt}
                     </span>
                   </div>
 

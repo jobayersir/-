@@ -28,8 +28,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [selectedCadre, setSelectedCadre] = useState<PostCadre>('assistant_teacher_arabic');
   const [darkMode, setDarkMode] = useState<boolean>(false);
-  const [bengaliFont, setBengaliFont] = useState<string>('Hind Siliguri');
-  const [arabicFont, setArabicFont] = useState<string>('Amiri');
+  const [bengaliFont, setBengaliFont] = useState<string>('Noto Serif Bengali');
+  const [arabicFont, setArabicFont] = useState<string>('Noto Naskh Arabic');
   const [harakatVisible, setHarakatVisible] = useState<boolean>(true);
   const [isProfileSideSheetOpen, setIsProfileSideSheetOpen] = useState<boolean>(false);
 
@@ -211,7 +211,11 @@ export default function App() {
         )}
 
         {activeTab === 'ustad_ai' && (
-          <UstadAiView />
+          <UstadAiView
+            bengaliFont={bengaliFont}
+            arabicFont={arabicFont}
+            harakatVisible={harakatVisible}
+          />
         )}
 
         {activeTab === 'dashboard' && (

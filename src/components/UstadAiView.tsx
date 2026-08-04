@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '../types';
 import { UstadAiLogo } from './UstadAiLogo';
+import { formatArabicText, getArabicFontFamily, getBengaliFontFamily } from '../utils/arabic';
 import { 
   Send, 
   Sparkles, 
@@ -11,7 +12,6 @@ import {
   MicOff, 
   Paperclip, 
   Trash2, 
-  Lightbulb, 
   Image as ImageIcon,
   History,
   MessageSquarePlus,
@@ -19,7 +19,17 @@ import {
   RotateCcw
 } from 'lucide-react';
 
-export const UstadAiView: React.FC = () => {
+interface UstadAiViewProps {
+  bengaliFont?: string;
+  arabicFont?: string;
+  harakatVisible?: boolean;
+}
+
+export const UstadAiView: React.FC<UstadAiViewProps> = ({
+  bengaliFont = 'Noto Serif Bengali',
+  arabicFont = 'Noto Naskh Arabic',
+  harakatVisible = true,
+}) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome-1',
@@ -37,14 +47,6 @@ export const UstadAiView: React.FC = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const quickPrompts = [
-    'নাহু ও সরফের প্রধান পার্থক্য এবং এরাব নির্ধারণের সহজ কৌশল',
-    'ইলমে ফরায়েজে আসাবা ও জবুল ফুরূজের অংশ বন্টন নীতি',
-    'ফিকহুস সুন্নাহ্ বইয়ের মূল বিষয়সমূহ ও নিবন্ধনের গুরুত্বপূর্ণ অধ্যায়',
-    '১৭তম ও ১৮তম নিবন্ধনের আরবি ব্যাকরণ প্রশ্নের উদাহরণ ও সমাধান',
-    'বালাগাত ও ফাসাহাত এর পার্থক্য কী?',
-  ];
 
   const cleanNoSymbols = (str: string) => {
     return str.replace(/[*#]/g, '').trim();
@@ -74,10 +76,18 @@ export const UstadAiView: React.FC = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
+    const currentImage = attachedImage;
     setMessages((prev) => [...prev, userMsg]);
     if (!customText) setInputPrompt('');
     setAttachedImage(null);
     setLoading(true);
+
+    const history = messages
+      .filter((m) => m.id !== 'welcome-1')
+      .map((m) => ({
+        role: m.sender === 'user' ? 'user' : 'model',
+        text: m.text,
+      }));
 
     try {
       const res = await fetch('/api/ustad-ai', {
@@ -85,12 +95,18 @@ export const UstadAiView: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'chat',
-          prompt: fullPrompt,
+          prompt: textToSend || 'সংযুক্ত ছবিটি বিশ্লেষণ করুন',
+          image: currentImage,
+          history,
         }),
       });
 
       const data = await res.json();
-      const rawText = data.text || data.error || 'উস্তাদ এআই উত্তর: আপনার প্রশ্নের সমাধান প্রস্তুত করা হচ্ছে। পুনরায় চেষ্টা করুন।';
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'সার্ভার থেকে উত্তর পেতে সমস্যা হয়েছে।');
+      }
+
+      const rawText = data.text || 'উস্তাদ এআই উত্তর প্রদান করতে পারেনি। অনুগ্রহ করে আবার চেষ্টা করুন।';
       const ustadMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ustad',
@@ -99,18 +115,12 @@ export const UstadAiView: React.FC = () => {
       };
 
       setMessages((prev) => [...prev, ustadMsg]);
-    } catch (err) {
-      // Local fallback in case of direct fetch/network error
+    } catch (err: any) {
+      const errorMsg = err?.message || 'উস্তাদ এআই সংযোগে সমস্যা হয়েছে। ইন্টারনেট বা API কী চেক করে আবার চেষ্টা করুন।';
       const ustadMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ustad',
-        text: cleanNoSymbols(`উস্তাদ এআই উত্তর:
-আপনার প্রশ্নটি পাওয়া গিয়েছে: "${textToSend}"
-
-মাদ্রাসা নিবন্ধন প্রস্তুতি টিপস:
-• নাহু ও সরফ: বাক্যের শেষ বর্ণে এরাব ও সিগাহ রূপান্তরের নিয়ম ভালোভাব পড়ুন।
-• ফিকহ ও হাদিস: আল-কুরআন ও সুন্নাহর মৌলিক বিধানসমূহ থেকে নিবন্ধন পরীক্ষায় ১৫+ নম্বর আসবে।
-• তামরীন একাডেমির মডেল টেস্টে অনুশীলন চালিয়ে যান!`),
+        text: cleanNoSymbols(`উস্তাদ এআই: ${errorMsg}`),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, ustadMsg]);
@@ -193,24 +203,8 @@ export const UstadAiView: React.FC = () => {
         </div>
       </div>
 
-      {/* Suggested Prompts Pills */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
-        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 shrink-0 flex items-center">
-          <Lightbulb className="w-3.5 h-3.5 mr-1 text-amber-500" /> সাজেস্টেড প্রশ্ন:
-        </span>
-        {quickPrompts.map((qp, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSendMessage(qp)}
-            className="px-3.5 py-1.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-500 text-xs font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap shadow-xs transition-all hover:scale-[1.02] shrink-0"
-          >
-            {qp}
-          </button>
-        ))}
-      </div>
-
       {/* Main Chat Interface Container */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl flex flex-col h-[560px] overflow-hidden">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl flex flex-col h-[580px] overflow-hidden">
         
         {/* Messages Scroll Area */}
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
@@ -234,25 +228,34 @@ export const UstadAiView: React.FC = () => {
                       : 'bg-emerald-600 text-white font-medium rounded-tr-xs'
                   }`}
                 >
-                  <div className="space-y-1.5 leading-relaxed font-sans">
+                  <div className="space-y-1.5 leading-relaxed">
                     {msg.text.split('\n').map((line, lIdx) => {
                       if (!line.trim()) return <div key={lIdx} className="h-1" />;
                       const isArabicLine = /[\u0600-\u06FF]/.test(line);
+                      const formattedText = isArabicLine
+                        ? formatArabicText(line, harakatVisible)
+                        : line;
+
                       return (
                         <p
                           key={lIdx}
                           dir={isArabicLine ? 'rtl' : 'ltr'}
+                          style={{
+                            fontFamily: isArabicLine
+                              ? getArabicFontFamily(arabicFont)
+                              : getBengaliFontFamily(bengaliFont),
+                          }}
                           className={
                             isArabicLine
                               ? isUstad
-                                ? 'text-right font-arabic text-emerald-800 dark:text-emerald-300 text-base font-bold py-0.5'
-                                : 'text-right font-arabic text-white text-base font-bold py-0.5'
+                                ? 'text-right text-emerald-800 dark:text-emerald-300 text-base sm:text-lg font-bold py-0.5'
+                                : 'text-right text-white text-base sm:text-lg font-bold py-0.5'
                               : isUstad
                               ? 'text-left text-emerald-800 dark:text-emerald-300 font-bold'
                               : 'text-left text-white font-medium'
                           }
                         >
-                          {line}
+                          {formattedText}
                         </p>
                       );
                     })}
