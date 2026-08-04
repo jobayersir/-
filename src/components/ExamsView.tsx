@@ -756,7 +756,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         className="py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center space-x-1.5 transition-all active:scale-95"
                       >
                         <BarChart2 className="w-4 h-4 text-emerald-600" />
-                        <span>রিপোর্ট দেখুন</span>
+                        <span>ব্যাখ্যা সহ উত্তর</span>
                       </button>
                       <button
                         onClick={() => setViewingLeaderboardExam(exam)}
@@ -767,44 +767,33 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                       </button>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        onClick={() => handleStartExam(exam)}
-                        className={`col-span-2 py-3 rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${
-                          isPremium
-                            ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 shadow-amber-500/20'
-                            : isLive
-                            ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white shadow-rose-600/30'
-                            : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-600/20'
-                        }`}
-                      >
-                        {isPremium ? (
-                          <>
-                            <Crown className="w-4 h-4 text-slate-950" />
-                            <span>প্রিমিয়াম পরীক্ষা</span>
-                          </>
-                        ) : isLive ? (
-                          <>
-                            <Radio className="w-4 h-4 animate-pulse" />
-                            <span>লাইভ পরীক্ষা</span>
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 fill-white" />
-                            <span>ফ্রি পরীক্ষা দিন</span>
-                          </>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => setViewingLeaderboardExam(exam)}
-                        className="py-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700 font-extrabold text-xs sm:text-sm shadow-2xs flex items-center justify-center space-x-1 transition-all active:scale-95"
-                        title="এই পরীক্ষার মেধা তালিকা দেখুন"
-                      >
-                        <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
-                        <span>মেধা তালিকা</span>
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleStartExam(exam)}
+                      className={`w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95 ${
+                        isPremium
+                          ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 shadow-amber-500/20'
+                          : isLive
+                          ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white shadow-rose-600/30'
+                          : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-600/20'
+                      }`}
+                    >
+                      {isPremium ? (
+                        <>
+                          <Crown className="w-4 h-4 text-slate-950" />
+                          <span>প্রিমিয়াম পরীক্ষা দিন</span>
+                        </>
+                      ) : isLive ? (
+                        <>
+                          <Radio className="w-4 h-4 animate-pulse" />
+                          <span>লাইভ পরীক্ষা দিন</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 fill-white" />
+                          <span>ফ্রি পরীক্ষা দিন</span>
+                        </>
+                      )}
+                    </button>
                   )}
                 </div>
               </div>
@@ -931,19 +920,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                 className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
               >
                 <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Filter Pills (Matches Image: সার্বিক, আজকের সেরা, বন্ধুদের মধ্যে) */}
-            <div className="flex items-center justify-center gap-1.5 p-1 bg-slate-200 dark:bg-slate-800 rounded-xl text-xs font-bold">
-              <button className="flex-1 py-1.5 rounded-lg bg-emerald-800 text-white font-extrabold shadow-sm text-center">
-                সার্বিক
-              </button>
-              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 text-center">
-                আজকের সেরা
-              </button>
-              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 text-center">
-                বন্ধুদের মধ্যে
               </button>
             </div>
 

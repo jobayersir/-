@@ -477,6 +477,31 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                 </div>
               </div>
 
+              {/* 2 Primary Result Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-2 max-w-md mx-auto">
+                <button
+                  onClick={() => {
+                    reviewSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="py-3 rounded-2xl bg-emerald-800 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center space-x-1.5 shadow-md active:scale-95 transition-all border border-emerald-600/50"
+                >
+                  <HelpCircle className="w-4 h-4 text-emerald-300" />
+                  <span>ব্যাখ্যা সহ উত্তর</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (onOpenLeaderboard) {
+                      onOpenLeaderboard(exam);
+                    }
+                  }}
+                  className="py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center space-x-1.5 shadow-lg active:scale-95 transition-all"
+                >
+                  <Trophy className="w-4 h-4 text-slate-950" />
+                  <span>মেধা তালিকা</span>
+                </button>
+              </div>
+
             </div>
 
             {/* Statistics Grid */}
