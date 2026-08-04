@@ -1,7 +1,8 @@
 import React from 'react';
+const logoImg = '/src/assets/images/tamreen_academy_logo_1785821158176.jpg';
 
 interface LogoProps {
-  variant?: 'horizontal' | 'stacked' | 'icon';
+  variant?: 'horizontal' | 'stacked' | 'icon' | 'image';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   showSubtitle?: boolean;
@@ -15,100 +16,146 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   // Size scaling multipliers
   const sizeMap = {
-    sm: { icon: 'w-7 h-7', text: 'text-base', subText: 'text-[9px]', gap: 'space-x-2' },
-    md: { icon: 'w-10 h-10 sm:w-12 sm:h-12', text: 'text-xl sm:text-2xl', subText: 'text-[10px] sm:text-xs', gap: 'space-x-2.5 sm:space-x-3' },
+    sm: { icon: 'w-8 h-8', text: 'text-base', subText: 'text-[9px]', gap: 'space-x-2' },
+    md: { icon: 'w-11 h-11 sm:w-13 sm:h-13', text: 'text-xl sm:text-2xl', subText: 'text-[10px] sm:text-xs', gap: 'space-x-2.5 sm:space-x-3' },
     lg: { icon: 'w-16 h-16 sm:w-20 sm:h-20', text: 'text-3xl sm:text-4xl', subText: 'text-sm sm:text-base', gap: 'space-x-4' },
-    xl: { icon: 'w-24 h-24 sm:w-28 sm:h-28', text: 'text-4xl sm:text-5xl', subText: 'text-base sm:text-lg', gap: 'space-x-5' },
+    xl: { icon: 'w-24 h-24 sm:w-32 sm:h-32', text: 'text-4xl sm:text-5xl', subText: 'text-base sm:text-lg', gap: 'space-x-5' },
   };
 
   const { icon: iconSize, text: textSize, subText: subTextSize, gap } = sizeMap[size];
 
-  // SVG Emblem component for Tamreen Academy
-  const Emblem = ({ svgClass }: { svgClass: string }) => (
+  // Precision Square Kufic (الخط الكوفي المربع) SVG Emblem for Tamreen Academy
+  const KuficEmblem = ({ svgClass }: { svgClass: string }) => (
     <svg
-      viewBox="0 0 200 200"
+      viewBox="0 0 200 210"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={`${svgClass} transition-colors duration-300`}
+      className={`${svgClass} transition-all duration-300 drop-shadow-sm`}
     >
-      {/* Dome Apex & Arch */}
+      {/* 1. Islamic Pointed Dome Arch Outer Contour */}
       <path
-        d="M100 20 C125 42 145 65 145 95 V125 H55 V95 C55 65 75 42 100 20 Z"
-        className="fill-emerald-800 dark:fill-emerald-400 stroke-emerald-900 dark:stroke-emerald-300"
-        strokeWidth="4"
-      />
-      <path
-        d="M100 28 C120 48 137 68 137 95 V120 H63 V95 C63 68 80 48 100 28 Z"
-        className="fill-white dark:fill-slate-900"
+        d="M100 12 C128 36 156 62 156 102 V132 C156 135 154 137 151 137 H49 C46 137 44 135 44 132 V102 C44 62 72 36 100 12 Z"
+        className="stroke-emerald-800 dark:stroke-emerald-400 fill-white dark:fill-slate-900"
+        strokeWidth="7"
+        strokeLinejoin="round"
       />
 
-      {/* Gold Crescent Moon & Star inside top dome */}
+      {/* Inner Arch Accent */}
+      <path
+        d="M100 20 C123 42 147 66 147 102 V130 H53 V102 C53 66 77 42 100 20 Z"
+        className="stroke-emerald-900/20 dark:stroke-emerald-400/30"
+        strokeWidth="2"
+        fill="none"
+      />
+
+      {/* 2. Gold Crescent Moon & 5-Point Star inside Top Dome */}
       <g className="fill-amber-500 dark:fill-amber-400">
-        <path d="M100 40 C95 40 90 44 90 50 C90 56 95 60 100 60 C97 58 95 54 95 50 C95 46 97 42 100 40 Z" />
-        <polygon points="103,45 104,48 107,48 105,50 106,53 103,51 100,53 101,50 99,48 102,48" />
+        {/* Crescent facing right */}
+        <path d="M100 32 C93 32 87 37 87 45 C87 53 93 58 100 58 C96 55 93 50 93 45 C93 40 96 35 100 32 Z" />
+        {/* Star */}
+        <polygon points="105,40 106.5,44 111,44 107.5,46.5 109,51 105,48 101,51 102.5,46.5 99,44 103.5,44" />
       </g>
 
-      {/* Arabic Calligraphy "تمرين" Frame Box inside Dome */}
+      {/* 3. Square Kufic Frame Box (إطار الكوفي المربع) */}
       <rect
-        x="68"
-        y="65"
-        width="64"
-        height="36"
+        x="52"
+        y="62"
+        width="96"
+        height="56"
         rx="2"
-        className="fill-emerald-800 dark:fill-emerald-400"
+        className="stroke-emerald-800 dark:stroke-emerald-400 fill-white dark:fill-slate-900"
+        strokeWidth="4"
       />
-      
-      {/* Calligraphy text inside box */}
-      <text
-        x="100"
-        y="90"
-        textAnchor="middle"
-        className="fill-amber-300 dark:fill-amber-200 font-arabic font-bold text-[26px]"
-        style={{ fontFamily: "'Amiri', 'Noto Naskh Arabic', serif" }}
-      >
-        تمرين
-      </text>
 
-      {/* Open Book Pages at Base */}
+      {/* SQUARE KUFIC CALLIGRAPHY: "تمرين" (Right to Left) */}
+      <g className="fill-emerald-800 dark:fill-emerald-400">
+        {/* --- Letter 'ت' (Far Right) --- */}
+        {/* Base and side walls */}
+        <path d="M136 74 H142 V106 H130 V98 H136 V74 Z" />
+        {/* Two Gold Dots above 'ت' */}
+        <rect x="131" y="68" width="4.5" height="4.5" className="fill-amber-500 dark:fill-amber-400" />
+        <rect x="137.5" y="68" width="4.5" height="4.5" className="fill-amber-500 dark:fill-amber-400" />
+
+        {/* --- Letter 'م' (Middle-Right) --- */}
+        {/* Square loop */}
+        <path d="M116 82 H126 V98 H116 V82 Z M121 87 H121.1 V93 H121 Z" />
+        <rect x="119" y="87" width="3" height="6" className="fill-white dark:fill-slate-900" />
+        {/* Bottom connecting bar */}
+        <path d="M110 98 H130 V106 H110 V98 Z" />
+
+        {/* --- Letter 'ر' (Middle) --- */}
+        <path d="M98 82 H104 V106 H90 V98 H98 V82 Z" />
+
+        {/* --- Letter 'ي' (Middle-Left) --- */}
+        <path d="M76 82 H82 V106 H68 V98 H76 V82 Z" />
+        {/* Two Gold Dots below 'ي' */}
+        <rect x="70" y="110" width="4.5" height="4.5" className="fill-amber-500 dark:fill-amber-400" />
+        <rect x="76.5" y="110" width="4.5" height="4.5" className="fill-amber-500 dark:fill-amber-400" />
+
+        {/* --- Letter 'ن' (Far Left) --- */}
+        <path d="M56 74 H62 V106 H50 V74 H56 V98 H56 Z" />
+        {/* One Gold Dot inside 'ن' bowl */}
+        <rect x="53" y="84" width="5" height="5" className="fill-amber-500 dark:fill-amber-400" />
+      </g>
+
+      {/* 4. Open Book at Base (الكتاب المفتوح) */}
       <g>
-        {/* Left Green Book Cover */}
+        {/* Left Book Cover */}
         <path
-          d="M100 155 C70 142 40 148 20 158 V132 C40 122 70 120 100 135 Z"
+          d="M100 178 C65 162 30 168 10 180 V150 C30 138 65 135 100 152 Z"
           className="fill-emerald-900 dark:fill-emerald-500"
         />
-        {/* Right Green Book Cover */}
+        {/* Right Book Cover */}
         <path
-          d="M100 155 C130 142 160 148 180 158 V132 C160 122 130 120 100 135 Z"
+          d="M100 178 C135 162 170 168 190 180 V150 C170 138 135 135 100 152 Z"
           className="fill-emerald-900 dark:fill-emerald-500"
         />
 
-        {/* Inner Gold Page Leaves */}
+        {/* Inner Gold Pages */}
         <path
-          d="M100 150 C72 137 42 142 24 150 V138 C42 130 72 128 100 140 Z"
+          d="M100 171 C68 156 34 161 14 171 V158 C34 148 68 145 100 159 Z"
           className="fill-amber-500 dark:fill-amber-400"
         />
         <path
-          d="M100 150 C128 137 158 142 176 150 V138 C158 130 128 128 100 140 Z"
+          d="M100 171 C132 156 166 161 186 171 V158 C166 148 132 145 100 159 Z"
           className="fill-amber-500 dark:fill-amber-400"
         />
 
-        {/* Central Spine Line */}
-        <line
-          x1="100"
-          y1="130"
-          x2="100"
-          y2="157"
-          className="stroke-emerald-950 dark:stroke-emerald-200"
-          strokeWidth="3"
+        {/* Top Page Highlights */}
+        <path
+          d="M100 166 C70 152 38 156 18 165 V156 C38 147 70 144 100 157 Z"
+          className="fill-emerald-100 dark:fill-slate-800"
+        />
+        <path
+          d="M100 166 C130 152 162 156 182 165 V156 C162 147 130 144 100 157 Z"
+          className="fill-emerald-100 dark:fill-slate-800"
+        />
+
+        {/* Book Spine Center */}
+        <path
+          d="M98 148 H102 V180 H98 Z"
+          className="fill-emerald-950 dark:fill-emerald-300"
         />
       </g>
     </svg>
   );
 
+  if (variant === 'image') {
+    return (
+      <div className={`inline-flex items-center justify-center ${className}`}>
+        <img
+          src={logoImg}
+          alt="TAMREEN ACADEMY LOGO"
+          className={`object-contain rounded-lg ${iconSize} mix-blend-multiply dark:mix-blend-normal dark:bg-white/90 dark:p-1`}
+        />
+      </div>
+    );
+  }
+
   if (variant === 'icon') {
     return (
       <div className={`inline-flex items-center justify-center ${className}`}>
-        <Emblem svgClass={iconSize} />
+        <KuficEmblem svgClass={iconSize} />
       </div>
     );
   }
@@ -116,26 +163,26 @@ export const Logo: React.FC<LogoProps> = ({
   if (variant === 'stacked') {
     return (
       <div className={`flex flex-col items-center text-center ${className}`}>
-        <Emblem svgClass={iconSize} />
+        <KuficEmblem svgClass={iconSize} />
         <div className="mt-2 flex flex-col items-center">
           <span
-            className={`font-black tracking-wider text-emerald-900 dark:text-emerald-300 uppercase ${textSize}`}
-            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+            className={`font-black tracking-widest text-emerald-900 dark:text-emerald-300 uppercase ${textSize}`}
+            style={{ fontFamily: "system-ui, -apple-system, sans-serif", letterSpacing: '0.08em' }}
           >
             TAMREEN
           </span>
-          <div className="flex items-center space-x-2 mt-0.5 w-full justify-center">
-            <span className="h-[1.5px] w-6 bg-amber-500 dark:bg-amber-400" />
+          <div className="flex items-center space-x-2 mt-1 w-full justify-center">
+            <span className="h-[2px] w-8 bg-amber-500 dark:bg-amber-400" />
             <span
-              className={`font-semibold tracking-[0.25em] text-amber-600 dark:text-amber-400 uppercase ${subTextSize}`}
+              className={`font-extrabold tracking-[0.3em] text-amber-600 dark:text-amber-400 uppercase ${subTextSize}`}
             >
               ACADEMY
             </span>
-            <span className="h-[1.5px] w-6 bg-amber-500 dark:bg-amber-400" />
+            <span className="h-[2px] w-8 bg-amber-500 dark:bg-amber-400" />
           </div>
           {showSubtitle && (
-            <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1">
-              তামরীন একাডেমি • শিক্ষায় উৎকর্ষ
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5">
+              তামরীন একাডেমি • মাদ্রাসা শিক্ষক নিবন্ধন প্রস্তুতি
             </span>
           )}
         </div>
@@ -143,27 +190,27 @@ export const Logo: React.FC<LogoProps> = ({
     );
   }
 
-  // Horizontal variant (default)
+  // Horizontal variant (default for Header & Footer)
   return (
     <div className={`inline-flex items-center ${gap} ${className}`}>
       <div className="flex-shrink-0">
-        <Emblem svgClass={iconSize} />
+        <KuficEmblem svgClass={iconSize} />
       </div>
       <div className="flex flex-col justify-center">
         <span
-          className={`font-extrabold tracking-tight text-emerald-900 dark:text-emerald-300 leading-none uppercase ${textSize}`}
-          style={{ letterSpacing: '0.04em' }}
+          className={`font-black tracking-wider text-emerald-950 dark:text-emerald-300 leading-none uppercase ${textSize}`}
+          style={{ letterSpacing: '0.06em' }}
         >
           TAMREEN
         </span>
-        <div className="flex items-center space-x-1.5 mt-1">
-          <span className="h-[1.5px] flex-1 bg-amber-500/80 dark:bg-amber-400/80 min-w-[12px]" />
+        <div className="flex items-center space-x-1.5 mt-1.5">
+          <span className="h-[1.5px] w-3.5 bg-amber-500 dark:bg-amber-400" />
           <span
-            className={`font-bold tracking-[0.25em] text-amber-600 dark:text-amber-400 uppercase leading-none ${subTextSize}`}
+            className={`font-bold tracking-[0.28em] text-amber-600 dark:text-amber-400 uppercase leading-none ${subTextSize}`}
           >
             ACADEMY
           </span>
-          <span className="h-[1.5px] flex-1 bg-amber-500/80 dark:bg-amber-400/80 min-w-[12px]" />
+          <span className="h-[1.5px] w-3.5 bg-amber-500 dark:bg-amber-400" />
         </div>
       </div>
     </div>
