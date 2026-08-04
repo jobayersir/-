@@ -203,7 +203,7 @@ export default function App() {
         )}
 
         {activeTab === 'exams' && (
-          <ExamsView mcqQuestions={QUESTION_BANK} />
+          <ExamsView mcqQuestions={QUESTION_BANK} onOpenLeaderboard={() => setActiveTab('leaderboard')} />
         )}
 
         {activeTab === 'courses' && (

@@ -1,0 +1,481 @@
+import React, { useState } from 'react';
+import { 
+  Trophy, 
+  Crown, 
+  Flame, 
+  Clock, 
+  Award, 
+  Zap, 
+  CheckCircle2, 
+  Sparkles,
+  ArrowUp,
+  Medal,
+  Calendar,
+  ChevronRight,
+  UserCheck
+} from 'lucide-react';
+import { UserProfileData, NavTab } from '../types';
+
+interface LeaderboardViewProps {
+  user?: UserProfileData;
+  onTabChange?: (tab: NavTab) => void;
+  onBackToExam?: () => void;
+}
+
+export interface LeaderboardUser {
+  rank: number;
+  name: string;
+  avatar?: string;
+  cadre: string;
+  score: number;
+  maxScore: number;
+  accuracyPercentage: number;
+  timeSpentMinutes: number;
+  streakDays: number;
+  location: string;
+  isCurrentUser?: boolean;
+}
+
+export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ 
+  user, 
+  onTabChange,
+  onBackToExam 
+}) => {
+  const [filterPeriod, setFilterPeriod] = useState<'today' | 'weekly' | 'monthly' | 'allTime'>('today');
+
+  // Top 3 Podium Mock Data for Tamreen Academy
+  const topWinners: Record<string, LeaderboardUser[]> = {
+    today: [
+      {
+        rank: 1,
+        name: 'মাওলানা হাফেজ আব্দুল মালেক',
+        cadre: 'প্রভাষক (আরবি)',
+        score: 98,
+        maxScore: 100,
+        accuracyPercentage: 98,
+        timeSpentMinutes: 38,
+        streakDays: 24,
+        location: 'ঢাকা'
+      },
+      {
+        rank: 2,
+        name: 'মুফতি তানভীর আহমেদ',
+        cadre: 'সহকারী শিক্ষক (আরবি)',
+        score: 95,
+        maxScore: 100,
+        accuracyPercentage: 95,
+        timeSpentMinutes: 41,
+        streakDays: 18,
+        location: 'চট্টগ্রাম'
+      },
+      {
+        rank: 3,
+        name: 'কারি মোশতাক মাহমুদ',
+        cadre: 'সহকারী মৌলভী',
+        score: 92,
+        maxScore: 100,
+        accuracyPercentage: 92,
+        timeSpentMinutes: 44,
+        streakDays: 15,
+        location: 'সিলেট'
+      }
+    ],
+    weekly: [
+      {
+        rank: 1,
+        name: 'মুফতি তানভীর আহমেদ',
+        cadre: 'সহকারী শিক্ষক (আরবি)',
+        score: 485,
+        maxScore: 500,
+        accuracyPercentage: 97,
+        timeSpentMinutes: 210,
+        streakDays: 30,
+        location: 'চট্টগ্রাম'
+      },
+      {
+        rank: 2,
+        name: 'মাওলানা হাফেজ আব্দুল মালেক',
+        cadre: 'প্রভাষক (আরবি)',
+        score: 478,
+        maxScore: 500,
+        accuracyPercentage: 95,
+        timeSpentMinutes: 205,
+        streakDays: 24,
+        location: 'ঢাকা'
+      },
+      {
+        rank: 3,
+        name: 'হাফেজ ওবায়দুল ইসলাম',
+        cadre: 'ইবতেদায়ী প্রধান',
+        score: 462,
+        maxScore: 500,
+        accuracyPercentage: 92,
+        timeSpentMinutes: 225,
+        streakDays: 19,
+        location: 'রাজশাহী'
+      }
+    ],
+    monthly: [
+      {
+        rank: 1,
+        name: 'মাওলানা হাফেজ আব্দুল মালেক',
+        cadre: 'প্রভাষক (আরবি)',
+        score: 1920,
+        maxScore: 2000,
+        accuracyPercentage: 96,
+        timeSpentMinutes: 840,
+        streakDays: 45,
+        location: 'ঢাকা'
+      },
+      {
+        rank: 2,
+        name: 'কারি মোশতাক মাহমুদ',
+        cadre: 'সহকারী মৌলভী',
+        score: 1880,
+        maxScore: 2000,
+        accuracyPercentage: 94,
+        timeSpentMinutes: 890,
+        streakDays: 38,
+        location: 'সিলেট'
+      },
+      {
+        rank: 3,
+        name: 'মুফতি তানভীর আহমেদ',
+        cadre: 'সহকারী শিক্ষক (আরবি)',
+        score: 1845,
+        maxScore: 2000,
+        accuracyPercentage: 92,
+        timeSpentMinutes: 860,
+        streakDays: 30,
+        location: 'চট্টগ্রাম'
+      }
+    ],
+    allTime: [
+      {
+        rank: 1,
+        name: 'মাওলানা হাফেজ আব্দুল মালেক',
+        cadre: 'প্রভাষক (আরবি)',
+        score: 5420,
+        maxScore: 5600,
+        accuracyPercentage: 97,
+        timeSpentMinutes: 2400,
+        streakDays: 120,
+        location: 'ঢাকা'
+      },
+      {
+        rank: 2,
+        name: 'মুফতি তানভীর আহমেদ',
+        cadre: 'সহকারী শিক্ষক (আরবি)',
+        score: 5180,
+        maxScore: 5600,
+        accuracyPercentage: 95,
+        timeSpentMinutes: 2510,
+        streakDays: 95,
+        location: 'চট্টগ্রাম'
+      },
+      {
+        rank: 3,
+        name: 'কারি মোশতাক মাহমুদ',
+        cadre: 'সহকারী মৌলভী',
+        score: 4950,
+        maxScore: 5600,
+        accuracyPercentage: 93,
+        timeSpentMinutes: 2480,
+        streakDays: 88,
+        location: 'সিলেট'
+      }
+    ]
+  };
+
+  // Current User Card Info
+  const currentUser: LeaderboardUser = {
+    rank: 15,
+    name: user?.name || 'মাওলানা মোঃ আব্দুল্লাহ (আপনি)',
+    cadre: 'সহকারী শিক্ষক (আরবি)',
+    score: 84,
+    maxScore: 100,
+    accuracyPercentage: 84,
+    timeSpentMinutes: 52,
+    streakDays: user?.streakDays || 14,
+    location: 'ময়মনসিংহ',
+    isCurrentUser: true
+  };
+
+  // List of other ranked users (4th to 12th)
+  const remainingUsers: LeaderboardUser[] = [
+    { rank: 4, name: 'হাফেজ মাওলানা সিফাত উল্লাহ', cadre: 'লেকচারার ফিকহ', score: 90, maxScore: 100, accuracyPercentage: 90, timeSpentMinutes: 45, streakDays: 12, location: 'কুমিল্লা' },
+    { rank: 5, name: 'মাওলানা উবায়দুল ইসলাম', cadre: 'সহকারী মৌলভী', score: 89, maxScore: 100, accuracyPercentage: 89, timeSpentMinutes: 46, streakDays: 14, location: 'রাজশাহী' },
+    { rank: 6, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: 88, maxScore: 100, accuracyPercentage: 88, timeSpentMinutes: 48, streakDays: 11, location: 'রংপুর' },
+    { rank: 7, name: 'কারী কামরুল হাসান', cadre: 'ইবতেদায়ী প্রধান', score: 87, maxScore: 100, accuracyPercentage: 87, timeSpentMinutes: 49, streakDays: 10, location: 'বরিশাল' },
+    { rank: 8, name: 'হাফেজ তরিকুল ইসলাম', cadre: 'সহকারী শিক্ষক (আরবি)', score: 86, maxScore: 100, accuracyPercentage: 86, timeSpentMinutes: 50, streakDays: 9, location: 'খুলনা' },
+    { rank: 9, name: 'মাওলানা মাহমুদুল হাসান', cadre: 'সহকারী মৌলভী', score: 85, maxScore: 100, accuracyPercentage: 85, timeSpentMinutes: 51, streakDays: 8, location: 'গাজীপুর' },
+    { rank: 10, name: 'মুফতি শফিকুল ইসলাম', cadre: 'প্রভাষক হাদিস', score: 85, maxScore: 100, accuracyPercentage: 85, timeSpentMinutes: 51, streakDays: 15, location: 'ময়মনসিংহ' },
+    { rank: 11, name: 'হাফেজ জহিরুল ইসলাম', cadre: 'সহকারী শিক্ষক', score: 84, maxScore: 100, accuracyPercentage: 84, timeSpentMinutes: 53, streakDays: 7, location: 'বগুড়া' },
+    { rank: 12, name: 'কারি নোমান আহমেদ', cadre: 'ইবতেদায়ী কারী', score: 83, maxScore: 100, accuracyPercentage: 83, timeSpentMinutes: 54, streakDays: 6, location: 'নোয়াখালী' },
+  ];
+
+  const currentPodium = topWinners[filterPeriod] || topWinners.today;
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6 pb-24 animate-in fade-in duration-300">
+      
+      {/* ========================================================= */}
+      {/* HEADER BANNER                                             */}
+      {/* ========================================================= */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-950 text-white p-6 sm:p-8 shadow-2xl border border-emerald-800/60">
+        <div className="absolute -right-12 -bottom-12 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-12 -top-12 w-52 h-52 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="space-y-2 text-center sm:text-left">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-900/80 border border-amber-400/40 text-amber-300 text-xs font-bold shadow-sm">
+              <Trophy className="w-4 h-4 text-amber-400 animate-pulse" />
+              <span>তামরীন একাডেমি জাতীয় মেধা তালিকা</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              অল-বাংলাদেশ মেধা তালিকা <span className="text-amber-400 font-arabic font-extrabold text-xl">(قائمة المتفوقين)</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-emerald-100/90 font-medium">
+              ১৮তম শিক্ষক নিবন্ধন প্রিপারেশনের সেরা পরীক্ষার্থীদের তালিকা
+            </p>
+          </div>
+
+          {onBackToExam && (
+            <button
+              onClick={onBackToExam}
+              className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition-all active:scale-95 shrink-0"
+            >
+              পরীক্ষায় ফিরে যান
+            </button>
+          )}
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="relative z-10 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-6 p-1.5 bg-emerald-900/60 backdrop-blur-md rounded-2xl border border-emerald-700/50 w-full overflow-x-auto">
+          {[
+            { id: 'today', label: 'আজকে' },
+            { id: 'weekly', label: 'এই সপ্তাহে' },
+            { id: 'monthly', label: 'এই মাসে' },
+            { id: 'allTime', label: 'সর্বকালের' }
+          ].map((tab) => {
+            const isActive = filterPeriod === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setFilterPeriod(tab.id as any)}
+                className={`flex-1 min-w-[70px] sm:min-w-[90px] py-2 rounded-xl text-xs font-extrabold transition-all text-center ${
+                  isActive 
+                    ? 'bg-amber-400 text-slate-950 shadow-md scale-105' 
+                    : 'text-emerald-100 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* TOP 3 WINNERS PODIUM DESIGN                               */}
+      {/* ========================================================= */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-6">
+        <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 text-center flex items-center justify-center space-x-2">
+          <Sparkles className="w-5 h-5 text-amber-500" />
+          <span>শীর্ষ ৩ বিজয়ী (Top Performers)</span>
+        </h2>
+
+        {/* Podium Layout */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 items-end pt-6 pb-2 max-w-2xl mx-auto">
+          
+          {/* 🥈 SILVER - Rank 2 (Left) */}
+          <div className="flex flex-col items-center">
+            <div className="relative mb-2">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-slate-300 via-slate-100 to-slate-400 p-1 shadow-lg flex items-center justify-center">
+                <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center text-slate-200 font-extrabold text-lg sm:text-xl">
+                  {currentPodium[1]?.name.charAt(0) || '2'}
+                </div>
+              </div>
+              <span className="absolute -bottom-2 inset-x-0 mx-auto w-6 h-6 rounded-full bg-slate-300 text-slate-950 font-black text-xs flex items-center justify-center shadow-md border border-white">
+                🥈
+              </span>
+            </div>
+            
+            <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 text-center line-clamp-1 mt-2">
+              {currentPodium[1]?.name}
+            </span>
+            <span className="text-[10px] text-slate-500 font-semibold">{currentPodium[1]?.location}</span>
+            <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+              {currentPodium[1]?.score} পয়েন্ট
+            </span>
+
+            <div className="w-full mt-3 h-24 sm:h-28 rounded-t-2xl bg-gradient-to-t from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700/80 border border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center p-2 shadow-inner">
+              <span className="text-xl sm:text-2xl font-black text-slate-600 dark:text-slate-300">২</span>
+              <span className="text-[10px] font-bold text-slate-500">রানার-আপ</span>
+            </div>
+          </div>
+
+          {/* 🥇 GOLD - Rank 1 (Center - Tallest) */}
+          <div className="flex flex-col items-center -mt-6">
+            <div className="relative mb-2">
+              <div className="absolute -top-6 inset-x-0 mx-auto flex justify-center animate-bounce">
+                <Crown className="w-7 h-7 text-amber-400 drop-shadow-md" />
+              </div>
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-1.5 shadow-2xl flex items-center justify-center">
+                <div className="w-full h-full rounded-2xl bg-slate-950 flex items-center justify-center text-amber-300 font-black text-xl sm:text-2xl">
+                  {currentPodium[0]?.name.charAt(0) || '1'}
+                </div>
+              </div>
+              <span className="absolute -bottom-2 inset-x-0 mx-auto w-7 h-7 rounded-full bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center shadow-lg border-2 border-white">
+                🥇
+              </span>
+            </div>
+
+            <span className="text-xs sm:text-base font-black text-slate-950 dark:text-slate-100 text-center line-clamp-1 mt-2">
+              {currentPodium[0]?.name}
+            </span>
+            <span className="text-[11px] text-amber-600 dark:text-amber-400 font-bold">{currentPodium[0]?.cadre}</span>
+            <span className="text-sm font-black text-amber-500 mt-0.5">
+              {currentPodium[0]?.score} পয়েন্ট
+            </span>
+
+            <div className="w-full mt-3 h-32 sm:h-36 rounded-t-2xl bg-gradient-to-t from-amber-500/30 via-amber-400/20 to-amber-300/10 dark:from-amber-900/40 dark:to-slate-800 border-2 border-amber-400/50 flex flex-col items-center justify-center p-2 shadow-lg">
+              <span className="text-2xl sm:text-3xl font-black text-amber-500">১</span>
+              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400">জাতীয় চ্যাম্পিয়ন</span>
+            </div>
+          </div>
+
+          {/* 🥉 BRONZE - Rank 3 (Right) */}
+          <div className="flex flex-col items-center">
+            <div className="relative mb-2">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-amber-700 via-amber-600 to-amber-800 p-1 shadow-lg flex items-center justify-center">
+                <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center text-amber-200 font-extrabold text-lg sm:text-xl">
+                  {currentPodium[2]?.name.charAt(0) || '3'}
+                </div>
+              </div>
+              <span className="absolute -bottom-2 inset-x-0 mx-auto w-6 h-6 rounded-full bg-amber-700 text-white font-black text-xs flex items-center justify-center shadow-md border border-white">
+                🥉
+              </span>
+            </div>
+
+            <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 text-center line-clamp-1 mt-2">
+              {currentPodium[2]?.name}
+            </span>
+            <span className="text-[10px] text-slate-500 font-semibold">{currentPodium[2]?.location}</span>
+            <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+              {currentPodium[2]?.score} পয়েন্ট
+            </span>
+
+            <div className="w-full mt-3 h-20 sm:h-24 rounded-t-2xl bg-gradient-to-t from-amber-900/20 to-slate-100 dark:from-slate-800 dark:to-slate-700/80 border border-amber-800/30 flex flex-col items-center justify-center p-2 shadow-inner">
+              <span className="text-xl sm:text-2xl font-black text-amber-700 dark:text-amber-400">৩</span>
+              <span className="text-[10px] font-bold text-slate-500">৩য় স্থান</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* CURRENT USER HIGHLIGHTED CARD (My Rank with Green Glow)   */}
+      {/* ========================================================= */}
+      <div className="relative p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-600/10 via-emerald-500/15 to-teal-500/10 dark:from-emerald-950/90 dark:to-teal-950/90 border-2 border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.35)] backdrop-blur-md transition-all">
+        
+        <div className="flex items-center justify-between mb-3 border-b border-emerald-500/30 pb-2">
+          <div className="flex items-center space-x-2">
+            <UserCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+              আপনার অবস্থান (MY RANK)
+            </span>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-emerald-600 text-white font-black text-xs shadow-sm">
+            জাতীয় অবস্থান: #{currentUser.rank}
+          </span>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-4 w-full sm:w-auto">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xl flex items-center justify-center shadow-lg border-2 border-emerald-300 shrink-0">
+              #{currentUser.rank}
+            </div>
+            <div>
+              <h3 className="font-extrabold text-base sm:text-lg text-slate-950 dark:text-slate-100 flex items-center space-x-2">
+                <span>{currentUser.name}</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-[10px] font-bold">
+                  আপনি
+                </span>
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
+                {currentUser.cadre} • {currentUser.location}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-emerald-500/20 pt-2 sm:pt-0">
+            <div className="text-center px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-200 dark:border-emerald-800">
+              <span className="text-[10px] text-slate-400 block font-semibold">প্রাপ্ত নম্বর</span>
+              <strong className="text-emerald-700 dark:text-emerald-300 text-sm font-black">{currentUser.score}/{currentUser.maxScore}</strong>
+            </div>
+            <div className="text-center px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-200 dark:border-emerald-800">
+              <span className="text-[10px] text-slate-400 block font-semibold">সময়</span>
+              <strong className="text-slate-900 dark:text-slate-100 text-sm font-black">{currentUser.timeSpentMinutes} মিনিট</strong>
+            </div>
+            <div className="text-center px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-200 dark:border-emerald-800">
+              <span className="text-[10px] text-slate-400 block font-semibold">স্ট্রিক</span>
+              <strong className="text-amber-500 text-sm font-black">{currentUser.streakDays} দিন 🔥</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* REMAINING USERS LIST                                      */}
+      {/* ========================================================= */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
+        <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center justify-between">
+          <span>অন্যান্য পরীক্ষার্থীদের র‍্যাঙ্কিং</span>
+          <span className="text-xs font-normal text-slate-500">মোট পরীক্ষার্থী: ৪,৮৫০+</span>
+        </h3>
+
+        <div className="space-y-2.5">
+          {remainingUsers.map((u) => (
+            <div
+              key={u.rank}
+              className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/80 flex items-center justify-between hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <div className="flex items-center space-x-3.5">
+                <span className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-extrabold text-xs flex items-center justify-center shrink-0">
+                  #{u.rank}
+                </span>
+
+                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-sm flex items-center justify-center shrink-0">
+                  {u.name.charAt(0)}
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-950 dark:text-slate-100 leading-snug">
+                    {u.name}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    {u.cadre} • {u.location}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4 text-right">
+                <div>
+                  <span className="font-black text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 block">
+                    {u.score} পয়েন্ট
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-semibold block">
+                    সময়: {u.timeSpentMinutes} মি.
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+};

@@ -1,5 +1,7 @@
 import React from 'react';
 import { UserProfileData, NavTab, PostCadre } from '../types';
+import { LeaderboardView } from './LeaderboardView';
+export { LeaderboardView };
 import { 
   User, 
   Bookmark, 
@@ -145,48 +147,7 @@ export const WrongQuestionsView: React.FC<ViewProps> = ({ onTabChange }) => (
   </div>
 );
 
-// 4. Leaderboard View
-export const LeaderboardView: React.FC = () => (
-  <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
-    <div className="flex items-center space-x-2">
-      <Trophy className="w-6 h-6 text-amber-500" />
-      <h2 className="font-extrabold text-xl text-slate-900 dark:text-slate-100">
-        তামরীন একাডেমি জাতীয় মেধা তালিকা (Leaderboard)
-      </h2>
-    </div>
-
-    <div className="space-y-2">
-      {[
-        { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', location: 'ঢাকা', score: '২,৮৪০ পয়েন্ট', bg: 'from-amber-400 to-amber-600' },
-        { rank: 2, name: 'মুফতি তানভীর আহমেদ', location: 'চট্টগ্রাম', score: '২,৭১০ পয়েন্ট', bg: 'from-slate-300 to-slate-500' },
-        { rank: 3, name: 'কারি মোশতাক মাহমুদ', location: 'সিলেট', score: '২,৬৫০ পয়েন্ট', bg: 'from-amber-600 to-amber-800' },
-        { rank: 4, name: 'মাওলানা মোঃ আব্দুল্লাহ (আপনি)', location: 'ময়মনসিংহ', score: '২,৪২০ পয়েন্ট', bg: 'from-emerald-500 to-teal-700' },
-        { rank: 5, name: 'মাওলানা উবায়দুল ইসলাম', location: 'রাজশাহী', score: '২,৩৮০ পয়েন্ট', bg: 'from-slate-400 to-slate-600' },
-      ].map((user) => (
-        <div
-          key={user.rank}
-          className={`flex items-center justify-between p-4 rounded-2xl border ${
-            user.rank === 4
-              ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-300 dark:border-emerald-700 font-bold'
-              : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/50 dark:border-slate-700'
-          }`}
-        >
-          <div className="flex items-center space-x-3">
-            <span className={`w-8 h-8 rounded-xl bg-gradient-to-tr ${user.bg} text-slate-950 font-extrabold text-xs flex items-center justify-center shadow-xs`}>
-              #{user.rank}
-            </span>
-            <div>
-              <h3 className="font-bold text-xs text-slate-900 dark:text-slate-100">{user.name}</h3>
-              <span className="text-[10px] text-slate-400">{user.location}</span>
-            </div>
-          </div>
-
-          <span className="font-black text-xs text-amber-600 dark:text-amber-400">{user.score}</span>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+// 4. Leaderboard View is imported from ./LeaderboardView above
 
 // 5. Premium Membership View
 export const PremiumView: React.FC = () => (
