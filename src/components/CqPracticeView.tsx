@@ -121,14 +121,14 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
                 <span className="text-xs text-slate-500">{selectedQuestion.yearTag}</span>
               </div>
 
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-950 dark:text-slate-50 leading-relaxed">
                 {selectedQuestion.title}
               </h3>
 
               {selectedQuestion.titleArabic && (
                 <p
                   style={{ fontFamily: arabicFont }}
-                  className="font-arabic text-xl text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/40"
+                  className="font-arabic text-2xl sm:text-3xl font-bold text-emerald-950 dark:text-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/40 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 leading-[2.2]"
                 >
                   {selectedQuestion.titleArabic}
                 </p>

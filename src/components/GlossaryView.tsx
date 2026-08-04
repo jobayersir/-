@@ -75,13 +75,13 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({ arabicFont, onBookma
           >
             <div className="flex items-start justify-between">
               <div>
-                <p style={{ fontFamily: arabicFont }} className="text-2xl font-bold text-emerald-800 dark:text-emerald-300 font-arabic">
+                <p style={{ fontFamily: arabicFont }} className="text-3xl sm:text-4xl font-bold text-emerald-950 dark:text-emerald-200 font-arabic leading-[2.2]">
                   {term.termArabic}
                 </p>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mt-1">
+                <h4 className="text-base sm:text-lg font-bold text-slate-950 dark:text-slate-50 mt-1">
                   {term.termBangla}
                 </h4>
-                <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
                   {term.termEnglish}
                 </p>
               </div>
@@ -99,7 +99,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({ arabicFont, onBookma
               </button>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+            <p className="text-sm sm:text-base font-medium text-slate-900 dark:text-slate-100 leading-relaxed bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
               {term.definitionBangla}
             </p>
 

@@ -29,7 +29,7 @@ interface UstadAiViewProps {
 }
 
 export const UstadAiView: React.FC<UstadAiViewProps> = ({
-  bengaliFont = 'Noto Serif Bengali',
+  bengaliFont = 'Hind Siliguri',
   arabicFont = 'Noto Naskh Arabic',
   harakatVisible = true,
 }) => {
@@ -344,13 +344,13 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                 )}
 
                 <div
-                  className={`max-w-[90%] sm:max-w-[80%] rounded-3xl p-4 sm:p-5 text-sm sm:text-base space-y-2 relative group shadow-md ${
+                  className={`max-w-[92%] sm:max-w-[85%] rounded-3xl p-4 sm:p-6 space-y-3 relative group shadow-md ${
                     isUstad
-                      ? 'bg-white dark:bg-slate-900 text-emerald-950 dark:text-emerald-200 border-2 border-emerald-500/30 dark:border-emerald-700/60'
-                      : 'bg-emerald-600 text-white font-medium rounded-tr-xs'
+                      ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-emerald-50 border-2 border-emerald-500/30 dark:border-emerald-700/60'
+                      : 'bg-emerald-600 text-white font-semibold rounded-tr-xs'
                   }`}
                 >
-                  <div className="space-y-2.5 leading-relaxed">
+                  <div className="space-y-3">
                     {msg.text.split('\n').map((line, lIdx) => {
                       if (!line.trim()) return <div key={lIdx} className="h-2" />;
                       const isArabicLine = /[\u0600-\u06FF]/.test(line);
@@ -370,11 +370,11 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                           className={
                             isArabicLine
                               ? isUstad
-                                ? 'text-right text-emerald-900 dark:text-emerald-200 text-2xl sm:text-3xl font-bold py-1.5'
-                                : 'text-right text-white text-2xl sm:text-3xl font-bold py-1.5'
+                                ? 'text-right text-emerald-950 dark:text-emerald-100 text-2xl sm:text-3xl lg:text-4xl font-bold py-2 leading-[2.2]'
+                                : 'text-right text-white text-2xl sm:text-3xl lg:text-4xl font-bold py-2 leading-[2.2]'
                               : isUstad
-                              ? 'text-left text-emerald-950 dark:text-emerald-100 text-base sm:text-lg lg:text-xl font-semibold leading-relaxed'
-                              : 'text-left text-white text-base sm:text-lg lg:text-xl font-medium leading-relaxed'
+                              ? 'text-left text-slate-950 dark:text-emerald-50 text-lg sm:text-xl lg:text-2xl font-semibold sm:font-bold leading-[1.95]'
+                              : 'text-left text-white text-lg sm:text-xl lg:text-2xl font-semibold leading-[1.85]'
                           }
                         >
                           {formattedText}

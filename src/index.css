@@ -4,24 +4,38 @@
 
 @layer base {
   body {
-    font-family: 'Noto Serif Bengali', 'Hind Siliguri', serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Hind Siliguri', 'Anek Bangla', 'Noto Serif Bengali', system-ui, -apple-system, sans-serif;
+    line-height: 1.85;
+    color: #0f172a; /* Slate 900 for high-contrast crisp text in light mode */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+}
+
+/* Premium Font Utilities */
+.font-bengali {
+  font-family: 'Hind Siliguri', 'Anek Bangla', sans-serif;
+  line-height: 1.8;
+}
+
+.font-bengali-display {
+  font-family: 'Anek Bangla', 'Hind Siliguri', sans-serif;
+  line-height: 1.75;
 }
 
 .font-bengali-serif {
   font-family: 'Noto Serif Bengali', serif;
-}
-
-.font-bengali-sans {
-  font-family: 'Hind Siliguri', sans-serif;
+  line-height: 1.9;
 }
 
 .font-arabic, .font-amiri {
   font-family: 'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', 'Traditional Arabic', serif;
+  line-height: 2.2 !important;
 }
 
 .font-naskh {
   font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
+  line-height: 2.2 !important;
 }
 
 /* Custom scrollbar */

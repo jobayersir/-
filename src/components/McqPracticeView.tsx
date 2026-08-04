@@ -386,7 +386,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
 
                 {/* Question Text (Bangla Left, Arabic Right) */}
                 <div className="space-y-3">
-                  <h3 dir="ltr" className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 leading-snug text-left">
+                  <h3 dir="ltr" className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-950 dark:text-slate-50 leading-relaxed text-left">
                     {toBnNum(qIdx + 1)}. {q.question}
                   </h3>
 
@@ -394,7 +394,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                     <div
                       dir="rtl"
                       style={{ fontFamily: getArabicFontFamily(arabicFont) }}
-                      className="text-lg sm:text-xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/60 dark:bg-emerald-950/40 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right"
+                      className="text-2xl sm:text-3xl text-emerald-950 dark:text-emerald-200 leading-[2.2] font-bold font-arabic bg-emerald-50/60 dark:bg-emerald-950/40 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right"
                     >
                       {formatArabicText(q.questionArabic, harakatVisible)}
                     </div>
@@ -402,19 +402,19 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                 </div>
 
                 {/* Options Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                   {q.options.map((opt, optIdx) => {
                     const isSelected = selectedOpt === optIdx;
                     const isCorrect = optIdx === q.correctAnswer;
                     const showResult = mode === 'practice' && isAnswered;
 
-                    let btnStyle = 'bg-slate-100 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#020617,-3px_-3px_6px_#1e293b] hover:border-emerald-500';
+                    let btnStyle = 'bg-slate-100 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-950 dark:text-slate-100 shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#020617,-3px_-3px_6px_#1e293b] hover:border-emerald-500 font-semibold';
 
                     if (mode === 'practice' && showResult) {
                       if (isCorrect) {
-                        btnStyle = 'bg-emerald-100 dark:bg-emerald-950 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]';
+                        btnStyle = 'bg-emerald-100 dark:bg-emerald-950 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-bold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]';
                       } else if (isSelected && !isCorrect) {
-                        btnStyle = 'bg-rose-100 dark:bg-rose-950 border-rose-500 text-rose-900 dark:text-rose-200 font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]';
+                        btnStyle = 'bg-rose-100 dark:bg-rose-950 border-rose-500 text-rose-950 dark:text-rose-100 font-bold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]';
                       }
                     } else if (isSelected) {
                       btnStyle = 'bg-emerald-600 border-emerald-600 text-white font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)]';
@@ -430,16 +430,16 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                           if (examSubmitted && mode === 'exam') return;
                           setUserAnswers((prev) => ({ ...prev, [qIdx]: optIdx }));
                         }}
-                        className={`w-full p-3.5 rounded-2xl border flex items-center justify-between text-xs sm:text-sm transition-all text-left ${btnStyle}`}
+                        className={`w-full p-4 rounded-2xl border flex items-center justify-between text-base sm:text-lg transition-all text-left ${btnStyle}`}
                       >
-                        <div className="flex items-center space-x-2.5 w-full">
-                          <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center shrink-0">
+                        <div className="flex items-center space-x-3 w-full">
+                          <span className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0">
                             {['ক', 'খ', 'গ', 'ঘ'][optIdx]}
                           </span>
                           <span
                             dir={isOptArabic ? 'rtl' : 'ltr'}
                             style={isOptArabic ? { fontFamily: getArabicFontFamily(arabicFont) } : undefined}
-                            className={isOptArabic ? 'font-arabic text-right w-full text-sm' : 'text-left'}
+                            className={isOptArabic ? 'font-arabic text-right w-full text-lg sm:text-xl font-bold leading-[2.1]' : 'text-left font-semibold text-base sm:text-lg leading-relaxed'}
                           >
                             {formattedOpt}
                           </span>

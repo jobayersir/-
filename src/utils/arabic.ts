@@ -38,11 +38,13 @@ export function getArabicFontFamily(fontName?: string): string {
  */
 export function getBengaliFontFamily(fontName?: string): string {
   switch (fontName) {
-    case 'Noto Serif Bengali':
-      return "'Noto Serif Bengali', serif";
     case 'Hind Siliguri':
-      return "'Hind Siliguri', sans-serif";
+      return "'Hind Siliguri', 'Anek Bangla', 'Noto Serif Bengali', sans-serif";
+    case 'Anek Bangla':
+      return "'Anek Bangla', 'Hind Siliguri', sans-serif";
+    case 'Noto Serif Bengali':
+      return "'Noto Serif Bengali', 'Hind Siliguri', serif";
     default:
-      return "'Noto Serif Bengali', serif";
+      return "'Hind Siliguri', 'Anek Bangla', 'Noto Serif Bengali', sans-serif";
   }
 }
