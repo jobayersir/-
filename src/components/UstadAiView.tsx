@@ -24,7 +24,7 @@ export const UstadAiView: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'ustad',
-      text: `আসসালামু আলাইকুম ওয়ারাহমাতুল্লাহ! আমি **উস্তাদ এআই** (Ustad AI Tutor)।
+      text: `আসসালামু আলাইকুম ওয়ারাহমাতুল্লাহ! আমি উস্তাদ এআই (Ustad AI Tutor)।
 বাংলাদেশ মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) পরীক্ষার যেকোনো প্রশ্ন, আরবি ব্যাকরণ (نحو وصرف), ফিকহ, হাদীস বা অনলাইন প্রস্তুতি কৌশল জিজ্ঞেস করুন।`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
@@ -46,6 +46,10 @@ export const UstadAiView: React.FC = () => {
     '১৭তম ও ১৮তম নিবন্ধনের আরবি ব্যাকরণ প্রশ্নের উদাহরণ ও সমাধান',
     'বালাগাত ও ফাসাহাত এর পার্থক্য কী?',
   ];
+
+  const cleanNoSymbols = (str: string) => {
+    return str.replace(/[*#]/g, '').trim();
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -87,10 +91,11 @@ export const UstadAiView: React.FC = () => {
       });
 
       const data = await res.json();
+      const rawText = data.text || data.error || 'উস্তাদ এআই উত্তর: আপনার প্রশ্নের সমাধান প্রস্তুত করা হচ্ছে। পুনরায় চেষ্টা করুন।';
       const ustadMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ustad',
-        text: data.text || data.error || '✨ **উস্তাদ এআই উত্তর:** আপনার প্রশ্নের সমাধান তামরীন একাডেমি ডেটাবেস থেকে প্রস্তুত করা হচ্ছে। পুনরায় প্রশ্ন করুন।',
+        text: cleanNoSymbols(rawText),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
 
@@ -100,13 +105,13 @@ export const UstadAiView: React.FC = () => {
       const ustadMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ustad',
-        text: `✨ **উস্তাদ এআই উত্তর:**
-আপনার প্রশ্নটি সংরক্ষিত হয়েছে: "${textToSend}"
+        text: cleanNoSymbols(`উস্তাদ এআই উত্তর:
+আপনার প্রশ্নটি পাওয়া গিয়েছে: "${textToSend}"
 
-📚 **মাদ্রাসা নিবন্ধন প্রস্তুতি টিপস:**
-• **নাহু ও সরফ:** বাক্যের শেষ বর্ণে এরাব ও সিগাহ রূপান্তরের নিয়ম ভালোভাব পড়ুন।
-• **ফিকহ ও হাদিস:** আল-কুরআন ও সুন্নাহর মৌলিক বিধানসমূহ থেকে নিবন্ধন পরীক্ষায় ১৫+ নম্বর আসবে।
-• তামরীন একাডেমির মডেল টেস্টে অনুশীলন চালিয়ে যান!`,
+মাদ্রাসা নিবন্ধন প্রস্তুতি টিপস:
+• নাহু ও সরফ: বাক্যের শেষ বর্ণে এরাব ও সিগাহ রূপান্তরের নিয়ম ভালোভাব পড়ুন।
+• ফিকহ ও হাদিস: আল-কুরআন ও সুন্নাহর মৌলিক বিধানসমূহ থেকে নিবন্ধন পরীক্ষায় ১৫+ নম্বর আসবে।
+• তামরীন একাডেমির মডেল টেস্টে অনুশীলন চালিয়ে যান!`),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, ustadMsg]);
@@ -230,8 +235,24 @@ export const UstadAiView: React.FC = () => {
                       : 'bg-emerald-600 text-white font-medium rounded-tr-xs'
                   }`}
                 >
-                  <div className="whitespace-pre-line leading-relaxed font-sans">
-                    {msg.text}
+                  <div className="space-y-1.5 leading-relaxed font-sans">
+                    {msg.text.split('\n').map((line, lIdx) => {
+                      if (!line.trim()) return <div key={lIdx} className="h-1" />;
+                      const isArabicLine = /[\u0600-\u06FF]/.test(line);
+                      return (
+                        <p
+                          key={lIdx}
+                          dir={isArabicLine ? 'rtl' : 'ltr'}
+                          className={
+                            isArabicLine
+                              ? 'text-right font-arabic text-emerald-800 dark:text-emerald-300 text-sm sm:text-base font-medium py-0.5'
+                              : 'text-left'
+                          }
+                        >
+                          {line}
+                        </p>
+                      );
+                    })}
                   </div>
                   
                   <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-700/50 text-[10px] opacity-70">

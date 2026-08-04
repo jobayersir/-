@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Desktop Top Navigation Bar (Logo | Home | পরীক্ষা দিন | কোর্স | উস্তাদ AI) */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 bg-slate-100/70 dark:bg-slate-800/60 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 bg-slate-100/90 dark:bg-slate-900/90 p-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-[inset_2px_2px_4px_#cbd5e1,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#020617,inset_-2px_-2px_4px_#1e293b]">
             {desktopNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -126,23 +126,18 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={item.id}
                   onClick={() => onTabChange(item.id as NavTab)}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-semibold transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition-all duration-200 ${
                     isActive
-                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20 scale-[1.02]'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white/60 dark:hover:bg-slate-700/50'
+                      ? 'bg-emerald-600 dark:bg-emerald-700 text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.2)] scale-[1.02]'
+                      : 'bg-slate-200/60 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#020617,-3px_-3px_6px_#1e293b] hover:scale-[1.02]'
                   }`}
                 >
                   {item.id === 'ustad_ai' ? (
                     <UstadAiLogo size="sm" />
                   ) : (
-                    Icon && <Icon className={`w-4 h-4 ${isActive ? 'text-white' : item.isSpecial ? 'text-amber-500' : 'text-emerald-600 dark:text-emerald-400'}`} />
+                    Icon && <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-emerald-700 dark:text-emerald-400'}`} />
                   )}
                   <span>{item.labelBn}</span>
-                  {item.isSpecial && (
-                    <span className="px-1.5 py-0.2 text-[9px] font-black rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider">
-                      PRO
-                    </span>
-                  )}
                 </button>
               );
             })}

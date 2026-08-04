@@ -36,10 +36,17 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
 }) => {
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [mode, setMode] = useState<'practice' | 'exam'>('practice');
+  const [viewType, setViewType] = useState<'scroll' | 'single'>('scroll'); // Default to bottom-to-top scroll feed
   const [questions, setQuestions] = useState<MCQQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
   const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
+
+  // Helper for Bengali serial numbers (১, ২, ৩, ৪, ৫...)
+  const toBnNum = (n: number) => {
+    const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return String(n).split('').map(d => bnDigits[parseInt(d)] || d).join('');
+  };
   
   // Exam timer states
   const [examSubmitted, setExamSubmitted] = useState(false);
@@ -183,30 +190,56 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
     <div className="space-y-6 animate-in fade-in duration-200">
       
       {/* Top Filter & Mode Switcher */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
         
-        {/* Mode Selector Buttons */}
-        <div className="flex items-center space-x-2 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full md:w-auto">
-          <button
-            onClick={() => setMode('practice')}
-            className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-              mode === 'practice'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
-          >
-            অনুশীলন মোড (Practice)
-          </button>
-          <button
-            onClick={() => setMode('exam')}
-            className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
-              mode === 'exam'
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`}
-          >
-            মডেল টেস্ট মোড (Live Exam)
-          </button>
+        {/* Mode & View Selector Buttons */}
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div className="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-[inset_2px_2px_4px_#cbd5e1,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#020617,inset_-2px_-2px_4px_#1e293b]">
+            <button
+              onClick={() => setMode('practice')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                mode === 'practice'
+                  ? 'bg-emerald-600 text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)]'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+            >
+              অনুশীলন মোড
+            </button>
+            <button
+              onClick={() => setMode('exam')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
+                mode === 'exam'
+                  ? 'bg-amber-600 text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)]'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+              }`}
+            >
+              মডেল টেস্ট মোড
+            </button>
+          </div>
+
+          {/* View Mode Toggle: Scroll Feed vs Single View */}
+          <div className="flex items-center space-x-1 bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-[inset_2px_2px_4px_#cbd5e1,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#020617,inset_-2px_-2px_4px_#1e293b]">
+            <button
+              onClick={() => setViewType('scroll')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewType === 'scroll'
+                  ? 'bg-teal-600 text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)]'
+                  : 'text-slate-600 dark:text-slate-400'
+              }`}
+            >
+              স্ক্রলিং তালিকা
+            </button>
+            <button
+              onClick={() => setViewType('single')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewType === 'single'
+                  ? 'bg-teal-600 text-white shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)]'
+                  : 'text-slate-600 dark:text-slate-400'
+              }`}
+            >
+              একক কার্ড
+            </button>
+          </div>
         </div>
 
         {/* Subject Filter Dropdown */}
@@ -215,7 +248,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
           <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
-            className="w-full md:w-auto bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
+            className="w-full md:w-auto bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#020617,-3px_-3px_6px_#1e293b]"
           >
             {subjectsList.map((s) => (
               <option key={s.id} value={s.id}>
@@ -234,9 +267,9 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
         )}
       </div>
 
-      {/* Main MCQ Card or Exam Result */}
+      {/* Main MCQ Content */}
       {questions.length === 0 ? (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 text-center border border-slate-200 dark:border-slate-700">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-8 text-center border border-slate-200 dark:border-slate-700">
           <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">
             এই বিভাগে কোনো প্রশ্ন পাওয়া যায়নি
@@ -310,16 +343,164 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
           </div>
         </div>
 
+      ) : viewType === 'scroll' ? (
+
+        /* Bottom-to-Top Scrollable List Feed View */
+        <div className="space-y-6">
+          {questions.map((q, qIdx) => {
+            const isAnswered = userAnswers[qIdx] !== undefined;
+            const selectedOpt = userAnswers[qIdx];
+
+            return (
+              <div
+                key={q.id || qIdx}
+                className="bg-white dark:bg-slate-800 rounded-3xl p-5 sm:p-7 border border-slate-200/80 dark:border-slate-700 shadow-md space-y-5 animate-in slide-in-from-bottom duration-300"
+              >
+                {/* Question Serial Number & Tag Header */}
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="px-3 py-1 rounded-2xl bg-emerald-600 text-white text-xs font-extrabold shadow-[inset_1px_1px_3px_rgba(0,0,0,0.3)]">
+                      প্রশ্ন নং: {toBnNum(qIdx + 1)} / {toBnNum(questions.length)}
+                    </span>
+                    {q.yearTag && (
+                      <span className="text-xs text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-full font-bold">
+                        {q.yearTag}
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => onBookmark(q.id, 'mcq')}
+                    className={`p-2 rounded-xl transition-colors ${
+                      bookmarkedIds.includes(q.id)
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400'
+                    }`}
+                    title="বুকমার্ক করুন"
+                  >
+                    <Bookmark className="w-4 h-4" fill={bookmarkedIds.includes(q.id) ? 'currentColor' : 'none'} />
+                  </button>
+                </div>
+
+                {/* Question Text (Bangla Left, Arabic Right) */}
+                <div className="space-y-3">
+                  <h3 dir="ltr" className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 leading-snug text-left">
+                    {toBnNum(qIdx + 1)}. {q.question}
+                  </h3>
+
+                  {q.questionArabic && (
+                    <div
+                      dir="rtl"
+                      style={{ fontFamily: arabicFont }}
+                      className={`text-lg sm:text-xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/60 dark:bg-emerald-950/40 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right ${
+                        !harakatVisible ? 'select-none' : ''
+                      }`}
+                    >
+                      {q.questionArabic}
+                    </div>
+                  )}
+                </div>
+
+                {/* Options Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {q.options.map((opt, optIdx) => {
+                    const isSelected = selectedOpt === optIdx;
+                    const isCorrect = optIdx === q.correctAnswer;
+                    const showResult = mode === 'practice' && isAnswered;
+
+                    let btnStyle = 'bg-slate-100 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 shadow-[3px_3px_6px_#cbd5e1,-3px_-3px_6px_#ffffff] dark:shadow-[3px_3px_6px_#020617,-3px_-3px_6px_#1e293b] hover:border-emerald-500';
+
+                    if (mode === 'practice' && showResult) {
+                      if (isCorrect) {
+                        btnStyle = 'bg-emerald-100 dark:bg-emerald-950 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]';
+                      } else if (isSelected && !isCorrect) {
+                        btnStyle = 'bg-rose-100 dark:bg-rose-950 border-rose-500 text-rose-900 dark:text-rose-200 font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.1)]';
+                      }
+                    } else if (isSelected) {
+                      btnStyle = 'bg-emerald-600 border-emerald-600 text-white font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.3)]';
+                    }
+
+                    const isOptArabic = /[\u0600-\u06FF]/.test(opt);
+
+                    return (
+                      <button
+                        key={optIdx}
+                        onClick={() => {
+                          if (examSubmitted && mode === 'exam') return;
+                          setUserAnswers((prev) => ({ ...prev, [qIdx]: optIdx }));
+                        }}
+                        className={`w-full p-3.5 rounded-2xl border flex items-center justify-between text-xs sm:text-sm transition-all text-left ${btnStyle}`}
+                      >
+                        <div className="flex items-center space-x-2.5 w-full">
+                          <span className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center shrink-0">
+                            {['ক', 'খ', 'গ', 'ঘ'][optIdx]}
+                          </span>
+                          <span dir={isOptArabic ? 'rtl' : 'ltr'} className={isOptArabic ? 'font-arabic text-right w-full text-sm' : 'text-left'}>
+                            {opt}
+                          </span>
+                        </div>
+
+                        {showResult && (
+                          <div className="shrink-0 ml-2">
+                            {isCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />}
+                            {isSelected && !isCorrect && <XCircle className="w-5 h-5 text-rose-600 shrink-0" />}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Explanation in Practice Mode */}
+                {mode === 'practice' && isAnswered && (
+                  <div className="mt-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 flex items-center">
+                        <CheckCircle2 className="w-4 h-4 mr-1 text-emerald-600" />
+                        ব্যাখ্যা:
+                      </span>
+                      <button
+                        onClick={() => handleAskUstadAi(q)}
+                        disabled={aiLoading}
+                        className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center space-x-1 shadow-sm"
+                      >
+                        <Sparkles className="w-3 h-3 text-white animate-pulse" />
+                        <span>{aiLoading ? 'ভাবছে...' : 'উস্তাদ এআই ব্যাখ্যা'}</span>
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed text-left">
+                      {q.explanation}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Bottom Submit Button in Exam Mode */}
+          {mode === 'exam' && !examSubmitted && (
+            <div className="text-center pt-4">
+              <button
+                onClick={handleSubmitExam}
+                className="px-8 py-3 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-sm shadow-xl"
+              >
+                পরীক্ষা জমা দিন (Submit Exam)
+              </button>
+            </div>
+          )}
+        </div>
+
       ) : (
 
-        /* Active Question Display */
+        /* Active Single Question Card Display */
         <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-md space-y-6">
           
           {/* Question Header & Navigation */}
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-4">
             <div className="flex items-center space-x-2">
-              <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
-                প্রশ্ন {currentIndex + 1} / {questions.length}
+              <span className="px-3 py-1 rounded-2xl bg-emerald-600 text-white text-xs font-extrabold">
+                প্রশ্ন {toBnNum(currentIndex + 1)} / {toBnNum(questions.length)}
               </span>
               {currentQ.yearTag && (
                 <span className="text-xs text-slate-500 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-full font-medium">
@@ -344,14 +525,15 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
 
           {/* Question Text (Bangla & Arabic) */}
           <div className="space-y-3">
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug">
-              {currentQ.question}
+            <h3 dir="ltr" className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug text-left">
+              {toBnNum(currentIndex + 1)}. {currentQ.question}
             </h3>
             
             {currentQ.questionArabic && (
               <p
+                dir="rtl"
                 style={{ fontFamily: arabicFont }}
-                className={`text-xl sm:text-2xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/40 ${
+                className={`text-xl sm:text-2xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/50 dark:bg-emerald-950/30 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right ${
                   !harakatVisible ? 'select-none' : ''
                 }`}
               >
@@ -379,21 +561,25 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                 btnStyle = 'bg-emerald-600 border-emerald-600 text-white font-bold shadow-md';
               }
 
+              const isOptArabic = /[\u0600-\u06FF]/.test(opt);
+
               return (
                 <button
                   key={optIdx}
                   onClick={() => handleSelectOption(optIdx)}
-                  className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between text-sm sm:text-base transition-all ${btnStyle}`}
+                  className={`w-full p-4 rounded-2xl border flex items-center justify-between text-sm sm:text-base transition-all ${btnStyle}`}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 w-full">
                     <span className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
                       {['ক', 'খ', 'গ', 'ঘ'][optIdx]}
                     </span>
-                    <span>{opt}</span>
+                    <span dir={isOptArabic ? 'rtl' : 'ltr'} className={isOptArabic ? 'font-arabic text-right w-full' : 'text-left'}>
+                      {opt}
+                    </span>
                   </div>
 
                   {showResult && (
-                    <div>
+                    <div className="shrink-0 ml-2">
                       {isCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />}
                       {isSelected && !isCorrect && <XCircle className="w-5 h-5 text-rose-600 shrink-0" />}
                     </div>
@@ -416,14 +602,14 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                 <button
                   onClick={() => handleAskUstadAi(currentQ)}
                   disabled={aiLoading}
-                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-slate-950 animate-pulse" />
-                  <span>{aiLoading ? 'উস্তাদ এআই ভাবছে...' : 'উস্তাদ এআই থেকে বিস্তারিত জানুন'}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
+                  <span>{aiLoading ? 'উস্তাদ এআই ভাবছে...' : 'উস্তad এআই ব্যাখ্যা'}</span>
                 </button>
               </div>
 
-              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed text-left">
                 {currentQ.explanation}
               </p>
 
@@ -434,7 +620,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                     <Sparkles className="w-4 h-4 mr-1 text-amber-600" />
                     উস্তাদ এআই ব্যাখ্যা:
                   </div>
-                  <p className="whitespace-pre-line leading-relaxed">{aiExplainText}</p>
+                  <p className="whitespace-pre-line leading-relaxed text-left">{aiExplainText}</p>
                 </div>
               )}
             </div>
@@ -445,7 +631,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
             <button
               onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
               disabled={currentIndex === 0}
-              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm disabled:opacity-40 flex items-center space-x-1"
+              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm disabled:opacity-40 flex items-center space-x-1 shadow-[2px_2px_4px_#cbd5e1,-2px_-2px_4px_#ffffff]"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>পূর্ববর্তী</span>
@@ -462,7 +648,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
               <button
                 onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
                 disabled={currentIndex === questions.length - 1}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm disabled:opacity-40 flex items-center space-x-1"
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm disabled:opacity-40 flex items-center space-x-1 shadow-[2px_2px_4px_rgba(0,0,0,0.2)]"
               >
                 <span>পরবর্তী</span>
                 <ChevronRight className="w-4 h-4" />
