@@ -7,6 +7,17 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Permissive CORS middleware for Mobile Cellular (3G/4G/5G), Wi-Fi, and WebViews
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(200);
+    }
+    next();
+  });
+
   app.use(express.json({ limit: "10mb" }));
 
   // API Health Check Endpoint
