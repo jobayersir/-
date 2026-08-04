@@ -24,8 +24,7 @@ export const UstadAiView: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'ustad',
-      text: `আসসালামু আলাইকুম ওয়ারাহমাতুল্লাহ! আমি উস্তাদ এআই (Ustad AI Tutor)।
-বাংলাদেশ মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) পরীক্ষার যেকোনো প্রশ্ন, আরবি ব্যাকরণ (نحو وصرف), ফিকহ, হাদীস বা অনলাইন প্রস্তুতি কৌশল জিজ্ঞেস করুন।`,
+      text: `আমি তামরীন উস্তাদ AI। আরবি বাংলা ও ইংরেজির যে কোন বিষয় জানতে আমাকে জিজ্ঞাস করুন`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
