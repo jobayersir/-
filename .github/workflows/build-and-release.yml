@@ -1,0 +1,55 @@
+name: Build and Package Web & Mobile App
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  build:
+    name: Build Web App & Export Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 🏗️ Build Production Bundle (Vite)
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: 🤐 Zip Dist Folder for Web Hosting / Deployment
+        run: |
+          cd dist
+          zip -r ../madrasa-ntrca-web-build.zip .
+          cd ..
+
+      - name: ⬆️ Upload Web Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: madrasa-ntrca-web-build
+          path: madrasa-ntrca-web-build.zip
+          retention-days: 30
+
+      - name: ⬆️ Upload Full Source Code Backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: madrasa-ntrca-source-code
+          path: |
+            .
+            !.git
+            !node_modules
+            !dist
+          retention-days: 30
