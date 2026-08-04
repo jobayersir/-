@@ -82,8 +82,8 @@ export async function processGeminiRequest(reqBody: any) {
     userPrompt = "সাধারণ প্রশ্ন ও টিউটোরিয়াল দিকনির্দেশনা";
   }
 
-  // Try retrieving API key from multiple environment sources
-  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || process.env.VITE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  // Try retrieving API key from multiple environment sources or request body
+  const apiKey = reqBody?.apiKey || process.env.GEMINI_API_KEY || process.env.API_KEY || process.env.VITE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
   if (apiKey && apiKey !== "MY_GEMINI_API_KEY" && apiKey.trim().length > 5) {
     try {
@@ -140,7 +140,7 @@ export async function processGeminiRequest(reqBody: any) {
       });
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
+        model: "gemini-2.5-flash",
         contents,
         config: {
           systemInstruction,
