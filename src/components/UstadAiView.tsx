@@ -215,7 +215,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                 PRO 3.6
               </span>
             </div>
-            <p className="text-xs text-emerald-200/90 font-medium">
+            <p className="text-sm text-emerald-200/90 font-medium">
               আপনার পড়াশোনার বিশ্বস্ত সঙ্গী
             </p>
           </div>
@@ -344,15 +344,15 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                 )}
 
                 <div
-                  className={`max-w-[88%] sm:max-w-[78%] rounded-3xl p-4 sm:p-5 text-xs sm:text-sm space-y-2 relative group shadow-md ${
+                  className={`max-w-[90%] sm:max-w-[80%] rounded-3xl p-4 sm:p-5 text-sm sm:text-base space-y-2 relative group shadow-md ${
                     isUstad
-                      ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 border-2 border-emerald-500/30 dark:border-emerald-700/60'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-950 dark:text-emerald-200 border-2 border-emerald-500/30 dark:border-emerald-700/60'
                       : 'bg-emerald-600 text-white font-medium rounded-tr-xs'
                   }`}
                 >
-                  <div className="space-y-1.5 leading-relaxed">
+                  <div className="space-y-2 leading-relaxed">
                     {msg.text.split('\n').map((line, lIdx) => {
-                      if (!line.trim()) return <div key={lIdx} className="h-1" />;
+                      if (!line.trim()) return <div key={lIdx} className="h-1.5" />;
                       const isArabicLine = /[\u0600-\u06FF]/.test(line);
                       const formattedText = isArabicLine
                         ? formatArabicText(line, harakatVisible)
@@ -370,11 +370,11 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                           className={
                             isArabicLine
                               ? isUstad
-                                ? 'text-right text-emerald-800 dark:text-emerald-300 text-base sm:text-lg font-bold py-0.5'
-                                : 'text-right text-white text-base sm:text-lg font-bold py-0.5'
+                                ? 'text-right text-emerald-900 dark:text-emerald-200 text-xl sm:text-2xl font-bold py-1'
+                                : 'text-right text-white text-xl sm:text-2xl font-bold py-1'
                               : isUstad
-                              ? 'text-left text-emerald-800 dark:text-emerald-300 font-bold'
-                              : 'text-left text-white font-medium'
+                              ? 'text-left text-emerald-950 dark:text-emerald-100 text-sm sm:text-base font-semibold'
+                              : 'text-left text-white text-sm sm:text-base font-medium'
                           }
                         >
                           {formattedText}
@@ -383,7 +383,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                     })}
                   </div>
                   
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-700/50 text-[10px] opacity-70">
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-200/50 dark:border-slate-700/50 text-xs opacity-75">
                     <span>{msg.timestamp}</span>
                     {isUstad && (
                       <button
@@ -490,16 +490,16 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
               placeholder={isRecording ? 'আপনার কথা শুনছি...' : 'উস্তাদ এআই-কে জিজ্ঞেস করুন...'}
-              className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="flex-1 px-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
 
             {/* Send Button */}
             <button
               type="submit"
               disabled={loading || (!inputPrompt.trim() && !attachedImage)}
-              className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md disabled:opacity-40 transition-all flex items-center space-x-1.5"
+              className="px-5 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base shadow-md disabled:opacity-40 transition-all flex items-center space-x-1.5"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5" />
               <span className="hidden sm:inline">পাঠান</span>
             </button>
           </form>

@@ -141,7 +141,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
                 <CheckCircle className="w-4 h-4 mr-1.5 text-emerald-600" />
                 উচ্চ নম্বর অর্জনের মূল পয়েন্টসমূহ (Key Scoring Topics):
               </h5>
-              <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1 pl-5 list-disc">
+              <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 pl-5 list-disc">
                 {selectedQuestion.keyPoints.map((pt, idx) => (
                   <li key={idx}>{pt}</li>
                 ))}
@@ -154,7 +154,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
                 onClick={() =>
                   setShowModelAnswer(prev => ({ ...prev, [selectedQuestion.id]: !prev[selectedQuestion.id] }))
                 }
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-50 dark:bg-slate-900 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center justify-between border border-emerald-200 dark:border-slate-700 transition-colors"
+                className="w-full py-3 px-4 rounded-xl bg-emerald-50 dark:bg-slate-900 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 font-bold text-sm flex items-center justify-between border border-emerald-200 dark:border-slate-700 transition-colors"
               >
                 <span>আদর্শ নমুনা উত্তর দেখুন (Model Answer)</span>
                 {showModelAnswer[selectedQuestion.id] ? (
@@ -165,7 +165,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
               </button>
 
               {showModelAnswer[selectedQuestion.id] && (
-                <div className="mt-3 p-5 rounded-2xl bg-emerald-50/40 dark:bg-slate-900 border border-emerald-100 dark:border-slate-700 text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed animate-in fade-in">
+                <div className="mt-3 p-5 rounded-2xl bg-emerald-50/40 dark:bg-slate-900 border border-emerald-100 dark:border-slate-700 text-sm sm:text-base text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed animate-in fade-in">
                   {selectedQuestion.modelAnswer}
                 </div>
               )}
@@ -174,7 +174,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
             {/* Student Answer Input Box & AI Evaluation */}
             <div className="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center">
+                <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center">
                   <Sparkles className="w-4 h-4 mr-1.5 text-amber-500" />
                   আপনার নিজের উত্তর লিখুন এবং উস্তাদ এআই দ্বারা মূল্যায়ন করান:
                 </h4>
@@ -185,13 +185,13 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
                 onChange={(e) => setUserAnswerInput(e.target.value)}
                 rows={5}
                 placeholder="এখানে আপনার উত্তর বা খসড়া পয়েন্টগুলো লিখুন বা টাইপ করুন (বাংলা ও আরবিতে)..."
-                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
 
               <button
                 onClick={handleEvaluateAnswer}
                 disabled={evaluating || !userAnswerInput.trim()}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs sm:text-sm shadow-md disabled:opacity-50 flex items-center justify-center space-x-2 transition-all"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm sm:text-base shadow-md disabled:opacity-50 flex items-center justify-center space-x-2 transition-all"
               >
                 <Send className="w-4 h-4" />
                 <span>{evaluating ? 'উস্তাদ এআই মূল্যায়ন করছে...' : 'উস্তাদ এআই মূল্যায়ন জমা দিন'}</span>
@@ -200,11 +200,11 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
               {/* AI Feedback Output Box */}
               {aiEvaluation && (
                 <div className="p-5 rounded-2xl bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-800/80 space-y-3 animate-in fade-in">
-                  <div className="flex items-center space-x-2 text-amber-900 dark:text-amber-300 font-bold text-sm">
+                  <div className="flex items-center space-x-2 text-amber-900 dark:text-amber-300 font-bold text-base">
                     <Award className="w-5 h-5 text-amber-600" />
                     <span>উস্তাদ এআই মূল্যায়ন রিপোর্ট:</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed">
+                  <p className="text-sm sm:text-base text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed">
                     {aiEvaluation}
                   </p>
                 </div>
