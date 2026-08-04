@@ -1,52 +1,59 @@
 import React from 'react';
-import { Home, CheckSquare, Edit3, BookOpen, Bot, BookMarked, Rocket, HelpCircle } from 'lucide-react';
+import { Home, FileCheck2, GraduationCap, Bot } from 'lucide-react';
+import { NavTab } from '../types';
 
 interface NavigationProps {
   activeTab: string;
-  onTabChange: (tab: string) => void;
+  onTabChange: (tab: NavTab) => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
-  const tabs = [
-    { id: 'home', label: 'হোম', icon: Home, badge: '' },
-    { id: 'mcq', label: 'এমসিকিউ', icon: CheckSquare, badge: 'MCQ' },
-    { id: 'cq', label: 'সিকিউ/লিখিত', icon: Edit3, badge: 'CQ' },
-    { id: 'question_bank', label: 'প্রশ্ন ব্যাংক', icon: BookOpen, badge: 'Past Papers' },
-    { id: 'ustad_ai', label: 'উস্তাদ এআই', icon: Bot, badge: 'AI' },
-    { id: 'glossary', label: 'পরিভাষা', icon: BookMarked, badge: 'Glossary' },
-    { id: 'deployment', label: 'ডিপ্লয়মেন্ট গাইড', icon: Rocket, badge: 'New' },
+  // Mobile bottom bar EXACTLY 4 items: Home, Exams, Courses, Ustad AI
+  const navItems = [
+    { id: 'home', label: 'হোম', icon: Home },
+    { id: 'exams', label: 'পরীক্ষা দিন', icon: FileCheck2 },
+    { id: 'courses', label: 'কোর্স', icon: GraduationCap },
+    { id: 'ustad_ai', label: 'উস্তাদ AI', icon: Bot, isSpecial: true },
   ];
 
   return (
-    <nav className="bg-white dark:bg-slate-900 border-b border-emerald-100 dark:border-slate-800 shadow-sm transition-colors">
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="flex space-x-1 sm:space-x-3 overflow-x-auto py-2 no-scrollbar">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-2 pb-safe">
+      <div className="mx-auto max-w-md rounded-t-3xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-x border-slate-200/80 dark:border-slate-800 shadow-[0_-8px_30px_rgba(0,0,0,0.12)] px-2 py-2">
+        <div className="grid grid-cols-4 gap-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+
             return (
               <button
-                key={tab.id}
-                onClick={() => onTabChange(tab.id)}
-                className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
+                key={item.id}
+                onClick={() => onTabChange(item.id as NavTab)}
+                className={`relative flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-300 min-h-[48px] ${
                   isActive
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20 font-semibold scale-[1.02]'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 hover:text-emerald-700 dark:hover:text-emerald-400'
+                    ? 'text-emerald-900 dark:text-emerald-300 font-bold scale-[1.03]'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-emerald-600 dark:text-emerald-400'}`} />
-                <span>{tab.label}</span>
-                {tab.badge && (
-                  <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                      isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                    }`}
-                  >
-                    {tab.badge}
-                  </span>
+                {/* Active Pill Indicator Background */}
+                {isActive && (
+                  <div className="absolute inset-0 bg-emerald-100/80 dark:bg-emerald-950/80 rounded-2xl border border-emerald-300/50 dark:border-emerald-700/50 shadow-sm transition-all" />
                 )}
+
+                <div className="relative z-10 flex flex-col items-center space-y-1">
+                  <div className="relative">
+                    <Icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? 'scale-110 text-emerald-700 dark:text-emerald-300' : ''}`} />
+                    {item.isSpecial && (
+                      <span className="absolute -top-1 -right-1.5 flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                      </span>
+                    )}
+                  </div>
+
+                  <span className={`text-[11px] leading-none transition-all ${isActive ? 'font-bold text-emerald-950 dark:text-emerald-200' : 'font-medium'}`}>
+                    {item.label}
+                  </span>
+                </div>
               </button>
             );
           })}

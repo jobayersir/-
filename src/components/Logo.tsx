@@ -14,12 +14,12 @@ export const Logo: React.FC<LogoProps> = ({
   className = '',
   showSubtitle = true,
 }) => {
-  // Size scaling multipliers
+  // Size scaling multipliers carefully balanced so icon height matches text block height
   const sizeMap = {
-    sm: { icon: 'w-8 h-8', text: 'text-base', subText: 'text-[9px]', gap: 'space-x-2' },
-    md: { icon: 'w-11 h-11 sm:w-13 sm:h-13', text: 'text-xl sm:text-2xl', subText: 'text-[10px] sm:text-xs', gap: 'space-x-2.5 sm:space-x-3' },
-    lg: { icon: 'w-16 h-16 sm:w-20 sm:h-20', text: 'text-3xl sm:text-4xl', subText: 'text-sm sm:text-base', gap: 'space-x-4' },
-    xl: { icon: 'w-24 h-24 sm:w-32 sm:h-32', text: 'text-4xl sm:text-5xl', subText: 'text-base sm:text-lg', gap: 'space-x-5' },
+    sm: { icon: 'w-7 h-7 sm:w-8 sm:h-8', text: 'text-sm sm:text-base', subText: 'text-[8px] sm:text-[9px]', gap: 'space-x-2' },
+    md: { icon: 'w-9 h-9 sm:w-11 sm:h-11', text: 'text-lg sm:text-xl', subText: 'text-[9px] sm:text-[10px]', gap: 'space-x-2.5 sm:space-x-3' },
+    lg: { icon: 'w-14 h-14 sm:w-16 sm:h-16', text: 'text-2xl sm:text-3xl', subText: 'text-xs sm:text-sm', gap: 'space-x-3.5 sm:space-x-4' },
+    xl: { icon: 'w-20 h-20 sm:w-24 sm:h-24', text: 'text-4xl sm:text-5xl', subText: 'text-sm sm:text-base', gap: 'space-x-4 sm:space-x-5' },
   };
 
   const { icon: iconSize, text: textSize, subText: subTextSize, gap } = sizeMap[size];
@@ -193,24 +193,24 @@ export const Logo: React.FC<LogoProps> = ({
   // Horizontal variant (default for Header & Footer)
   return (
     <div className={`inline-flex items-center ${gap} ${className}`}>
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 flex items-center justify-center">
         <KuficEmblem svgClass={iconSize} />
       </div>
       <div className="flex flex-col justify-center">
         <span
           className={`font-black tracking-wider text-emerald-950 dark:text-emerald-300 leading-none uppercase ${textSize}`}
-          style={{ letterSpacing: '0.06em' }}
+          style={{ letterSpacing: '0.05em' }}
         >
           TAMREEN
         </span>
-        <div className="flex items-center space-x-1.5 mt-1.5">
-          <span className="h-[1.5px] w-3.5 bg-amber-500 dark:bg-amber-400" />
+        <div className="flex items-center space-x-1 mt-1">
+          <span className="h-[1.5px] flex-1 bg-amber-500 dark:bg-amber-400 min-w-[8px]" />
           <span
-            className={`font-bold tracking-[0.28em] text-amber-600 dark:text-amber-400 uppercase leading-none ${subTextSize}`}
+            className={`font-bold tracking-[0.25em] text-amber-600 dark:text-amber-400 uppercase leading-none ${subTextSize}`}
           >
             ACADEMY
           </span>
-          <span className="h-[1.5px] w-3.5 bg-amber-500 dark:bg-amber-400" />
+          <span className="h-[1.5px] flex-1 bg-amber-500 dark:bg-amber-400 min-w-[8px]" />
         </div>
       </div>
     </div>

@@ -85,3 +85,79 @@ export interface ChatMessage {
   timestamp: string;
   isAudioSynthesized?: boolean;
 }
+
+export type NavTab = 
+  | 'home'
+  | 'exams'
+  | 'courses'
+  | 'ustad_ai'
+  | 'mcq'
+  | 'cq'
+  | 'qbank'
+  | 'glossary'
+  | 'dashboard'
+  | 'profile'
+  | 'my_courses'
+  | 'bookmarks'
+  | 'wrong_questions'
+  | 'history'
+  | 'leaderboard'
+  | 'premium'
+  | 'settings'
+  | 'deployment';
+
+export type ExamCategory = 'daily' | 'free' | 'premium' | 'live' | 'upcoming' | 'completed';
+
+export interface ExamItem {
+  id: string;
+  title: string;
+  titleArabic?: string;
+  category: ExamCategory;
+  durationMinutes: number;
+  totalQuestions: number;
+  difficulty: 'সহজ' | 'মাঝারি' | 'কঠিন';
+  participantsCount: string;
+  subject: string;
+  isPremium: boolean;
+  thumbnailUrl?: string;
+  scheduledTime?: string;
+}
+
+export interface CourseItem {
+  id: string;
+  title: string;
+  titleArabic?: string;
+  cadre: PostCadre;
+  instructor: string;
+  totalModules: number;
+  completedModules: number;
+  isPremium: boolean;
+  rating: number;
+  studentCount: number;
+  progressPercent: number;
+  thumbnailBg: string;
+  description: string;
+}
+
+export interface UserProfileData {
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  cadre: PostCadre;
+  isPremium: boolean;
+  joinedDate: string;
+  totalSolvedQuestions: number;
+  accuracyRate: number;
+  streakDays: number;
+  targetYear: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  description: string;
+  timeAgo: string;
+  isRead: boolean;
+  type: 'exam' | 'course' | 'ai' | 'update';
+}
+
