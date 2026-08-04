@@ -16,23 +16,16 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js Environment
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: ☕ Setup Java JDK 21 for Android Build
+      - name: ☕ Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '21'
-
-      - name: 🤖 Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: 📜 Accept Android SDK Licenses
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: 📦 Install Dependencies
         run: npm install
@@ -42,9 +35,11 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: 📱 Generate & Sync Android Project (Capacitor)
+      - name: 📱 Add & Sync Android Platform (Capacitor)
         run: |
-          npx cap add android || true
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
           npx cap sync android
 
       - name: 🔨 Build Android APK (Gradle Debug APK)
@@ -76,4 +71,3 @@ jobs:
           name: madrasa-ntrca-web-build
           path: madrasa-ntrca-web-build.zip
           retention-days: 30
-
