@@ -45,6 +45,14 @@ jobs:
       - name: ⚙️ Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      - name: 🔧 Ensure Valid Gradle Wrapper Jar
+        run: |
+          mkdir -p android/gradle/wrapper
+          if [ ! -f "android/gradle/wrapper/gradle-wrapper.jar" ] || ! java -jar android/gradle/wrapper/gradle-wrapper.jar --version >/dev/null 2>&1; then
+            echo "Downloading clean Gradle Wrapper JAR..."
+            curl -sSL -o android/gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.11.1/gradle/wrapper/gradle-wrapper.jar
+          fi
+
       - name: 🔨 Build Android APK (Gradle Debug APK)
         run: |
           cd android
