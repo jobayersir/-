@@ -9,6 +9,8 @@ interface HeaderProps {
   onToggleDarkMode: () => void;
   activeTab: string;
   onTabChange: (tab: string) => void;
+  bengaliFont: string;
+  onChangeBengaliFont: (font: string) => void;
   arabicFont: string;
   onChangeArabicFont: (font: string) => void;
   harakatVisible: boolean;
@@ -22,6 +24,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleDarkMode,
   activeTab,
   onTabChange,
+  bengaliFont,
+  onChangeBengaliFont,
   arabicFont,
   onChangeArabicFont,
   harakatVisible,
@@ -83,41 +87,83 @@ export const Header: React.FC<HeaderProps> = ({
               </select>
             </div>
 
-            {/* Arabic Font Options Dropdown Button */}
+            {/* Font & Display Options Dropdown Button */}
             <div className="relative">
               <button
                 onClick={() => setShowFontMenu(!showFontMenu)}
-                className="p-2 sm:px-3 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium flex items-center space-x-1 transition-all"
-                title="আরবি ফন্ট ও হরকত সেটআপ"
+                className="p-2 sm:px-3 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium flex items-center space-x-1.5 transition-all"
+                title="ফন্ট ও প্রদর্শন সেটআপ"
               >
                 <Type className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="hidden sm:inline font-arabic text-sm">خط</span>
+                <span className="hidden sm:inline font-bold">ফন্ট</span>
+                <span className="hidden sm:inline font-arabic text-sm">/ خط</span>
               </button>
 
               {showFontMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50 text-xs space-y-3 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 pb-2">
-                    আরবি ফন্ট নির্বাচন (Arabic Font)
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-3.5 z-50 text-xs space-y-3.5 animate-in fade-in zoom-in-95 duration-150">
+                  
+                  {/* Bangla Font Selector */}
+                  <div>
+                    <div className="font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 pb-1.5 mb-2">
+                      বাংলা ফন্ট (Bangla Font)
+                    </div>
+                    <div className="space-y-1">
+                      {[
+                        { name: 'Noto Serif Bengali', label: 'নোটো শরিফ (Serif)' },
+                        { name: 'Hind Siliguri', label: 'হিন্দ শিলিগুড়ি (Sans)' },
+                      ].map((item) => (
+                        <button
+                          key={item.name}
+                          onClick={() => {
+                            onChangeBengaliFont(item.name);
+                          }}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition-colors ${
+                            bengaliFont === item.name
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-bold'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <span>{item.label}</span>
+                          {bengaliFont === item.name && (
+                            <span className="text-xs bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded">সক্রিয়</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div className="space-y-1.5">
-                    {['Amiri', 'Traditional Arabic', 'Scheherazade New'].map((font) => (
-                      <button
-                        key={font}
-                        onClick={() => {
-                          onChangeArabicFont(font);
-                          setShowFontMenu(false);
-                        }}
-                        className={`w-full text-left px-2.5 py-1.5 rounded-md font-arabic text-base flex items-center justify-between transition-colors ${
-                          arabicFont === font
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold'
-                            : 'hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
-                        }`}
-                      >
-                        <span>{font}</span>
-                        <span className="text-xs text-slate-400">خط</span>
-                      </button>
-                    ))}
+
+                  {/* Arabic Font Selector */}
+                  <div>
+                    <div className="font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 pb-1.5 mb-2">
+                      আরবি ফন্ট (Arabic Font)
+                    </div>
+                    <div className="space-y-1">
+                      {[
+                        { name: 'Amiri', label: 'الأميري (Amiri)' },
+                        { name: 'Noto Naskh Arabic', label: 'নাসখ (Noto Naskh)' },
+                        { name: 'Scheherazade New', label: 'شهرزاد (Scheherazade)' },
+                      ].map((font) => (
+                        <button
+                          key={font.name}
+                          onClick={() => {
+                            onChangeArabicFont(font.name);
+                          }}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md font-arabic text-base flex items-center justify-between transition-colors ${
+                            arabicFont === font.name
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold'
+                              : 'hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <span>{font.label}</span>
+                          {arabicFont === font.name && (
+                            <span className="text-xs font-sans bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded">সক্রিয়</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Harakat Toggle */}
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
                     <span className="text-slate-600 dark:text-slate-400 font-medium">হরকত (حركات) প্রদর্শন</span>
                     <button

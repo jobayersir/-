@@ -14,6 +14,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [selectedCadre, setSelectedCadre] = useState<PostCadre>('assistant_teacher_arabic');
   const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [bengaliFont, setBengaliFont] = useState<string>('Noto Serif Bengali');
   const [arabicFont, setArabicFont] = useState<string>('Amiri');
   const [harakatVisible, setHarakatVisible] = useState<boolean>(true);
 
@@ -25,9 +26,22 @@ export default function App() {
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem('madrasa_prep_theme');
-      if (savedTheme === 'dark') {
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         setDarkMode(true);
         document.documentElement.classList.add('dark');
+      } else {
+        setDarkMode(false);
+        document.documentElement.classList.remove('dark');
+      }
+
+      const savedBengaliFont = localStorage.getItem('madrasa_prep_bengali_font');
+      if (savedBengaliFont) {
+        setBengaliFont(savedBengaliFont);
+      }
+
+      const savedArabicFont = localStorage.getItem('madrasa_prep_arabic_font');
+      if (savedArabicFont) {
+        setArabicFont(savedArabicFont);
       }
 
       const savedResults = localStorage.getItem('madrasa_prep_results');
@@ -43,6 +57,31 @@ export default function App() {
       console.error('Failed to parse local storage', e);
     }
   }, []);
+
+  // Sync dark mode class on documentElement
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // Sync Bengali font on body
+  useEffect(() => {
+    if (bengaliFont === 'Noto Serif Bengali') {
+      document.body.style.fontFamily = "'Noto Serif Bengali', 'Hind Siliguri', serif, system-ui";
+    } else {
+      document.body.style.fontFamily = "'Hind Siliguri', 'Noto Serif Bengali', sans-serif, system-ui";
+    }
+    localStorage.setItem('madrasa_prep_bengali_font', bengaliFont);
+  }, [bengaliFont]);
+
+  // Sync Arabic font preference
+  const handleChangeArabicFont = (font: string) => {
+    setArabicFont(font);
+    localStorage.setItem('madrasa_prep_arabic_font', font);
+  };
 
   // Dark mode toggle handler
   const handleToggleDarkMode = () => {
@@ -106,8 +145,10 @@ export default function App() {
         onToggleDarkMode={handleToggleDarkMode}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        bengaliFont={bengaliFont}
+        onChangeBengaliFont={setBengaliFont}
         arabicFont={arabicFont}
-        onChangeArabicFont={setArabicFont}
+        onChangeArabicFont={handleChangeArabicFont}
         harakatVisible={harakatVisible}
         onToggleHarakat={() => setHarakatVisible(!harakatVisible)}
       />
