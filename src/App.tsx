@@ -13,6 +13,7 @@ import { CqPracticeView } from './components/CqPracticeView';
 import { QuestionBankView } from './components/QuestionBankView';
 import { GlossaryView } from './components/GlossaryView';
 import { DeploymentGuideView } from './components/DeploymentGuideView';
+import { AdminView } from './components/AdminView';
 import { 
   ProfileView, 
   BookmarksView, 
@@ -244,6 +245,10 @@ export default function App() {
 
         {activeTab === 'leaderboard' && (
           <LeaderboardView />
+        )}
+
+        {activeTab === 'admin' && (
+          <AdminView />
         )}
 
         {activeTab === 'premium' && (

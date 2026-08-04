@@ -17,6 +17,7 @@ import {
   Check, 
   HelpCircle, 
   Sparkles, 
+  FileText,
   AlertCircle,
   ChevronDown,
   ChevronUp,
@@ -67,6 +68,39 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
 
   // Explanation Accordion Open States for Question Review
   const [openExplanations, setOpenExplanations] = useState<Record<number, boolean>>({});
+
+  // Ustad AI Explanation States per Question
+  const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
+  const [loadingAiIdx, setLoadingAiIdx] = useState<number | null>(null);
+
+  const handleFetchAiExplanation = async (idx: number, q: MCQQuestion) => {
+    setLoadingAiIdx(idx);
+    try {
+      const res = await fetch('/api/ustad-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'explain_mcq',
+          questionData: {
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            subject: q.subject,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data.text) {
+        setAiExplanations((prev) => ({ ...prev, [idx]: data.text }));
+        setOpenExplanations((prev) => ({ ...prev, [idx]: true }));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('উস্তাদ এআই সংযোগে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+    } finally {
+      setLoadingAiIdx(null);
+    }
+  };
 
   // Copy Toast State
   const [copiedToastText, setCopiedToastText] = useState<string | null>(null);
@@ -636,41 +670,97 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                         </div>
                       </div>
 
-                      {/* Collapsible Explanation Card */}
-                      {q.explanation && (
-                        <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-800">
-                          <button
-                            onClick={() => {
-                              setOpenExplanations((p) => ({ ...p, [idx]: !p[idx] }));
-                            }}
-                            className="w-full flex items-center justify-between text-xs font-extrabold text-emerald-700 dark:text-emerald-400 hover:underline py-1"
-                          >
-                            <span className="flex items-center space-x-1.5">
-                              <Sparkles className="w-4 h-4 text-amber-500" />
-                              <span>বিস্তারিত ব্যাখ্যা দেখুন (Detailed Explanation)</span>
-                            </span>
-                            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                          </button>
+                      {/* Manual & Ustad AI Explanation Section */}
+                      <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-slate-800 space-y-3">
+                        
+                        {/* 1. Manual Explanation (If present from Admin Panel) */}
+                        {q.explanation && q.explanation.trim().length > 0 ? (
+                          <div className="space-y-2">
+                            <button
+                              onClick={() => setOpenExplanations((p) => ({ ...p, [idx]: !p[idx] }))}
+                              className="w-full flex items-center justify-between text-xs font-black text-amber-700 dark:text-amber-300 py-1"
+                            >
+                              <span className="flex items-center space-x-1.5">
+                                <FileText className="w-4 h-4 text-amber-500" />
+                                <span>ম্যানুয়াল বিবরণী ও ব্যাখ্যা (Manual Explanation)</span>
+                              </span>
+                              {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </button>
 
-                          {isOpen && (
-                            <div className="mt-3 p-4 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed relative space-y-3">
-                              <p>{q.explanation}</p>
+                            {isOpen && (
+                              <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/40 border border-amber-300/80 dark:border-amber-800/80 text-xs sm:text-sm text-slate-900 dark:text-slate-100 leading-relaxed space-y-3 shadow-2xs">
+                                <p className="font-medium">{q.explanation}</p>
+                                <div className="flex items-center justify-between pt-2 border-t border-amber-200/60 dark:border-amber-800/50">
+                                  <span className="text-[10px] font-bold text-amber-800 dark:text-amber-400">
+                                    সহীহ ম্যানুয়াল বিবরণী
+                                  </span>
+                                  <button
+                                    onClick={() => handleCopyExplanation(q.explanation || '')}
+                                    className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-[11px] flex items-center space-x-1 shadow-xs transition-all active:scale-95"
+                                  >
+                                    <Copy className="w-3 h-3" />
+                                    <span>কপি করুন</span>
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : null}
 
-                              {/* Copy Button at Bottom Right of Every Explanation Card */}
-                              <div className="flex justify-end pt-2">
+                        {/* 2. Ustad AI Explanation Button & Box */}
+                        <div className="space-y-2">
+                          {!aiExplanations[idx] && (
+                            <button
+                              onClick={() => handleFetchAiExplanation(idx, q)}
+                              disabled={loadingAiIdx === idx}
+                              className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-800 to-teal-900 hover:from-emerald-700 hover:to-teal-800 text-white font-extrabold text-xs flex items-center justify-between shadow-md transition-all active:scale-95 disabled:opacity-60"
+                            >
+                              <span className="flex items-center space-x-2">
+                                <Sparkles className="w-4 h-4 text-amber-300 animate-spin" />
+                                <span>
+                                  {loadingAiIdx === idx
+                                    ? 'উস্তাদ এআই ব্যাখ্যা বিশ্লেষণ করছে...'
+                                    : q.explanation
+                                    ? 'উস্তাদ এআই দিয়ে আরও বিস্তৃত ব্যাখ্যা জানুন'
+                                    : 'উস্তাদ এআই দিয়ে ব্যাখ্যা জানুন'}
+                                </span>
+                              </span>
+                              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-amber-400 text-slate-950 uppercase">
+                                AI Tutor
+                              </span>
+                            </button>
+                          )}
+
+                          {aiExplanations[idx] && (
+                            <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-slate-900 text-white border border-emerald-500/50 text-xs sm:text-sm leading-relaxed space-y-3 shadow-lg relative">
+                              <div className="flex items-center justify-between border-b border-emerald-800/80 pb-2">
+                                <span className="font-black text-amber-400 text-xs flex items-center space-x-1.5">
+                                  <Sparkles className="w-4 h-4 text-amber-400" />
+                                  <span>উস্তাদ এআই বিশ্লেষণ ও ব্যাখ্যা</span>
+                                </span>
+                                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-700 text-white">
+                                  Gemini AI Powered
+                                </span>
+                              </div>
+
+                              <p className="whitespace-pre-line font-medium text-emerald-50">
+                                {aiExplanations[idx]}
+                              </p>
+
+                              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-emerald-800/60">
                                 <button
-                                  onClick={() => handleCopyExplanation(q.explanation || '')}
-                                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all active:scale-95"
-                                  title="ব্যাখ্যা কপি করুন"
+                                  onClick={() => handleCopyExplanation(aiExplanations[idx])}
+                                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center space-x-1 shadow-sm active:scale-95"
                                 >
                                   <Copy className="w-3.5 h-3.5 text-amber-300" />
-                                  <span>কপি করুন (Copy)</span>
+                                  <span>কপি করুন</span>
                                 </button>
                               </div>
                             </div>
                           )}
                         </div>
-                      )}
+
+                      </div>
 
                     </div>
                   );

@@ -104,7 +104,8 @@ export type NavTab =
   | 'leaderboard'
   | 'premium'
   | 'settings'
-  | 'deployment';
+  | 'deployment'
+  | 'admin';
 
 export type ExamCategory = 'daily' | 'free' | 'premium' | 'live' | 'upcoming' | 'completed';
 
