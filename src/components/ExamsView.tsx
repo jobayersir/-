@@ -766,30 +766,45 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         <span>মেধা তালিকা</span>
                       </button>
                     </div>
-                  ) : isPremium ? (
-                    <button
-                      onClick={() => handleStartExam(exam)}
-                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-sm shadow-md shadow-amber-500/20 flex items-center justify-center space-x-2 transition-all active:scale-95"
-                    >
-                      <Crown className="w-4 h-4 text-slate-950" />
-                      <span>প্রিমিয়াম পরীক্ষা আনলক করুন</span>
-                    </button>
-                  ) : isLive ? (
-                    <button
-                      onClick={() => handleStartExam(exam)}
-                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-black text-sm shadow-md shadow-rose-600/30 flex items-center justify-center space-x-2 transition-all active:scale-95"
-                    >
-                      <Radio className="w-4 h-4 animate-pulse" />
-                      <span>লাইভ পরীক্ষায় অংশ নিন</span>
-                    </button>
                   ) : (
-                    <button
-                      onClick={() => handleStartExam(exam)}
-                      className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-sm shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2 transition-all active:scale-95"
-                    >
-                      <Play className="w-4 h-4 fill-white" />
-                      <span>পরীক্ষা দিন</span>
-                    </button>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        onClick={() => handleStartExam(exam)}
+                        className={`col-span-2 py-3 rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-1.5 transition-all active:scale-95 ${
+                          isPremium
+                            ? 'bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 shadow-amber-500/20'
+                            : isLive
+                            ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white shadow-rose-600/30'
+                            : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-600/20'
+                        }`}
+                      >
+                        {isPremium ? (
+                          <>
+                            <Crown className="w-4 h-4 text-slate-950" />
+                            <span>প্রিমিয়াম পরীক্ষা</span>
+                          </>
+                        ) : isLive ? (
+                          <>
+                            <Radio className="w-4 h-4 animate-pulse" />
+                            <span>লাইভ পরীক্ষা</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4 fill-white" />
+                            <span>ফ্রি পরীক্ষা দিন</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => setViewingLeaderboardExam(exam)}
+                        className="py-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700 font-extrabold text-xs sm:text-sm shadow-2xs flex items-center justify-center space-x-1 transition-all active:scale-95"
+                        title="এই পরীক্ষার মেধা তালিকা দেখুন"
+                      >
+                        <Trophy className="w-4 h-4 text-amber-500 shrink-0" />
+                        <span>মেধা তালিকা</span>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -892,121 +907,161 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       )}
 
       {/* ========================================================= */}
-      {/* EXAM SPECIFIC LEADERBOARD MODAL                           */}
+      {/* EXAM SPECIFIC LEADERBOARD MODAL (Matches Screen 3)       */}
       {/* ========================================================= */}
       {viewingLeaderboardExam && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full shadow-2xl border border-amber-400/50 p-5 sm:p-6 space-y-5 relative">
+          <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-emerald-500/30 p-5 sm:p-6 space-y-4 relative">
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
               <div className="flex items-center space-x-2">
-                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                </div>
+                <Crown className="w-6 h-6 text-amber-500 shrink-0" />
                 <div>
-                  <h3 className="font-extrabold text-base sm:text-lg text-slate-950 dark:text-slate-100">
-                    জাতীয় মেধা তালিকা (Exam Leaderboard)
+                  <h3 className="font-black text-lg text-slate-950 dark:text-slate-100 flex items-center space-x-1.5">
+                    <span>লিডারবোর্ড</span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium truncate max-w-xs">
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-bold truncate max-w-[220px] sm:max-w-xs">
                     {viewingLeaderboardExam.title}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setViewingLeaderboardExam(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* User Rank Card */}
-            <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-emerald-950 text-white p-4 rounded-2xl shadow-md border border-emerald-700/60 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-inner">
-                  #১৫
-                </div>
-                <div>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="font-bold text-sm text-white">মাওলানা মোঃ আব্দুল্লাহ (আপনি)</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-400/30 text-amber-300 font-extrabold border border-amber-400/40">
-                      আপনার স্থান
-                    </span>
-                  </div>
-                  <p className="text-xs text-emerald-200 mt-0.5">
-                    প্রাপ্ত নম্বর: <strong className="text-white">{viewingLeaderboardExam.score || 26}/{viewingLeaderboardExam.totalMarks || 30}</strong> • নির্ভুলতা: {viewingLeaderboardExam.accuracy || 87}%
-                  </p>
-                </div>
-              </div>
+            {/* Filter Pills (Matches Image: সার্বিক, আজকের সেরা, বন্ধুদের মধ্যে) */}
+            <div className="flex items-center justify-center gap-1.5 p-1 bg-slate-200 dark:bg-slate-800 rounded-xl text-xs font-bold">
+              <button className="flex-1 py-1.5 rounded-lg bg-emerald-800 text-white font-extrabold shadow-sm text-center">
+                সার্বিক
+              </button>
+              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 text-center">
+                আজকের সেরা
+              </button>
+              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 text-center">
+                বন্ধুদের মধ্যে
+              </button>
             </div>
 
-            {/* Top Rankers List */}
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              <h4 className="text-xs font-black text-slate-500 uppercase tracking-wider mb-2 flex items-center space-x-1">
-                <Medal className="w-4 h-4 text-amber-500" />
-                <span>শীর্ষ পরীক্ষার্থী ও জাতীয় র‍্যাঙ্কিং</span>
-              </h4>
+            {/* Top 3 Winners Podium Cards (Exact Image Layout) */}
+            <div className="grid grid-cols-3 gap-2 items-end pt-2">
+              
+              {/* Rank 2 (Left - Ahmad Rafi) */}
+              <div className="bg-slate-100 dark:bg-slate-800/80 rounded-2xl p-3 border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center">
+                <div className="relative mb-1">
+                  <div className="w-12 h-12 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-sm flex items-center justify-center border-2 border-slate-400 overflow-hidden">
+                    আ
+                  </div>
+                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-400 text-white font-black text-[10px] flex items-center justify-center shadow">
+                    2
+                  </span>
+                </div>
+                <span className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate w-full">
+                  আহমাদ রাফি
+                </span>
+                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  ৯২%
+                </span>
+                <span className="text-[10px] text-slate-500 font-semibold">
+                  ৯২ নম্বর
+                </span>
+              </div>
 
+              {/* Rank 1 (Center - Gold Highlight - Mushfiqur Rahman) */}
+              <div className="bg-amber-100 dark:bg-amber-950/60 rounded-2xl p-3.5 border-2 border-amber-400 text-center flex flex-col items-center -mt-3 shadow-md">
+                <Crown className="w-4 h-4 text-amber-500 mb-0.5 animate-bounce" />
+                <div className="relative mb-1">
+                  <div className="w-14 h-14 rounded-full bg-amber-200 text-slate-950 font-black text-base flex items-center justify-center border-2 border-amber-500 overflow-hidden shadow">
+                    মু
+                  </div>
+                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] flex items-center justify-center shadow">
+                    1
+                  </span>
+                </div>
+                <span className="font-black text-xs text-slate-950 dark:text-amber-200 truncate w-full">
+                  মুশফিকুর রহমান
+                </span>
+                <span className="text-xs font-black text-amber-700 dark:text-amber-400 mt-0.5">
+                  ৯৬%
+                </span>
+                <span className="text-[10px] text-amber-800 dark:text-amber-300 font-bold">
+                  ৯৬ নম্বর
+                </span>
+              </div>
+
+              {/* Rank 3 (Right - Fariha Nur) */}
+              <div className="bg-amber-50/80 dark:bg-slate-800/80 rounded-2xl p-3 border border-amber-200/80 dark:border-slate-700 text-center flex flex-col items-center">
+                <div className="relative mb-1">
+                  <div className="w-12 h-12 rounded-full bg-amber-200/80 text-amber-900 font-black text-sm flex items-center justify-center border-2 border-amber-600 overflow-hidden">
+                    ফা
+                  </div>
+                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-700 text-white font-black text-[10px] flex items-center justify-center shadow">
+                    3
+                  </span>
+                </div>
+                <span className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate w-full">
+                  ফারিহা নূর
+                </span>
+                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  ৮৮%
+                </span>
+                <span className="text-[10px] text-slate-500 font-semibold">
+                  ৮৮ নম্বর
+                </span>
+              </div>
+
+            </div>
+
+            {/* Ranked Users List (Matches Image) */}
+            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
               {[
-                { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: '২৮/৩০', time: '২৫ মি.', location: 'ঢাকা', accuracy: '৯৫%' },
-                { rank: 2, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: '২৭/৩০', time: '২৭ মি.', location: 'চট্টগ্রাম', accuracy: '৯২%' },
-                { rank: 3, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: '২৬/৩০', time: '২৮ মি.', location: 'সিলেট', accuracy: '৮৯%' },
-                { rank: 4, name: 'হাফেজ ওবায়দুল ইসলাম', cadre: 'ইবতেদায়ী প্রধান', score: '২৬/৩০', time: '২৯ মি.', location: 'রাজশাহী', accuracy: '৮৮%' },
-                { rank: 15, name: 'মাওলানা মোঃ আব্দুল্লাহ (আপনি)', cadre: 'সহকারী শিক্ষক (আরবি)', score: `${viewingLeaderboardExam.score || 26}/${viewingLeaderboardExam.totalMarks || 30}`, time: '৩০ মি.', location: 'ময়মনসিংহ', accuracy: `${viewingLeaderboardExam.accuracy || 87}%`, isUser: true },
+                { rank: 4, name: 'তানভীর আহমেদ', accuracy: '৮৬%', score: '৮৬ নম্বর' },
+                { rank: 5, name: 'আরিফুল ইসলাম (আপনি)', accuracy: '৮৪%', score: '৮৪ নম্বর', isUser: true },
+                { rank: 6, name: 'সাবিহা আক্তার', accuracy: '৮৩%', score: '৮৩ নম্বর' },
+                { rank: 7, name: 'নাজমুল হাসান', accuracy: '৮১%', score: '৮১ নম্বর' },
+                { rank: 8, name: 'ইসরাত জাহান', accuracy: '৭৯%', score: '৭৯ নম্বর' },
               ].map((row, idx) => (
                 <div
                   key={idx}
-                  className={`p-3 rounded-2xl border flex items-center justify-between text-xs transition-all ${
+                  className={`px-3 py-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${
                     row.isUser
-                      ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-400 dark:border-amber-700/80 font-bold'
-                      : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/70'
+                      ? 'bg-emerald-100/90 dark:bg-emerald-950/80 border-emerald-400 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-2xs'
+                      : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/70 text-slate-900 dark:text-slate-100 font-bold'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-xs ${
-                      row.rank === 1 ? 'bg-amber-400 text-slate-950' :
-                      row.rank === 2 ? 'bg-slate-300 text-slate-900' :
-                      row.rank === 3 ? 'bg-amber-700 text-white' :
-                      'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}>
-                      #{row.rank}
+                    <span className="w-5 font-black text-center text-slate-500 dark:text-slate-400">
+                      {row.rank}
                     </span>
-                    <div>
-                      <div className="flex items-center space-x-1.5">
-                        <span className="font-extrabold text-slate-900 dark:text-slate-100">{row.name}</span>
-                        {row.isUser && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-600 text-white font-black">
-                            YOU
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-slate-500">{row.cadre} • {row.location}</span>
+                    <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-xs shrink-0">
+                      {row.name.charAt(0)}
                     </div>
+                    <span className="truncate max-w-[130px] sm:max-w-[180px]">{row.name}</span>
                   </div>
 
-                  <div className="text-right">
-                    <span className="font-black text-emerald-600 dark:text-emerald-400 block text-xs">{row.score}</span>
-                    <span className="text-[10px] text-slate-400">{row.time}</span>
+                  <div className="flex items-center space-x-3 text-right">
+                    <span className="font-extrabold text-slate-700 dark:text-slate-300">{row.accuracy}</span>
+                    <span className="font-black text-emerald-700 dark:text-emerald-400 min-w-[55px]">{row.score}</span>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Bottom Modal Actions */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="space-y-2 pt-1">
               <button
-                onClick={() => handleShareExam(viewingLeaderboardExam)}
-                className="py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-sm active:scale-95"
+                onClick={() => {
+                  setViewingLeaderboardExam(null);
+                  handleShareExam(viewingLeaderboardExam);
+                }}
+                className="w-full py-3.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
               >
-                <Share2 className="w-4 h-4" />
-                <span>মেধা তালিকা শেয়ার</span>
-              </button>
-              <button
-                onClick={() => setViewingLeaderboardExam(null)}
-                className="py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs"
-              >
-                বন্ধ করুন
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>সম্পূর্ণ লিডারবোর্ড দেখুন</span>
               </button>
             </div>
 
