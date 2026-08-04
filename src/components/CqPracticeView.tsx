@@ -35,6 +35,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
             marks: selectedQuestion.marks,
           },
           userAnswer: userAnswerInput,
+          apiKey: localStorage.getItem('tamreen_gemini_api_key') || undefined,
         }),
       });
 

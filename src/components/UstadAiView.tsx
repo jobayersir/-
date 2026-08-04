@@ -16,7 +16,10 @@ import {
   History,
   MessageSquarePlus,
   Zap,
-  RotateCcw
+  RotateCcw,
+  Key,
+  X,
+  Settings
 } from 'lucide-react';
 
 interface UstadAiViewProps {
@@ -45,8 +48,33 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
 
+  // API Key management
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [userApiKey, setUserApiKey] = useState(() => {
+    return localStorage.getItem('tamreen_gemini_api_key') || '';
+  });
+  const [keyInput, setKeyInput] = useState(userApiKey);
+  const [keySavedMsg, setKeySavedMsg] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSaveApiKey = () => {
+    const trimmed = keyInput.trim();
+    localStorage.setItem('tamreen_gemini_api_key', trimmed);
+    setUserApiKey(trimmed);
+    setKeySavedMsg(true);
+    setTimeout(() => {
+      setKeySavedMsg(false);
+      setShowKeyModal(false);
+    }, 1200);
+  };
+
+  const handleClearApiKey = () => {
+    localStorage.removeItem('tamreen_gemini_api_key');
+    setUserApiKey('');
+    setKeyInput('');
+  };
 
   const cleanNoSymbols = (str: string) => {
     return str.replace(/[*#]/g, '').trim();
@@ -90,6 +118,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
       }));
 
     try {
+      const activeKey = userApiKey || localStorage.getItem('tamreen_gemini_api_key') || undefined;
       const res = await fetch('/api/ustad-ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,6 +127,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
           prompt: textToSend || 'সংযুক্ত ছবিটি বিশ্লেষণ করুন',
           image: currentImage,
           history,
+          apiKey: activeKey,
         }),
       });
 
@@ -193,6 +223,22 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
 
         <div className="flex items-center space-x-2">
           <button
+            onClick={() => {
+              setKeyInput(userApiKey);
+              setShowKeyModal(true);
+            }}
+            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
+              userApiKey
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
+            }`}
+            title="Gemini API Key সেটআপ করুন"
+          >
+            <Key className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">{userApiKey ? 'কী সক্রিয়' : 'API Key সেটিং'}</span>
+          </button>
+
+          <button
             onClick={handleClearChat}
             className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-semibold backdrop-blur-md flex items-center space-x-1.5 transition-colors"
             title="নতুন চ্যাট শুরু করুন"
@@ -202,6 +248,82 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* API Key Modal */}
+      {showKeyModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setShowKeyModal(false)}
+              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center space-x-3">
+              <div className="p-3 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 rounded-2xl">
+                <Key className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  Gemini API Key সেটিং
+                </h3>
+                <p className="text-xs text-slate-5-00 text-slate-500 dark:text-slate-400">
+                  আপনার নিজস্ব Gemini API Key ব্যবহার করে সরাসরি AI সার্ভিস চালু রাখুন
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Gemini API Key (Google AI Studio):
+              </label>
+              <input
+                type="password"
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                placeholder="AIzaSy..."
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <p className="text-[11px] text-slate-400">
+                কী টি আপনার ব্রাউজারের LocalStorage-এ নিরাপদে সংরক্ষিত থাকবে।
+              </p>
+            </div>
+
+            {keySavedMsg && (
+              <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-600 dark:text-emerald-400 text-xs font-semibold text-center">
+                ✓ API Key সফলভাবে সংরক্ষিত হয়েছে!
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-2">
+              {userApiKey ? (
+                <button
+                  onClick={handleClearApiKey}
+                  className="px-3 py-2 text-xs font-bold text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl"
+                >
+                  কী মুছে ফেলুন
+                </button>
+              ) : <div />}
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setShowKeyModal(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  বাতিল
+                </button>
+                <button
+                  onClick={handleSaveApiKey}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-all"
+                >
+                  সংরক্ষণ করুন
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Chat Interface Container */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl flex flex-col h-[580px] overflow-hidden">

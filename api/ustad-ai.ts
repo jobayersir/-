@@ -65,7 +65,7 @@ function generateSmartFallbackResponse(userPrompt: string, action?: string, ques
 }
 
 export async function processGeminiRequest(reqBody: any) {
-  const { prompt, image, history, questionData, action, userAnswer } = reqBody || {};
+  const { prompt, image, history, questionData, action, userAnswer, apiKey: clientApiKey } = reqBody || {};
 
   let userPrompt = prompt;
 
@@ -82,8 +82,10 @@ export async function processGeminiRequest(reqBody: any) {
     userPrompt = "সাধারণ প্রশ্ন ও টিউটোরিয়াল দিকনির্দেশনা";
   }
 
-  // Try retrieving API key from multiple environment sources or request body
-  const apiKey = reqBody?.apiKey || process.env.GEMINI_API_KEY || process.env.API_KEY || process.env.VITE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  // Try retrieving API key from client request or server environment sources
+  const apiKey = (clientApiKey && typeof clientApiKey === 'string' && clientApiKey.trim().length > 5)
+    ? clientApiKey.trim()
+    : (process.env.GEMINI_API_KEY || process.env.API_KEY || process.env.VITE_GEMINI_API_KEY || process.env.GOOGLE_API_KEY);
 
   if (apiKey && apiKey !== "MY_GEMINI_API_KEY" && apiKey.trim().length > 5) {
     try {
@@ -111,7 +113,7 @@ export async function processGeminiRequest(reqBody: any) {
         for (const msg of history) {
           if (msg.text && (msg.role === 'user' || msg.role === 'model')) {
             contents.push({
-              role: msg.role,
+              role: msg.role === 'user' ? 'user' : 'model',
               parts: [{ text: msg.text }],
             });
           }
@@ -139,21 +141,33 @@ export async function processGeminiRequest(reqBody: any) {
         parts: currentParts,
       });
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents,
-        config: {
-          systemInstruction,
-          temperature: 0.5,
-        },
-      });
+      const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+      let lastErrMessage = "";
 
-      if (response && response.text) {
-        const cleanText = response.text.replace(/[*#]/g, '').trim();
-        return cleanText;
+      for (const modelName of candidateModels) {
+        try {
+          const response = await ai.models.generateContent({
+            model: modelName,
+            contents,
+            config: {
+              systemInstruction,
+              temperature: 0.5,
+            },
+          });
+
+          if (response && response.text) {
+            const cleanText = response.text.replace(/[*#]/g, '').trim();
+            return cleanText;
+          }
+        } catch (modelErr: any) {
+          lastErrMessage = modelErr?.message || String(modelErr);
+          console.warn(`Model ${modelName} failed:`, lastErrMessage);
+        }
       }
+
+      console.error("Gemini API invocation failed across candidate models:", lastErrMessage);
     } catch (err) {
-      console.warn("Gemini API call warning, using intelligent fallback response:", err);
+      console.warn("Gemini API call warning:", err);
     }
   }
 

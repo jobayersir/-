@@ -139,6 +139,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
             correctAnswer: q.correctAnswer,
             subject: q.subject,
           },
+          apiKey: localStorage.getItem('tamreen_gemini_api_key') || undefined,
         }),
       });
       const data = await res.json();
