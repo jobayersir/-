@@ -55,7 +55,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
   const [selectedCategory, setSelectedCategory] = useState<ExamCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('all');
-  const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState('all');
   const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'questions'>('latest');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
@@ -280,10 +279,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
     const matchesSubject =
       selectedSubjectFilter === 'all' || exam.subject.includes(selectedSubjectFilter);
 
-    const matchesDifficulty =
-      selectedDifficultyFilter === 'all' || exam.difficulty === selectedDifficultyFilter;
-
-    return matchesCategory && matchesSearch && matchesSubject && matchesDifficulty;
+    return matchesCategory && matchesSearch && matchesSubject;
   }).sort((a, b) => {
     if (sortBy === 'popular') {
       return parseInt(b.participantsCount) - parseInt(a.participantsCount);
@@ -347,64 +343,58 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
     <div className="space-y-6 pb-28 animate-in fade-in duration-300">
       
       {/* ========================================================= */}
-      {/* 1. HEADER HERO BANNER (Green & Gold Islamic Luxury Theme)  */}
+      {/* 1. HEADER HERO BANNER (Compact & Elegant Islamic Theme)    */}
       {/* ========================================================= */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-950 text-white p-6 sm:p-8 shadow-2xl border border-emerald-800/60">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-950 text-white p-4 sm:p-5 shadow-xl border border-emerald-800/60">
         
-        {/* Subtle Islamic Geometric Backdrop Accent */}
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-10 -top-10 w-56 h-56 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
+        {/* Subtle Backdrop Accent */}
+        <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -left-10 -top-10 w-44 h-44 bg-emerald-500/15 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            {/* Top Pill */}
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-900/80 border border-amber-400/40 text-amber-300 text-xs sm:text-sm font-bold shadow-sm backdrop-blur-md">
-              <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>১৮তম মাদ্রাসা শিক্ষক নিবন্ধন প্রিপারেশন হাব</span>
-            </div>
-
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-2 max-w-2xl">
             {/* Title & Subtitle */}
             <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-                পরীক্ষা দিন <span className="text-amber-400 font-extrabold text-2xl sm:text-3xl font-arabic">(اختبارات)</span>
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
+                পরীক্ষা দিন <span className="text-amber-400 font-extrabold text-xl sm:text-2xl font-arabic">(اختبارات)</span>
               </h1>
-              <p className="text-base sm:text-lg text-emerald-100/90 font-medium mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-emerald-100/90 font-medium mt-0.5 leading-relaxed">
                 নিজেকে যাচাই করুন, সাফল্যের পথে এগিয়ে যান
               </p>
             </div>
 
             {/* Stats Pills */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <div className="flex items-center space-x-2 bg-emerald-900/60 border border-emerald-700/50 px-3.5 py-1.5 rounded-2xl text-xs sm:text-sm font-semibold text-emerald-200">
-                <Flame className="w-4 h-4 text-amber-400" />
-                <span>আজকের মোট পরীক্ষা: <strong className="text-white font-extrabold">২৭টি</strong></span>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <div className="flex items-center space-x-1.5 bg-emerald-900/60 border border-emerald-700/50 px-3 py-1 rounded-xl text-xs font-semibold text-emerald-200">
+                <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>আজকের পরীক্ষা: <strong className="text-white font-black">২৭টি</strong></span>
               </div>
-              <div className="flex items-center space-x-2 bg-emerald-900/60 border border-emerald-700/50 px-3.5 py-1.5 rounded-2xl text-xs sm:text-sm font-semibold text-emerald-200">
-                <FileCheck2 className="w-4 h-4 text-teal-300" />
-                <span>সর্বমোট প্রশ্নব্যাংক: <strong className="text-white font-extrabold">১,২৫০+ টি</strong></span>
+              <div className="flex items-center space-x-1.5 bg-emerald-900/60 border border-emerald-700/50 px-3 py-1 rounded-xl text-xs font-semibold text-emerald-200">
+                <FileCheck2 className="w-3.5 h-3.5 text-teal-300 shrink-0" />
+                <span>প্রশ্নব্যাংক: <strong className="text-white font-black">১,২৫০+ টি</strong></span>
               </div>
             </div>
           </div>
 
           {/* Right Header Action Card */}
-          <div className="flex sm:flex-col items-center sm:items-end justify-between w-full md:w-auto gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-emerald-800/50">
-            <div className="bg-emerald-900/80 border border-amber-400/30 p-4 rounded-2xl backdrop-blur-md flex items-center space-x-3.5 shadow-lg">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 shrink-0">
-                <Award className="w-7 h-7" />
+          <div className="flex sm:flex-col items-center sm:items-end justify-between w-full md:w-auto gap-2 pt-2 md:pt-0 border-t md:border-t-0 border-emerald-800/50">
+            <div className="bg-emerald-900/80 border border-amber-400/30 px-3.5 py-2.5 rounded-2xl backdrop-blur-md flex items-center space-x-3 shadow-md">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 shrink-0">
+                <Award className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <span className="text-xs text-amber-200/90 font-semibold block">আজকের লাইভ মক টেস্ট</span>
-                <span className="font-extrabold text-white text-sm sm:text-base">রাত ৯:০০ টায় শুরু</span>
+                <span className="text-[11px] text-amber-200/90 font-semibold block leading-none mb-0.5">লাইভ মক টেস্ট</span>
+                <span className="font-extrabold text-white text-xs sm:text-sm">রাত ৯:০০ টায়</span>
               </div>
             </div>
 
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold flex items-center space-x-2 transition-all active:scale-95"
+              className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold flex items-center space-x-1.5 transition-all active:scale-95"
               title="পরীক্ষার তালিকা আপডেট করুন"
             >
-              <RefreshCw className={`w-4 h-4 text-amber-300 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-amber-300 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">রিফ্রেশ</span>
             </button>
           </div>
@@ -459,7 +449,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
         </div>
 
         {/* Secondary Filter Dropdowns & Sorting */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
           {/* Subject Filter */}
           <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-700">
             <BookOpen className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -479,21 +469,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
             </select>
           </div>
 
-          {/* Difficulty Filter */}
-          <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-700">
-            <Target className="w-4 h-4 text-amber-500 shrink-0" />
-            <select
-              value={selectedDifficultyFilter}
-              onChange={(e) => setSelectedDifficultyFilter(e.target.value)}
-              className="w-full bg-transparent text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
-            >
-              <option value="all">সকল কাঠিন্য স্তর</option>
-              <option value="সহজ">সহজ স্তর</option>
-              <option value="মাঝারি">মাঝারি স্তর</option>
-              <option value="কঠিন">কঠিন স্তর</option>
-            </select>
-          </div>
-
           {/* Sort Filter */}
           <div className="flex items-center space-x-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-700">
             <SlidersHorizontal className="w-4 h-4 text-teal-600 shrink-0" />
@@ -510,12 +485,11 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
         </div>
 
         {/* Reset Filters Option if any active */}
-        {(selectedSubjectFilter !== 'all' || selectedDifficultyFilter !== 'all' || searchQuery !== '') && (
+        {(selectedSubjectFilter !== 'all' || searchQuery !== '') && (
           <div className="flex justify-end pt-1">
             <button
               onClick={() => {
                 setSelectedSubjectFilter('all');
-                setSelectedDifficultyFilter('all');
                 setSearchQuery('');
               }}
               className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center space-x-1"
@@ -563,7 +537,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
             onClick={() => {
               setSelectedCategory('all');
               setSelectedSubjectFilter('all');
-              setSelectedDifficultyFilter('all');
               setSearchQuery('');
             }}
             className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md"
@@ -602,7 +575,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
                 )}
 
                 <div className="space-y-3.5">
-                  {/* Category Badge & Status */}
+                  {/* Category Badge & Free/Premium Status */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center space-x-2">
                       {/* Subject Icon Badge */}
@@ -630,10 +603,18 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
                       </span>
                     </div>
 
-                    {/* Difficulty Badge */}
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 px-2.5 py-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl">
-                      {exam.difficulty}
-                    </span>
+                    {/* Admin Selected Free / Premium Badge */}
+                    {isPremium ? (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-black bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-900 dark:text-amber-300 border border-amber-400/60 flex items-center space-x-1 shadow-2xs">
+                        <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span>প্রিমিয়াম</span>
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 flex items-center space-x-1 shadow-2xs">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>ফ্রি</span>
+                      </span>
+                    )}
                   </div>
 
                   {/* Title & Arabic Subtitle */}
@@ -653,19 +634,19 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions }) => {
                     বিষয়: <strong className="font-bold text-slate-900 dark:text-slate-100">{exam.subject}</strong>
                   </div>
 
-                  {/* Key Stats Bar (Duration, Questions, Total Marks) */}
-                  <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300">
-                    <div className="text-center border-r border-slate-200/80 dark:border-slate-700/80 pr-1">
-                      <span className="text-[10px] text-slate-400 block font-semibold">সময়</span>
-                      <strong className="text-slate-900 dark:text-slate-100 font-bold">{exam.durationMinutes} মিনিট</strong>
+                  {/* Key Stats Pill Buttons (Duration, Questions, Total Marks) */}
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                    <div className="px-2 sm:px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center space-x-1 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-2xs">
+                      <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span className="truncate">{exam.durationMinutes} মি.</span>
                     </div>
-                    <div className="text-center border-r border-slate-200/80 dark:border-slate-700/80 px-1">
-                      <span className="text-[10px] text-slate-400 block font-semibold">প্রশ্ন</span>
-                      <strong className="text-slate-900 dark:text-slate-100 font-bold">{exam.totalQuestions}টি</strong>
+                    <div className="px-2 sm:px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center space-x-1 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-2xs">
+                      <FileCheck2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                      <span className="truncate">{exam.totalQuestions} প্রশ্ন</span>
                     </div>
-                    <div className="text-center pl-1">
-                      <span className="text-[10px] text-slate-400 block font-semibold">মোট নম্বর</span>
-                      <strong className="text-emerald-700 dark:text-emerald-400 font-bold">{exam.totalMarks}</strong>
+                    <div className="px-2 sm:px-2.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center space-x-1 text-xs font-bold text-slate-800 dark:text-slate-200 shadow-2xs">
+                      <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span className="truncate">{exam.totalMarks} নম্বর</span>
                     </div>
                   </div>
 
