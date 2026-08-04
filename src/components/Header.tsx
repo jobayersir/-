@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { PostCadre, NavTab, NotificationItem, UserProfileData } from '../types';
 import { Logo } from './Logo';
+import { UstadAiLogo } from './UstadAiLogo';
 import { 
   Home, 
   FileCheck2, 
   GraduationCap, 
-  Bot, 
   Bell, 
   Moon, 
   Sun, 
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'home', label: 'Home', labelBn: 'হোম', icon: Home },
     { id: 'exams', label: 'Exams', labelBn: 'পরীক্ষা দিন', icon: FileCheck2 },
     { id: 'courses', label: 'Courses', labelBn: 'কোর্স', icon: GraduationCap },
-    { id: 'ustad_ai', label: 'AI Assistant', labelBn: 'উস্তাদ AI', icon: Bot, isSpecial: true },
+    { id: 'ustad_ai', label: 'AI Assistant', labelBn: 'উস্তাদ AI', icon: null, isSpecial: true },
   ];
 
   return (
@@ -132,7 +132,11 @@ export const Header: React.FC<HeaderProps> = ({
                       : 'text-slate-600 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-white/60 dark:hover:bg-slate-700/50'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : item.isSpecial ? 'text-amber-500' : 'text-emerald-600 dark:text-emerald-400'}`} />
+                  {item.id === 'ustad_ai' ? (
+                    <UstadAiLogo size="sm" />
+                  ) : (
+                    Icon && <Icon className={`w-4 h-4 ${isActive ? 'text-white' : item.isSpecial ? 'text-amber-500' : 'text-emerald-600 dark:text-emerald-400'}`} />
+                  )}
                   <span>{item.labelBn}</span>
                   {item.isSpecial && (
                     <span className="px-1.5 py-0.2 text-[9px] font-black rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider">
