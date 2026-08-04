@@ -1,15 +1,15 @@
-name: Build and Package Web & Mobile App
+name: Build Web App & Android APK
 
 on:
   push:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build Web App & Export Artifacts
+    name: Build Web & Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -21,15 +21,43 @@ jobs:
         with:
           node-version: '20'
 
+      - name: ☕ Setup Java JDK 17 for Android Build
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
       - name: 📦 Install Dependencies
         run: npm install
 
-      - name: 🏗️ Build Production Bundle (Vite)
+      - name: 🏗️ Build Web App (Vite)
         run: npm run build
         env:
           NODE_ENV: production
 
-      - name: 🤐 Zip Dist Folder for Web Hosting / Deployment
+      - name: 📱 Add & Sync Android Platform (Capacitor)
+        run: |
+          npx cap add android || true
+          npx cap sync android
+
+      - name: 🔨 Build Android APK (Gradle Debug APK)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: 🚚 Copy APK to Root & Rename
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk ./Madrasa-NTRCA-Prep.apk
+
+      - name: 📲 Upload Android APK Artifact (APK File for Phone)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Madrasa-NTRCA-Prep-APK
+          path: Madrasa-NTRCA-Prep.apk
+          retention-days: 30
+
+      - name: 🤐 Zip Dist Folder for Web Hosting
         run: |
           cd dist
           zip -r ../madrasa-ntrca-web-build.zip .
@@ -40,15 +68,4 @@ jobs:
         with:
           name: madrasa-ntrca-web-build
           path: madrasa-ntrca-web-build.zip
-          retention-days: 30
-
-      - name: ⬆️ Upload Full Source Code Backup
-        uses: actions/upload-artifact@v4
-        with:
-          name: madrasa-ntrca-source-code
-          path: |
-            .
-            !.git
-            !node_modules
-            !dist
           retention-days: 30
