@@ -1,5 +1,6 @@
 import React from 'react';
 import { PostCadre } from '../types';
+import { Logo } from './Logo';
 import { 
   Sparkles, 
   CheckSquare, 
@@ -45,41 +46,49 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       
       {/* Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-emerald-800/40">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-emerald-800/40">
         <div className="absolute -right-10 -bottom-10 w-64 h-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>১৮তম নিবন্ধন স্পেশাল ব্যাচ • NTRCA Madrasa Phase</span>
+        
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+          <div className="max-w-2xl space-y-4">
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>তামরীন একাডেমি (TAMREEN ACADEMY) • NTRCA স্পেশাল ব্যাচ</span>
+            </div>
+
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+              বিসমিল্লাহির রহমানির রহিম <br />
+              <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-amber-200 bg-clip-text text-transparent">
+                মাদ্রাসা শিক্ষক নিবন্ধন সফলতার বিশ্বস্ত সঙ্গী
+              </span>
+            </h2>
+
+            <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+              সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী ক্যাডারের জন্য তামরীন একাডেমির বিশ্বস্ত আরবি-বাংলা-ইংরেজি সিলেবাস, উস্তাদ এআই (Ustad AI), এমসিকিউ ও সিকিউ প্রস্তুতির সেরা ডিজিটাল প্ল্যাটফর্ম।
+            </p>
+
+            <div className="pt-2 flex flex-wrap gap-3">
+              <button
+                onClick={() => onTabChange('mcq')}
+                className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center space-x-2 transition-all hover:scale-[1.02]"
+              >
+                <Zap className="w-4 h-4" />
+                <span>মক টেস্ট শুরু করুন</span>
+              </button>
+
+              <button
+                onClick={() => onTabChange('ustad_ai')}
+                className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm backdrop-blur-md border border-white/20 flex items-center space-x-2 transition-all"
+              >
+                <Bot className="w-4 h-4 text-teal-300" />
+                <span>উস্তাদ এআই সাহায্য নিন</span>
+              </button>
+            </div>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-            বিসমিল্লাহির রহমানির রহিম <br />
-            <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-amber-200 bg-clip-text text-transparent">
-              মাদ্রাসা শিক্ষক নিবন্ধন সফলতার বিশ্বস্ত সঙ্গী
-            </span>
-          </h2>
-
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী ক্যাডারের জন্য আধুনিক আরবি-বাংলা-ইংরেজি সিলেবাস, উস্তাদ এআই (Ustad AI), এমসিকিউ ও সিকিউ প্রস্তুতির সেরা ডিজিটাল প্ল্যাটফর্ম।
-          </p>
-
-          <div className="pt-2 flex flex-wrap gap-3">
-            <button
-              onClick={() => onTabChange('mcq')}
-              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center space-x-2 transition-all hover:scale-[1.02]"
-            >
-              <Zap className="w-4 h-4" />
-              <span>মক টেস্ট শুরু করুন</span>
-            </button>
-
-            <button
-              onClick={() => onTabChange('ustad_ai')}
-              className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm backdrop-blur-md border border-white/20 flex items-center space-x-2 transition-all"
-            >
-              <Bot className="w-4 h-4 text-teal-300" />
-              <span>উস্তাদ এআই সাহায্য নিন</span>
-            </button>
+          {/* Logo Badge in Hero */}
+          <div className="hidden lg:flex flex-col items-center justify-center p-6 bg-white/10 dark:bg-slate-900/80 rounded-2xl backdrop-blur-md border border-white/15 shadow-2xl flex-shrink-0">
+            <Logo variant="stacked" size="lg" />
           </div>
         </div>
       </div>

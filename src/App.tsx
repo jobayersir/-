@@ -9,6 +9,7 @@ import { QuestionBankView } from './components/QuestionBankView';
 import { UstadAiView } from './components/UstadAiView';
 import { GlossaryView } from './components/GlossaryView';
 import { DeploymentGuideView } from './components/DeploymentGuideView';
+import { Logo } from './components/Logo';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
@@ -205,23 +206,30 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 py-6 mt-12 text-center text-xs text-slate-500 dark:text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center space-x-2">
-            <span className="font-bold text-emerald-700 dark:text-emerald-400">
-              মাদ্রাসা শিক্ষক নিবন্ধন প্রস্তুতি (NTRCA Madrasa Prep)
-            </span>
-            <span>• ১৮তম নিবন্ধনের সেরা ডিজিটাল প্ল্যাটফর্ম</span>
+      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 py-8 mt-12 text-xs text-slate-500 dark:text-slate-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <Logo variant="horizontal" size="sm" />
+            <div className="border-l border-slate-200 dark:border-slate-700 pl-3">
+              <span className="font-bold text-slate-800 dark:text-slate-200 block">
+                TAMREEN ACADEMY • তামরীন একাডেমি
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) স্পেশাল টিচিং প্ল্যাটফর্ম
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 text-xs font-medium">
             <button onClick={() => setActiveTab('deployment')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
-              গিটহাব & ভার্সেল গাইড
+              গিটহাব & ভার্সেল ডিপ্লয়মেন্ট
             </button>
             <span>•</span>
             <button onClick={() => setActiveTab('ustad_ai')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
-              উস্তাদ এআই সাহায্য
+              উস্তাদ এআই (Ustad AI)
             </button>
+            <span>•</span>
+            <span className="text-slate-400">© ২০২৬ সর্বস্বত্ব সংরক্ষিত</span>
           </div>
         </div>
       </footer>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { PostCadre } from '../types';
+import { Logo } from './Logo';
 import { BookOpen, Sparkles, Moon, Sun, Type, SlidersHorizontal, Layers, Target } from 'lucide-react';
 
 interface HeaderProps {
@@ -49,22 +50,15 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between h-16 sm:h-20">
           
           {/* Logo & Title */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onTabChange('home')}>
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-emerald-700 via-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 ring-2 ring-emerald-400/30">
-              <span className="font-arabic font-bold text-xl sm:text-2xl">م</span>
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-emerald-800 via-teal-700 to-emerald-600 dark:from-emerald-300 dark:via-teal-200 dark:to-emerald-400 bg-clip-text text-transparent">
-                  মাদ্রাসা শিক্ষক নিবন্ধন
-                </h1>
-                <span className="hidden sm:inline-block px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-700">
-                  NTRCA Madrasa
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                প্রস্তুতি প্ল্যাটফর্ম • ১৮তম নিবন্ধন লক্ষ্য
-              </p>
+          <div className="flex items-center space-x-3 sm:space-x-4 cursor-pointer py-1" onClick={() => onTabChange('home')}>
+            <Logo variant="horizontal" size="md" />
+            <div className="hidden xl:block border-l border-emerald-200 dark:border-slate-700 pl-3.5 py-0.5">
+              <span className="block text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                মাদ্রাসা শিক্ষক নিবন্ধন
+              </span>
+              <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                NTRCA Madrasa Prep
+              </span>
             </div>
           </div>
 
