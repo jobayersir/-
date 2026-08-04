@@ -1,0 +1,478 @@
+import React, { useState, useEffect } from 'react';
+import { MCQQuestion, PostCadre, SubjectCategory } from '../types';
+import { QUESTION_BANK } from '../data/questionBank';
+import { 
+  CheckCircle2, 
+  XCircle, 
+  HelpCircle, 
+  Bookmark, 
+  Clock, 
+  Sparkles, 
+  RotateCcw, 
+  Filter, 
+  ChevronRight, 
+  ChevronLeft,
+  Award,
+  AlertCircle,
+  Volume2
+} from 'lucide-react';
+
+interface McqPracticeViewProps {
+  selectedCadre: PostCadre;
+  arabicFont: string;
+  harakatVisible: boolean;
+  onSaveResult: (correct: number, total: number, timeTakenSeconds: number) => void;
+  onBookmark: (id: string, type: 'mcq') => void;
+  bookmarkedIds: string[];
+}
+
+export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
+  selectedCadre,
+  arabicFont,
+  harakatVisible,
+  onSaveResult,
+  onBookmark,
+  bookmarkedIds,
+}) => {
+  const [selectedSubject, setSelectedSubject] = useState<string>('all');
+  const [mode, setMode] = useState<'practice' | 'exam'>('practice');
+  const [questions, setQuestions] = useState<MCQQuestion[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
+  const [showExplanations, setShowExplanations] = useState<Record<number, boolean>>({});
+  
+  // Exam timer states
+  const [examSubmitted, setExamSubmitted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes default
+  const [timerActive, setTimerActive] = useState(false);
+
+  // Ustad AI Explanation modal
+  const [aiExplainText, setAiExplainText] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  // Filter questions on subject or cadre change
+  useEffect(() => {
+    let filtered = QUESTION_BANK;
+
+    if (selectedCadre !== 'all') {
+      filtered = filtered.filter(q => q.cadre.includes('all') || q.cadre.includes(selectedCadre));
+    }
+
+    if (selectedSubject !== 'all') {
+      filtered = filtered.filter(q => q.subject === selectedSubject);
+    }
+
+    setQuestions(filtered);
+    setCurrentIndex(0);
+    setUserAnswers({});
+    setShowExplanations({});
+    setExamSubmitted(false);
+    setTimeLeft(filtered.length * 60 || 600);
+    setTimerActive(mode === 'exam');
+  }, [selectedCadre, selectedSubject, mode]);
+
+  // Exam Countdown Timer
+  useEffect(() => {
+    let timer: any;
+    if (timerActive && timeLeft > 0 && !examSubmitted) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && !examSubmitted && timerActive) {
+      handleSubmitExam();
+    }
+    return () => clearInterval(timer);
+  }, [timerActive, timeLeft, examSubmitted]);
+
+  const currentQ = questions[currentIndex];
+
+  const handleSelectOption = (optionIndex: number) => {
+    if (examSubmitted && mode === 'exam') return;
+    setUserAnswers((prev) => ({ ...prev, [currentIndex]: optionIndex }));
+  };
+
+  const handleToggleExplanation = (index: number) => {
+    setShowExplanations((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const handleSubmitExam = () => {
+    setExamSubmitted(true);
+    setTimerActive(false);
+
+    // Calculate score
+    let correct = 0;
+    let wrong = 0;
+    questions.forEach((q, idx) => {
+      if (userAnswers[idx] !== undefined) {
+        if (userAnswers[idx] === q.correctAnswer) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      }
+    });
+
+    const timeTaken = (questions.length * 60) - timeLeft;
+    onSaveResult(correct, questions.length, Math.max(timeTaken, 10));
+  };
+
+  const handleAskUstadAi = async (q: MCQQuestion) => {
+    setAiLoading(true);
+    setAiExplainText(null);
+    try {
+      const res = await fetch('/api/ustad-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'explain_question',
+          questionData: {
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            subject: q.subject,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data.text) {
+        setAiExplainText(data.text);
+      } else {
+        setAiExplainText(data.error || 'উস্তাদ এআই উত্তর দিতে সমর্থ হয়নি।');
+      }
+    } catch (err) {
+      setAiExplainText('নেটওয়ার্ক সংযোগ ত্রুটি। পুনরায় চেষ্টা করুন।');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const calculateScoreDetails = () => {
+    let correct = 0;
+    let wrong = 0;
+    let skipped = 0;
+
+    questions.forEach((q, idx) => {
+      const ans = userAnswers[idx];
+      if (ans === undefined) {
+        skipped++;
+      } else if (ans === q.correctAnswer) {
+        correct++;
+      } else {
+        wrong++;
+      }
+    });
+
+    // Negative marking: 0.25 mark per wrong answer
+    const netScore = Math.max(0, correct - (wrong * 0.25));
+    return { correct, wrong, skipped, netScore };
+  };
+
+  const subjectsList: { id: string; label: string }[] = [
+    { id: 'all', label: 'সকল বিষয়' },
+    { id: 'quran_hadith', label: 'আল-কুরআন ও হাদিস' },
+    { id: 'fiqh_usul', label: 'ফিকহ ও উসূলে ফিকহ' },
+    { id: 'arabic_grammar', label: 'আরবি ভাষা (নাহু/সরফ)' },
+    { id: 'islamic_history', label: 'ইসলামী ইতিহাস' },
+    { id: 'bangla', label: 'বাংলা সাহিত্য ও ব্যাকরণ' },
+    { id: 'english', label: 'English Language' },
+    { id: 'mathematics', label: 'সাধারণ গণিত' },
+    { id: 'general_knowledge', label: 'সাধারণ জ্ঞান' },
+  ];
+
+  return (
+    <div className="space-y-6 animate-in fade-in duration-200">
+      
+      {/* Top Filter & Mode Switcher */}
+      <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        {/* Mode Selector Buttons */}
+        <div className="flex items-center space-x-2 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full md:w-auto">
+          <button
+            onClick={() => setMode('practice')}
+            className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+              mode === 'practice'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
+          >
+            অনুশীলন মোড (Practice)
+          </button>
+          <button
+            onClick={() => setMode('exam')}
+            className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+              mode === 'exam'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`}
+          >
+            মডেল টেস্ট মোড (Live Exam)
+          </button>
+        </div>
+
+        {/* Subject Filter Dropdown */}
+        <div className="flex items-center space-x-2 w-full md:w-auto">
+          <Filter className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="w-full md:w-auto bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
+          >
+            {subjectsList.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Timer during Exam Mode */}
+        {mode === 'exam' && !examSubmitted && (
+          <div className="flex items-center space-x-2 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-3 py-1.5 rounded-xl text-amber-800 dark:text-amber-300 text-xs font-bold">
+            <Clock className="w-4 h-4 animate-spin text-amber-600" />
+            <span>অবশিষ্ট সময়: {Math.floor(timeLeft / 60)}:{('0' + (timeLeft % 60)).slice(-2)}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Main MCQ Card or Exam Result */}
+      {questions.length === 0 ? (
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 text-center border border-slate-200 dark:border-slate-700">
+          <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">
+            এই বিভাগে কোনো প্রশ্ন পাওয়া যায়নি
+          </h3>
+          <p className="text-xs text-slate-500 mt-1">
+            অন্য কোনো বিষয় বা পদ নির্বাচন করে চেষ্টা করুন।
+          </p>
+        </div>
+      ) : mode === 'exam' && examSubmitted ? (
+        
+        /* Exam Results Summary Card */
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-md space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
+              <Award className="w-8 h-8" />
+            </div>
+            <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+              মডেল টেস্টের ফলাফল
+            </h3>
+            <p className="text-xs text-slate-500">
+              নেগেটিভ মার্কিং সহ হিসাবকৃত
+            </p>
+          </div>
+
+          {/* Score Stats Grid */}
+          {(() => {
+            const { correct, wrong, skipped, netScore } = calculateScoreDetails();
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                <div className="bg-emerald-50 dark:bg-emerald-950/50 p-4 rounded-2xl text-center border border-emerald-200 dark:border-emerald-800">
+                  <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">সঠিক উত্তর</span>
+                  <p className="text-2xl font-black text-emerald-800 dark:text-emerald-200 mt-1">{correct}</p>
+                </div>
+                <div className="bg-rose-50 dark:bg-rose-950/50 p-4 rounded-2xl text-center border border-rose-200 dark:border-rose-800">
+                  <span className="text-xs font-semibold text-rose-700 dark:text-rose-300">ভুল উত্তর (-০.২৫)</span>
+                  <p className="text-2xl font-black text-rose-800 dark:text-rose-200 mt-1">{wrong}</p>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl text-center border border-slate-200 dark:border-slate-700">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">উত্তর দেননি</span>
+                  <p className="text-2xl font-black text-slate-700 dark:text-slate-300 mt-1">{skipped}</p>
+                </div>
+                <div className="bg-amber-50 dark:bg-amber-950/50 p-4 rounded-2xl text-center border border-amber-200 dark:border-amber-800">
+                  <span className="text-xs font-semibold text-amber-800 dark:text-amber-300">নিট নম্বর</span>
+                  <p className="text-2xl font-black text-amber-900 dark:text-amber-200 mt-1">{netScore} / {questions.length}</p>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+            <button
+              onClick={() => {
+                setExamSubmitted(false);
+                setUserAnswers({});
+                setCurrentIndex(0);
+                setTimeLeft(questions.length * 60);
+                setTimerActive(true);
+              }}
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md flex items-center space-x-2"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>পুনরায় মক টেস্ট দিন</span>
+            </button>
+            <button
+              onClick={() => setMode('practice')}
+              className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-800 dark:text-slate-200 font-bold text-sm flex items-center space-x-2"
+            >
+              <span>উত্তর ও ব্যাখ্যা দেখুন</span>
+            </button>
+          </div>
+        </div>
+
+      ) : (
+
+        /* Active Question Display */
+        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-700 shadow-md space-y-6">
+          
+          {/* Question Header & Navigation */}
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-4">
+            <div className="flex items-center space-x-2">
+              <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+                প্রশ্ন {currentIndex + 1} / {questions.length}
+              </span>
+              {currentQ.yearTag && (
+                <span className="text-xs text-slate-500 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-full font-medium">
+                  {currentQ.yearTag}
+                </span>
+              )}
+            </div>
+
+            {/* Bookmark button */}
+            <button
+              onClick={() => onBookmark(currentQ.id, 'mcq')}
+              className={`p-2 rounded-xl transition-colors ${
+                bookmarkedIds.includes(currentQ.id)
+                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-400'
+              }`}
+              title="বুকমার্ক করুন"
+            >
+              <Bookmark className="w-4 h-4" fill={bookmarkedIds.includes(currentQ.id) ? 'currentColor' : 'none'} />
+            </button>
+          </div>
+
+          {/* Question Text (Bangla & Arabic) */}
+          <div className="space-y-3">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug">
+              {currentQ.question}
+            </h3>
+            
+            {currentQ.questionArabic && (
+              <p
+                style={{ fontFamily: arabicFont }}
+                className={`text-xl sm:text-2xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/40 ${
+                  !harakatVisible ? 'select-none' : ''
+                }`}
+              >
+                {currentQ.questionArabic}
+              </p>
+            )}
+          </div>
+
+          {/* Options Grid */}
+          <div className="grid grid-cols-1 gap-3 pt-2">
+            {currentQ.options.map((opt, optIdx) => {
+              const isSelected = userAnswers[currentIndex] === optIdx;
+              const isCorrect = optIdx === currentQ.correctAnswer;
+              const showResult = mode === 'practice' && userAnswers[currentIndex] !== undefined;
+
+              let btnStyle = 'bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-emerald-50/60 dark:hover:bg-slate-700/60';
+
+              if (mode === 'practice' && showResult) {
+                if (isCorrect) {
+                  btnStyle = 'bg-emerald-100 dark:bg-emerald-950/80 border-emerald-500 text-emerald-900 dark:text-emerald-200 font-bold';
+                } else if (isSelected && !isCorrect) {
+                  btnStyle = 'bg-rose-100 dark:bg-rose-950/80 border-rose-500 text-rose-900 dark:text-rose-200 font-bold';
+                }
+              } else if (isSelected) {
+                btnStyle = 'bg-emerald-600 border-emerald-600 text-white font-bold shadow-md';
+              }
+
+              return (
+                <button
+                  key={optIdx}
+                  onClick={() => handleSelectOption(optIdx)}
+                  className={`w-full p-4 rounded-2xl border text-left flex items-center justify-between text-sm sm:text-base transition-all ${btnStyle}`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0">
+                      {['ক', 'খ', 'গ', 'ঘ'][optIdx]}
+                    </span>
+                    <span>{opt}</span>
+                  </div>
+
+                  {showResult && (
+                    <div>
+                      {isCorrect && <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />}
+                      {isSelected && !isCorrect && <XCircle className="w-5 h-5 text-rose-600 shrink-0" />}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Solution & Ustad AI Explanation (Practice Mode) */}
+          {mode === 'practice' && userAnswers[currentIndex] !== undefined && (
+            <div className="mt-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 space-y-3 animate-in fade-in">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center">
+                  <CheckCircle2 className="w-4 h-4 mr-1.5 text-emerald-600" />
+                  সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা
+                </span>
+                
+                {/* Ustad AI Button */}
+                <button
+                  onClick={() => handleAskUstadAi(currentQ)}
+                  disabled={aiLoading}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-slate-950 animate-pulse" />
+                  <span>{aiLoading ? 'উস্তাদ এআই ভাবছে...' : 'উস্তাদ এআই থেকে বিস্তারিত জানুন'}</span>
+                </button>
+              </div>
+
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                {currentQ.explanation}
+              </p>
+
+              {/* AI Generated Text Box */}
+              {aiExplainText && (
+                <div className="mt-3 p-4 rounded-xl bg-amber-50/80 dark:bg-slate-800/90 border border-amber-200 dark:border-amber-800/60 text-xs sm:text-sm text-slate-800 dark:text-slate-200 space-y-2">
+                  <div className="font-bold text-amber-800 dark:text-amber-300 flex items-center">
+                    <Sparkles className="w-4 h-4 mr-1 text-amber-600" />
+                    উস্তাদ এআই ব্যাখ্যা:
+                  </div>
+                  <p className="whitespace-pre-line leading-relaxed">{aiExplainText}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Navigation Prev / Next Bar */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <button
+              onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+              disabled={currentIndex === 0}
+              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm disabled:opacity-40 flex items-center space-x-1"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>পূর্ববর্তী</span>
+            </button>
+
+            {mode === 'exam' && currentIndex === questions.length - 1 ? (
+              <button
+                onClick={handleSubmitExam}
+                className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs sm:text-sm shadow-md"
+              >
+                পরীক্ষা জমা দিন (Submit Exam)
+              </button>
+            ) : (
+              <button
+                onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
+                disabled={currentIndex === questions.length - 1}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm disabled:opacity-40 flex items-center space-x-1"
+              >
+                <span>পরবর্তী</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+        </div>
+      )}
+
+    </div>
+  );
+};

@@ -1,0 +1,6 @@
+{
+  "name": "মাদ্রাসা শিক্ষক নিবন্ধন প্রস্তুতি",
+  "description": "মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) প্রস্তুতির জন্য আধুনিক প্ল্যাটফর্ম। আরবি, বাংলা, ইংরেজি কন্টেন্ট, উস্তাদ এআই (Ustad AI), এমসিকিউ ও সিকিউ প্র্যাকটিস এবং প্রশ্ন ব্যাংক।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

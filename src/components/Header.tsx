@@ -1,0 +1,178 @@
+import React from 'react';
+import { PostCadre } from '../types';
+import { BookOpen, Sparkles, Moon, Sun, Type, SlidersHorizontal, Layers, Target } from 'lucide-react';
+
+interface HeaderProps {
+  selectedCadre: PostCadre;
+  onSelectCadre: (cadre: PostCadre) => void;
+  darkMode: boolean;
+  onToggleDarkMode: () => void;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  arabicFont: string;
+  onChangeArabicFont: (font: string) => void;
+  harakatVisible: boolean;
+  onToggleHarakat: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({
+  selectedCadre,
+  onSelectCadre,
+  darkMode,
+  onToggleDarkMode,
+  activeTab,
+  onTabChange,
+  arabicFont,
+  onChangeArabicFont,
+  harakatVisible,
+  onToggleHarakat,
+}) => {
+  const [showFontMenu, setShowFontMenu] = React.useState(false);
+
+  const cadreNames: Record<PostCadre, string> = {
+    all: 'সকল পদ (All Cadres)',
+    assistant_teacher_arabic: 'সহকারী শিক্ষক (আরবি)',
+    lecturer_arabic: 'প্রভাষক (আরবি/হাদিস/ফিকহ)',
+    assistant_maulvi: 'সহকারী মৌলভী',
+    ebtedayee_head: 'ইবতেদায়ী প্রধান ও ক্বারী',
+    lecturer_islamic_history: 'প্রভাষক (ইসলামী ইতিহাস)',
+    general_subject: 'সাধারণ বিষয় (বাংলা, ইংরেজি, গণিত)',
+  };
+
+  return (
+    <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-emerald-100 dark:border-slate-800 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          
+          {/* Logo & Title */}
+          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onTabChange('home')}>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-emerald-700 via-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 ring-2 ring-emerald-400/30">
+              <span className="font-arabic font-bold text-xl sm:text-2xl">م</span>
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-emerald-800 via-teal-700 to-emerald-600 dark:from-emerald-300 dark:via-teal-200 dark:to-emerald-400 bg-clip-text text-transparent">
+                  মাদ্রাসা শিক্ষক নিবন্ধন
+                </h1>
+                <span className="hidden sm:inline-block px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-700">
+                  NTRCA Madrasa
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                প্রস্তুতি প্ল্যাটফর্ম • ১৮তম নিবন্ধন লক্ষ্য
+              </p>
+            </div>
+          </div>
+
+          {/* Controls Right Section */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            
+            {/* Cadre Selector Dropdown */}
+            <div className="hidden md:flex items-center bg-emerald-50 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg border border-emerald-200/60 dark:border-slate-700 text-xs">
+              <Layers className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 mr-2" />
+              <select
+                value={selectedCadre}
+                onChange={(e) => onSelectCadre(e.target.value as PostCadre)}
+                className="bg-transparent text-slate-800 dark:text-slate-200 font-medium focus:outline-none cursor-pointer pr-1"
+              >
+                {Object.entries(cadreNames).map(([key, name]) => (
+                  <option key={key} value={key} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Arabic Font Options Dropdown Button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowFontMenu(!showFontMenu)}
+                className="p-2 sm:px-3 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium flex items-center space-x-1 transition-all"
+                title="আরবি ফন্ট ও হরকত সেটআপ"
+              >
+                <Type className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="hidden sm:inline font-arabic text-sm">خط</span>
+              </button>
+
+              {showFontMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-3 z-50 text-xs space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="font-semibold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700 pb-2">
+                    আরবি ফন্ট নির্বাচন (Arabic Font)
+                  </div>
+                  <div className="space-y-1.5">
+                    {['Amiri', 'Traditional Arabic', 'Scheherazade New'].map((font) => (
+                      <button
+                        key={font}
+                        onClick={() => {
+                          onChangeArabicFont(font);
+                          setShowFontMenu(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-md font-arabic text-base flex items-center justify-between transition-colors ${
+                          arabicFont === font
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        <span>{font}</span>
+                        <span className="text-xs text-slate-400">خط</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-400 font-medium">হরকত (حركات) প্রদর্শন</span>
+                    <button
+                      onClick={onToggleHarakat}
+                      className={`px-2.5 py-1 rounded text-xs font-semibold transition-colors ${
+                        harakatVisible
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      {harakatVisible ? 'চালু' : 'বন্ধ'}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Ustad AI Quick Button */}
+            <button
+              onClick={() => onTabChange('ustad_ai')}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-sm shadow-emerald-600/30 text-xs font-medium transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-300" />
+              <span>উস্তাদ এআই</span>
+            </button>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={onToggleDarkMode}
+              className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
+              title="থিম পরিবর্তন করুন"
+            >
+              {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Cadre Selector Bar */}
+        <div className="md:hidden py-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+          <span className="text-slate-500 dark:text-slate-400 font-medium flex items-center">
+            <Target className="w-3.5 h-3.5 mr-1 text-emerald-600" /> পদ:
+          </span>
+          <select
+            value={selectedCadre}
+            onChange={(e) => onSelectCadre(e.target.value as PostCadre)}
+            className="bg-emerald-50 dark:bg-slate-800 text-emerald-900 dark:text-emerald-200 font-medium py-1 px-2.5 rounded-md border border-emerald-200/80 dark:border-slate-700 focus:outline-none"
+          >
+            {Object.entries(cadreNames).map(([key, name]) => (
+              <option key={key} value={key}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </header>
+  );
+};
