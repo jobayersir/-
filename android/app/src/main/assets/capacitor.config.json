@@ -1,0 +1,8 @@
+{
+	"appId": "com.madrasa.ntrcaprep",
+	"appName": "মাদ্রাসা নিবন্ধন প্রস্তুতি",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	}
+}

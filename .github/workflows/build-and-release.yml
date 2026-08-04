@@ -21,11 +21,18 @@ jobs:
         with:
           node-version: '20'
 
-      - name: ☕ Setup Java JDK 17 for Android Build
+      - name: ☕ Setup Java JDK 21 for Android Build
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '21'
+
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📜 Accept Android SDK Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: 📦 Install Dependencies
         run: npm install
@@ -35,7 +42,7 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: 📱 Add & Sync Android Platform (Capacitor)
+      - name: 📱 Generate & Sync Android Project (Capacitor)
         run: |
           npx cap add android || true
           npx cap sync android
@@ -44,13 +51,13 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
-      - name: 🚚 Copy APK to Root & Rename
+      - name: 🚚 Copy APK to Root
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk ./Madrasa-NTRCA-Prep.apk
 
-      - name: 📲 Upload Android APK Artifact (APK File for Phone)
+      - name: 📲 Upload Android APK Artifact (Direct Download APK)
         uses: actions/upload-artifact@v4
         with:
           name: Madrasa-NTRCA-Prep-APK
@@ -69,3 +76,4 @@ jobs:
           name: madrasa-ntrca-web-build
           path: madrasa-ntrca-web-build.zip
           retention-days: 30
+
