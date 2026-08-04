@@ -175,8 +175,8 @@ export const UstadAiView: React.FC = () => {
                 PRO 3.6
               </span>
             </div>
-            <p className="text-xs text-emerald-200/80">
-              আরবি ব্যাকরণ, ফিকহ ও নিবন্ধনের স্মার্ট সহকারী
+            <p className="text-xs text-emerald-200/90 font-medium">
+              আপনার পড়াশোনার বিশ্বস্ত সঙ্গী
             </p>
           </div>
         </div>
@@ -228,9 +228,9 @@ export const UstadAiView: React.FC = () => {
                 )}
 
                 <div
-                  className={`max-w-[88%] sm:max-w-[78%] rounded-3xl p-4 sm:p-5 text-xs sm:text-sm space-y-2 relative group shadow-sm ${
+                  className={`max-w-[88%] sm:max-w-[78%] rounded-3xl p-4 sm:p-5 text-xs sm:text-sm space-y-2 relative group shadow-md ${
                     isUstad
-                      ? 'bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700/80'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 border-2 border-emerald-500/30 dark:border-emerald-700/60'
                       : 'bg-emerald-600 text-white font-medium rounded-tr-xs'
                   }`}
                 >
@@ -244,8 +244,12 @@ export const UstadAiView: React.FC = () => {
                           dir={isArabicLine ? 'rtl' : 'ltr'}
                           className={
                             isArabicLine
-                              ? 'text-right font-arabic text-emerald-800 dark:text-emerald-300 text-sm sm:text-base font-medium py-0.5'
-                              : 'text-left'
+                              ? isUstad
+                                ? 'text-right font-arabic text-emerald-800 dark:text-emerald-300 text-base font-bold py-0.5'
+                                : 'text-right font-arabic text-white text-base font-bold py-0.5'
+                              : isUstad
+                              ? 'text-left text-emerald-800 dark:text-emerald-300 font-bold'
+                              : 'text-left text-white font-medium'
                           }
                         >
                           {line}
