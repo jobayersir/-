@@ -134,7 +134,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
     return `${pad(minutes)}:${pad(seconds)}`;
   };
 
-  // Answer selection handler - locked once selected
+  // Answer selection handler - locked once selected & auto-scroll to next question
   const handleSelectOption = (qIdx: number, optIdx: number) => {
     if (isSubmitted) return;
     // Prevent changing answer once selected
@@ -144,6 +144,14 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       ...prev,
       [qIdx]: optIdx
     }));
+
+    // Auto scroll smoothly to next question card
+    setTimeout(() => {
+      const nextCard = document.getElementById(`q-card-${qIdx + 1}`);
+      if (nextCard) {
+        nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 350);
   };
 
   // Flag toggle handler
@@ -277,12 +285,12 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       )}
 
       {/* ========================================================= */}
-      {/* TOP APP BAR (Sticky Neumorphic Header Bar matching screenshot) */}
+      {/* TOP APP BAR (Pixel Perfect Top Bar)                       */}
       {/* ========================================================= */}
-      <header className="sticky top-0 z-40 p-2.5 sm:p-4 bg-[#f0f3f6]/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800 shadow-xs">
-        <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl p-2.5 sm:p-3.5 shadow-[3px_3px_10px_rgba(0,0,0,0.06),-3px_-3px_10px_rgba(255,255,255,0.9)] dark:shadow-none border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
+      <header className="sticky top-0 z-40 p-2.5 sm:p-3 bg-[#f0f3f6]/95 dark:bg-slate-950/95 backdrop-blur-md">
+        <div className="max-w-md sm:max-w-xl mx-auto bg-white dark:bg-slate-900 rounded-[20px] p-2.5 sm:p-3 shadow-xs border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-2">
           
-          {/* Left: Time remaining & back button */}
+          {/* Left: Timer 12:32 & Exit button */}
           <div className="flex items-center space-x-2 shrink-0">
             <button
               onClick={() => {
@@ -292,34 +300,33 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                   setShowExitConfirm(true);
                 }
               }}
-              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all"
+              className="p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-300 transition-all"
               title="বের হন"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
 
             {!isSubmitted ? (
-              <div className="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 font-mono tracking-wide flex items-center space-x-1">
-                <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{formatTime(timeRemainingSeconds)}</span>
-              </div>
+              <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 font-mono tracking-tight">
+                {formatTime(timeRemainingSeconds)}
+              </span>
             ) : (
               <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">রেজাল্ট</span>
             )}
           </div>
 
-          {/* Center: Answered ratio text (e.g. ০/২০ উত্তর) */}
-          <div className="text-center font-bold text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+          {/* Center: 0/20 উত্তর */}
+          <div className="text-center font-bold text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             {toBnNumeral(answeredCount)}/{toBnNumeral(totalQuestions)} উত্তর
           </div>
 
-          {/* Right: Neumorphic Submit Button */}
+          {/* Right: Gold Rounded Button 🧺 জমা দিন */}
           {!isSubmitted ? (
             <button
               onClick={() => setShowSubmitModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-[3px_3px_8px_rgba(0,0,0,0.15),-2px_-2px_6px_rgba(255,255,255,0.8)] border border-amber-300 active:scale-95 transition-all flex items-center space-x-1.5 shrink-0"
+              className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-[#ca8a04] hover:bg-[#b57a22] text-white font-extrabold text-xs sm:text-sm shadow-xs border border-[#b87d25] active:scale-95 transition-all flex items-center space-x-1 shrink-0"
             >
-              <span className="text-xs sm:text-sm">📥</span>
+              <span className="text-xs sm:text-sm">🧺</span>
               <span>জমা দিন</span>
             </button>
           ) : (
@@ -337,7 +344,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       {/* ========================================================= */}
       {/* MAIN CONTENT CONTAINER                                    */}
       {/* ========================================================= */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-6 pb-28">
+      <main className="flex-1 max-w-md sm:max-w-xl w-full mx-auto p-3 sm:p-4 pb-28">
         
         {!isSubmitted ? (
           /* ========================================================= */
@@ -349,7 +356,6 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
             {questions.map((q, qIdx) => {
               const isAnswered = userAnswers[qIdx] !== undefined;
               const selectedOptIdx = userAnswers[qIdx];
-              const isFlagged = flaggedIdxs.has(qIdx);
               
               // Detect Arabic for question text and options
               const isArabicQuestion = /[\u0600-\u06FF]/.test(q.question);
@@ -360,57 +366,52 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                 <div 
                   key={q.id || qIdx} 
                   id={`q-card-${qIdx}`}
-                  className={`bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 shadow-[4px_4px_12px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.85)] dark:shadow-none border-l-4 ${
-                    isAnswered ? 'border-l-emerald-600 dark:border-l-emerald-500' : 'border-l-[#1b365d] dark:border-l-emerald-700'
-                  } border-t border-r border-b border-slate-200/90 dark:border-slate-800 space-y-4 transition-all relative`}
+                  className={`bg-white dark:bg-slate-900 rounded-[20px] p-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-none border-l-[5px] ${
+                    isAnswered ? 'border-l-emerald-600 dark:border-l-emerald-500' : 'border-l-[#162e5c] dark:border-l-emerald-700'
+                  } space-y-4 transition-all relative`}
                 >
                   
-                  {/* Flag button on top corner if needed */}
-                  <div className="absolute top-3 right-3 z-10">
-                    <button
-                      onClick={() => handleToggleFlag(qIdx)}
-                      className={`p-1.5 rounded-lg text-xs font-bold transition-all ${
-                        isFlagged
-                          ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
-                      }`}
-                      title="প্রশ্ন ফ্ল্যাগ করুন"
-                    >
-                      <Flag className={`w-3.5 h-3.5 ${isFlagged ? 'fill-slate-950' : ''}`} />
-                    </button>
-                  </div>
-
-                  {/* Question Heading with Serial Number Badge inline */}
-                  <div 
-                    dir={isArabicQuestion ? 'rtl' : 'ltr'}
-                    className={`flex items-start gap-2.5 ${
-                      isArabicQuestion ? 'text-right font-arabic' : 'text-left font-sans'
-                    }`}
-                  >
-                    {/* Dark Solid Serial Badge matching screenshot (e.g. ১., ২., ৩.) */}
-                    <span 
-                      className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#1b365d] dark:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-0.5 shadow-xs font-sans"
-                    >
-                      {toBnNumeral(qIdx + 1)}
-                    </span>
-
-                    {/* Question Text with UNIFORM font size across all languages */}
-                    <h3 
-                      className="text-slate-900 dark:text-slate-100 font-extrabold text-base sm:text-lg leading-relaxed flex-1 pt-0.5"
-                      style={{ fontFamily: isArabicQuestion ? "'Amiri', serif" : undefined }}
-                    >
-                      {q.question}
-                    </h3>
-                  </div>
-
-                  {/* Arabic Secondary Question Text if present */}
-                  {q.questionArabic && !isArabicQuestion && (
-                    <div 
-                      dir="rtl"
-                      className="text-right font-arabic text-base sm:text-lg text-emerald-900 dark:text-emerald-200 font-bold bg-emerald-50/70 dark:bg-emerald-950/60 p-3 rounded-xl border border-emerald-200/80 dark:border-emerald-900/60 leading-relaxed"
-                      style={{ fontFamily: "'Amiri', serif" }}
-                    >
-                      {q.questionArabic}
+                  {/* Question Heading */}
+                  {isArabicQuestion ? (
+                    /* ARABIC QUESTION: dir="rtl", text-right, dark blue circle on the RIGHT */
+                    <div dir="rtl" className="space-y-1 text-right font-arabic">
+                      <div className="flex items-start gap-2.5">
+                        <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#162e5c] dark:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-1 shadow-xs font-sans">
+                          {toArNumeral(qIdx + 1)}
+                        </span>
+                        <h3 
+                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[22px] sm:text-[28px] leading-relaxed flex-1 pt-0.5"
+                          style={{ fontFamily: "'Amiri', serif" }}
+                        >
+                          {q.question}
+                        </h3>
+                      </div>
+                      {q.questionArabic && q.questionArabic !== q.question && (
+                        <p className="text-slate-500 dark:text-slate-400 font-sans text-sm sm:text-base font-bold pt-0.5">
+                          ({q.questionArabic})
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    /* BANGLA / ENGLISH QUESTION: dir="ltr", text-left, dark blue circle on the LEFT */
+                    <div dir="ltr" className="space-y-1 text-left">
+                      <div className="flex items-start gap-2.5">
+                        <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#162e5c] dark:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-0.5 shadow-xs font-sans">
+                          {toBnNumeral(qIdx + 1)}
+                        </span>
+                        <h3 className="text-slate-900 dark:text-slate-100 font-extrabold text-[20px] sm:text-[22px] leading-snug flex-1 pt-0.5">
+                          {q.question}
+                        </h3>
+                      </div>
+                      {q.questionArabic && (
+                        <p 
+                          dir="rtl"
+                          className="text-right font-arabic text-lg sm:text-xl text-emerald-900 dark:text-emerald-300 font-bold pt-1 leading-relaxed"
+                          style={{ fontFamily: "'Amiri', serif" }}
+                        >
+                          {q.questionArabic}
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -427,37 +428,37 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           disabled={isAnswered}
                           onClick={() => handleSelectOption(qIdx, oIdx)}
                           dir={isOptArabic ? 'rtl' : 'ltr'}
-                          className={`w-full p-3 sm:p-3.5 rounded-2xl border transition-all duration-150 flex items-center justify-between touch-manipulation ${
-                            isOptArabic ? 'text-right' : 'text-left'
+                          className={`w-full p-3 sm:p-3.5 rounded-xl transition-all duration-150 flex items-center gap-3 touch-manipulation ${
+                            isOptArabic ? 'text-right justify-start' : 'text-left justify-start'
                           } ${
                             isSelected
-                              ? 'bg-emerald-50 dark:bg-emerald-950/90 border-emerald-500 dark:border-emerald-500 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06)]'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/90 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-xs'
                               : isAnswered
-                              ? 'bg-slate-50 dark:bg-slate-900/50 text-slate-400 border-slate-200/60 dark:border-slate-800 opacity-60 cursor-not-allowed'
-                              : 'bg-[#f8fafc] dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 border-slate-200/90 dark:border-slate-700/80 hover:border-emerald-500 shadow-[2px_2px_5px_rgba(0,0,0,0.03),-2px_-2px_5px_rgba(255,255,255,0.9)] dark:shadow-none active:scale-[0.99]'
+                              ? 'bg-[#f8fafc] dark:bg-slate-900/50 text-slate-400 border border-slate-200/60 dark:border-slate-800 opacity-60 cursor-not-allowed'
+                              : 'bg-[#f8fafc] dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500 active:scale-[0.99]'
                           }`}
                         >
-                          <div className={`flex items-center space-x-3 ${isOptArabic ? 'space-x-reverse font-arabic' : ''} w-full`}>
-                            {/* Option Prefix Badge inside soft card */}
-                            <span 
-                              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center shrink-0 shadow-xs ${
-                                isSelected 
-                                  ? 'bg-emerald-600 text-white' 
-                                  : 'bg-[#e2e8f0]/90 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
-                              }`}
-                              style={{ fontFamily: isOptArabic ? "'Amiri', serif" : undefined }}
-                            >
-                              {badgeText}
-                            </span>
+                          {/* Option Badge */}
+                          <span 
+                            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-black flex items-center justify-center shrink-0 ${
+                              isSelected 
+                                ? 'bg-emerald-600 text-white' 
+                                : 'bg-[#e2e8f0] dark:bg-slate-700 text-[#162e5c] dark:text-slate-200'
+                            }`}
+                            style={{ fontFamily: isOptArabic ? "'Amiri', serif" : undefined }}
+                          >
+                            {badgeText}
+                          </span>
 
-                            {/* Option Text with UNIFORM font size */}
-                            <span 
-                              className="text-slate-900 dark:text-slate-100 font-bold text-sm sm:text-base leading-snug flex-1"
-                              style={{ fontFamily: isOptArabic ? "'Amiri', serif" : undefined }}
-                            >
-                              {optionText}
-                            </span>
-                          </div>
+                          {/* Option Text */}
+                          <span 
+                            className={`font-bold text-[18px] sm:text-[20px] leading-snug flex-1 ${
+                              isOptArabic ? 'font-arabic text-right' : 'font-sans text-left'
+                            }`}
+                            style={{ fontFamily: isOptArabic ? "'Amiri', serif" : undefined }}
+                          >
+                            {optionText}
+                          </span>
 
                           {isSelected && (
                             <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mx-1" />
@@ -467,21 +468,12 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                     })}
                   </div>
 
-                  {/* Lock Indicator Footer on Card if Answered */}
-                  {isAnswered && (
-                    <div className="pt-1 text-right">
-                      <span className="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-400 inline-flex items-center space-x-1">
-                        <span>🔒 উত্তর সংরক্ষিত</span>
-                      </span>
-                    </div>
-                  )}
-
                 </div>
               );
             })}
 
-            {/* Bottom Neumorphic Submit Banner */}
-            <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-[4px_4px_12px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.8)] text-center space-y-3">
+            {/* Bottom Submit Banner */}
+            <div className="p-6 rounded-[20px] bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-[0_2px_10px_rgba(0,0,0,0.04)] text-center space-y-3">
               <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-slate-100">
                 সকল প্রশ্নের উত্তর শেষ হয়েছে?
               </h3>
@@ -490,9 +482,9 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               </p>
               <button
                 onClick={() => setShowSubmitModal(true)}
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-black text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.8)] border border-amber-400/50 active:scale-95 transition-all inline-flex items-center space-x-2"
+                className="px-8 py-3 rounded-xl bg-[#ca8a04] hover:bg-[#b57a22] text-white font-extrabold text-sm shadow-xs border border-[#b87d25] active:scale-95 transition-all inline-flex items-center space-x-2"
               >
-                <span className="text-base">📥</span>
+                <span className="text-base">🧺</span>
                 <span>পরীক্ষা সাবমিট করুন</span>
               </button>
             </div>
