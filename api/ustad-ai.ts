@@ -141,7 +141,7 @@ export async function processGeminiRequest(reqBody: any) {
         parts: currentParts,
       });
 
-      const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+      const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest"];
       let lastErrMessage = "";
 
       for (const modelName of candidateModels) {
