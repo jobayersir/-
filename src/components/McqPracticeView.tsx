@@ -146,7 +146,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
       if (data.text) {
         setAiExplainText(data.text);
       } else {
-        setAiExplainText(data.error || 'উস্তাদ এআই উত্তর দিতে সমর্থ হয়নি।');
+        setAiExplainText(data.error || 'তামরীন AI উত্তর দিতে সমর্থ হয়নি।');
       }
     } catch (err) {
       setAiExplainText('নেটওয়ার্ক সংযোগ ত্রুটি। পুনরায় চেষ্টা করুন।');
@@ -470,7 +470,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                         className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center space-x-1 shadow-sm"
                       >
                         <Sparkles className="w-3 h-3 text-white animate-pulse" />
-                        <span>{aiLoading ? 'ভাবছে...' : 'উস্তাদ এআই ব্যাখ্যা'}</span>
+                        <span>{aiLoading ? 'ভাবছে...' : 'তামরীন AI ব্যাখ্যা'}</span>
                       </button>
                     </div>
 
@@ -606,14 +606,14 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                   সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা
                 </span>
                 
-                {/* Ustad AI Button */}
+                {/* Tamreen AI Button */}
                 <button
                   onClick={() => handleAskUstadAi(currentQ)}
                   disabled={aiLoading}
                   className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
-                  <span>{aiLoading ? 'উস্তাদ এআই ভাবছে...' : 'উস্তad এআই ব্যাখ্যা'}</span>
+                  <span>{aiLoading ? 'তামরীন AI ভাবছে...' : 'তামরীন AI ব্যাখ্যা'}</span>
                 </button>
               </div>
 
@@ -626,7 +626,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                 <div className="mt-3 p-4 rounded-xl bg-amber-50/80 dark:bg-slate-800/90 border border-amber-200 dark:border-amber-800/60 text-xs sm:text-sm text-slate-800 dark:text-slate-200 space-y-2">
                   <div className="font-bold text-amber-800 dark:text-amber-300 flex items-center">
                     <Sparkles className="w-4 h-4 mr-1 text-amber-600" />
-                    উস্তাদ এআই ব্যাখ্যা:
+                    তামরীন AI ব্যাখ্যা:
                   </div>
                   <p className="whitespace-pre-line leading-relaxed text-left">{aiExplainText}</p>
                 </div>

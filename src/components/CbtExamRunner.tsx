@@ -96,7 +96,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       }
     } catch (err) {
       console.error(err);
-      alert('উস্তাদ এআই সংযোগে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      alert('তামরীন AI সংযোগে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
     } finally {
       setLoadingAiIdx(null);
     }
@@ -753,7 +753,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                             >
                               <span className="flex items-center space-x-1.5">
                                 <FileText className="w-4 h-4 text-amber-500" />
-                                <span>ম্যানুয়াল বিবরণী ও ব্যাখ্যা (Manual Explanation)</span>
+                                <span>বিস্তারিত ব্যাখ্যা</span>
                               </span>
                               {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             </button>
@@ -763,7 +763,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                                 <p className="font-medium">{q.explanation}</p>
                                 <div className="flex items-center justify-between pt-2 border-t border-amber-200/60 dark:border-amber-800/50">
                                   <span className="text-[10px] font-bold text-amber-800 dark:text-amber-400">
-                                    সহীহ ম্যানুয়াল বিবরণী
+                                    সহীহ ম্যানুয়াল ব্যাখ্যা
                                   </span>
                                   <button
                                     onClick={() => handleCopyExplanation(q.explanation || '')}
@@ -778,7 +778,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           </div>
                         ) : null}
 
-                        {/* 2. Ustad AI Explanation Button & Box */}
+                        {/* 2. Tamreen AI Explanation Button & Box */}
                         <div className="space-y-2">
                           {!aiExplanations[idx] && (
                             <button
@@ -790,10 +790,10 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                                 <Sparkles className="w-4 h-4 text-amber-300 animate-spin" />
                                 <span>
                                   {loadingAiIdx === idx
-                                    ? 'উস্তাদ এআই ব্যাখ্যা বিশ্লেষণ করছে...'
+                                    ? 'তামরীন AI ব্যাখ্যা বিশ্লেষণ করছে...'
                                     : q.explanation
-                                    ? 'উস্তাদ এআই দিয়ে আরও বিস্তৃত ব্যাখ্যা জানুন'
-                                    : 'উস্তাদ এআই দিয়ে ব্যাখ্যা জানুন'}
+                                    ? 'তামরীন AI দিয়ে আরও বিস্তৃত ব্যাখ্যা জানুন'
+                                    : 'তামরীন AI দিয়ে ব্যাখ্যা জানুন'}
                                 </span>
                               </span>
                               <span className="text-[10px] font-black px-2 py-0.5 rounded bg-amber-400 text-slate-950 uppercase">
@@ -807,7 +807,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                               <div className="flex items-center justify-between border-b border-emerald-800/80 pb-2">
                                 <span className="font-black text-amber-400 text-xs flex items-center space-x-1.5">
                                   <Sparkles className="w-4 h-4 text-amber-400" />
-                                  <span>উস্তাদ এআই বিশ্লেষণ ও ব্যাখ্যা</span>
+                                  <span>তামরীন AI বিশ্লেষণ ও ব্যাখ্যা</span>
                                 </span>
                                 <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-emerald-700 text-white">
                                   Gemini AI Powered
