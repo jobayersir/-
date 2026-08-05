@@ -223,24 +223,8 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
 
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => {
-              setKeyInput(userApiKey);
-              setShowKeyModal(true);
-            }}
-            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-              userApiKey
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                : 'bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30'
-            }`}
-            title="Gemini API Key সেটআপ করুন"
-          >
-            <Key className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{userApiKey ? 'কী সক্রিয়' : 'API Key সেটিং'}</span>
-          </button>
-
-          <button
             onClick={handleClearChat}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-semibold backdrop-blur-md flex items-center space-x-1.5 transition-colors"
+            className="p-2.5 px-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-100 text-xs font-bold backdrop-blur-md flex items-center space-x-1.5 transition-all shadow-sm"
             title="নতুন চ্যাট শুরু করুন"
           >
             <RotateCcw className="w-4 h-4 text-amber-300" />

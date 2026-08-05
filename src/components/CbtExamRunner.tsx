@@ -351,7 +351,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               const selectedOptIdx = userAnswers[qIdx];
               const isFlagged = flaggedIdxs.has(qIdx);
               
-              // Arabic detection
+              // Detect Arabic for question text and options
               const isArabicQuestion = /[\u0600-\u06FF]/.test(q.question);
               const optionBadgesArabic = ['أ', 'ب', 'ج', 'د'];
               const optionBadgesBangla = ['ক', 'খ', 'গ', 'ঘ'];
@@ -360,9 +360,9 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                 <div 
                   key={q.id || qIdx} 
                   id={`q-card-${qIdx}`}
-                  className={`bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 shadow-[4px_4px_12px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.8)] dark:shadow-none border-l-4 ${
-                    isAnswered ? 'border-l-emerald-600 dark:border-l-emerald-500' : 'border-l-slate-900 dark:border-l-slate-600'
-                  } border-t border-r border-b border-slate-200/80 dark:border-slate-800 space-y-4 transition-all relative`}
+                  className={`bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 shadow-[4px_4px_12px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.85)] dark:shadow-none border-l-4 ${
+                    isAnswered ? 'border-l-emerald-600 dark:border-l-emerald-500' : 'border-l-[#1b365d] dark:border-l-emerald-700'
+                  } border-t border-r border-b border-slate-200/90 dark:border-slate-800 space-y-4 transition-all relative`}
                 >
                   
                   {/* Flag button on top corner if needed */}
@@ -380,21 +380,21 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                     </button>
                   </div>
 
-                  {/* Question Heading with Serial Number starting directly inline */}
+                  {/* Question Heading with Serial Number Badge inline */}
                   <div 
                     dir={isArabicQuestion ? 'rtl' : 'ltr'}
                     className={`flex items-start gap-2.5 ${
                       isArabicQuestion ? 'text-right font-arabic' : 'text-left font-sans'
                     }`}
                   >
-                    {/* Dark Filled Serial Number Badge */}
+                    {/* Dark Solid Serial Badge matching screenshot (e.g. ১., ২., ৩.) */}
                     <span 
-                      className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-900 dark:bg-emerald-800 text-white font-black text-xs sm:text-sm shrink-0 mt-0.5 shadow-sm font-sans"
+                      className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#1b365d] dark:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-0.5 shadow-xs font-sans"
                     >
                       {toBnNumeral(qIdx + 1)}
                     </span>
 
-                    {/* Question Text with Uniform Font Size */}
+                    {/* Question Text with UNIFORM font size across all languages */}
                     <h3 
                       className="text-slate-900 dark:text-slate-100 font-extrabold text-base sm:text-lg leading-relaxed flex-1 pt-0.5"
                       style={{ fontFamily: isArabicQuestion ? "'Amiri', serif" : undefined }}
@@ -419,7 +419,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                     {q.options.map((optionText, oIdx) => {
                       const isSelected = selectedOptIdx === oIdx;
                       const isOptArabic = /[\u0600-\u06FF]/.test(optionText) || isArabicQuestion;
-                      const badgeText = isOptArabic ? optionBadgesArabic[oIdx] : optionBadgesArabic[oIdx] || optionBadgesBangla[oIdx];
+                      const badgeText = optionBadgesArabic[oIdx] || optionBadgesBangla[oIdx];
 
                       return (
                         <button
@@ -427,23 +427,23 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           disabled={isAnswered}
                           onClick={() => handleSelectOption(qIdx, oIdx)}
                           dir={isOptArabic ? 'rtl' : 'ltr'}
-                          className={`w-full p-3 sm:p-3.5 rounded-xl border transition-all duration-150 flex items-center justify-between touch-manipulation ${
-                            isArabicQuestion ? 'text-right' : 'text-left'
+                          className={`w-full p-3 sm:p-3.5 rounded-2xl border transition-all duration-150 flex items-center justify-between touch-manipulation ${
+                            isOptArabic ? 'text-right' : 'text-left'
                           } ${
                             isSelected
                               ? 'bg-emerald-50 dark:bg-emerald-950/90 border-emerald-500 dark:border-emerald-500 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-[inset_2px_2px_4px_rgba(0,0,0,0.06)]'
                               : isAnswered
                               ? 'bg-slate-50 dark:bg-slate-900/50 text-slate-400 border-slate-200/60 dark:border-slate-800 opacity-60 cursor-not-allowed'
-                              : 'bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-500 shadow-[2px_2px_5px_rgba(0,0,0,0.03),-2px_-2px_5px_rgba(255,255,255,0.9)] dark:shadow-none active:scale-[0.99]'
+                              : 'bg-[#f8fafc] dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 border-slate-200/90 dark:border-slate-700/80 hover:border-emerald-500 shadow-[2px_2px_5px_rgba(0,0,0,0.03),-2px_-2px_5px_rgba(255,255,255,0.9)] dark:shadow-none active:scale-[0.99]'
                           }`}
                         >
                           <div className={`flex items-center space-x-3 ${isOptArabic ? 'space-x-reverse font-arabic' : ''} w-full`}>
                             {/* Option Prefix Badge inside soft card */}
                             <span 
-                              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs sm:text-sm font-black flex items-center justify-center shrink-0 shadow-xs ${
+                              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center shrink-0 shadow-xs ${
                                 isSelected 
                                   ? 'bg-emerald-600 text-white' 
-                                  : 'bg-slate-200/90 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
+                                  : 'bg-[#e2e8f0]/90 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
                               }`}
                               style={{ fontFamily: isOptArabic ? "'Amiri', serif" : undefined }}
                             >
@@ -480,19 +480,19 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               );
             })}
 
-            {/* Bottom Submit Banner matching request */}
+            {/* Bottom Neumorphic Submit Banner */}
             <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-[4px_4px_12px_rgba(0,0,0,0.05),-4px_-4px_12px_rgba(255,255,255,0.8)] text-center space-y-3">
               <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-slate-100">
                 সকল প্রশ্নের উত্তর শেষ হয়েছে?
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                পরীক্ষা জমা দিলে আপনার অর্জিত ফলাফল ও বিস্তারিত বিশ্লেষণ জাতীয় মেধা তালিকায় যুক্ত হবে।
+                পরীক্ষা জমা দিলে আপনার অর্জিত ফলাফল ও বিস্তারিত বিশ্লেষণ মেধা তালিকায় যুক্ত হবে।
               </p>
               <button
                 onClick={() => setShowSubmitModal(true)}
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-slate-950 font-black text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.8)] border border-amber-300 active:scale-95 transition-all inline-flex items-center space-x-2"
+                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-white font-black text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15),-3px_-3px_8px_rgba(255,255,255,0.8)] border border-amber-400/50 active:scale-95 transition-all inline-flex items-center space-x-2"
               >
-                <Award className="w-5 h-5 text-slate-950" />
+                <span className="text-base">📥</span>
                 <span>পরীক্ষা সাবমিট করুন</span>
               </button>
             </div>
