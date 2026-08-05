@@ -372,24 +372,26 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               const isAnswered = userAnswers[qIdx] !== undefined;
               const selectedOptIdx = userAnswers[qIdx];
               
-              // Detect Arabic for question text
-              const isArabicQuestion = /[\u0600-\u06FF]/.test(q.question);
+              // Clean question text to check whether it starts with Arabic
+              const cleanedQ = q.question.replace(/[\d\s\p{P}\p{S}]/gu, '');
+              const isArabicQuestion = /^[\u0600-\u06FF]/.test(cleanedQ);
 
-              // Serial number badge string
-              // Arabic subject -> Arabic numeral (١, ٢, ٣...)
+              // Serial number badge string inside dark circle:
+              // Islamic/Arabic subject or Arabic question -> Arabic numeral (١, ٢, ٣...)
               // English subject -> English numeral (1, 2, 3...)
               // Bangla subject -> Bangla numeral (১, ২, ৩...)
-              const serialBadgeText = isArabicSubject 
+              const serialBadgeText = (isArabicSubject || isArabicQuestion)
                 ? toArNumeral(qIdx + 1)
                 : isEnglishSubject 
                 ? `${qIdx + 1}`
                 : toBnNumeral(qIdx + 1);
 
-              // Option letters array:
-              // Arabic subject -> ['أ', 'ب', 'ج', 'د']
-              // English subject -> ['A', 'B', 'C', 'D']
-              // Bangla subject -> ['ক', 'খ', 'গ', 'ঘ']
-              const optionBadges = isArabicSubject
+              // Option badges & direction are UNIFORM for ALL options in this question:
+              // If the question is Arabic -> ALL options are RTL, badges are ['أ', 'ب', 'ج', 'د'] on the RIGHT
+              // If the question is Bangla/English -> ALL options are LTR, badges are ['ক', 'খ', 'গ', 'ঘ'] (or A,B,C,D) on the LEFT
+              const isRtlQuestion = isArabicQuestion;
+
+              const optionBadges = isRtlQuestion
                 ? ['أ', 'ب', 'ج', 'د']
                 : isEnglishSubject
                 ? ['A', 'B', 'C', 'D']
@@ -403,7 +405,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                 >
                   
                   {/* Question Heading */}
-                  {isArabicQuestion ? (
+                  {isRtlQuestion ? (
                     /* ARABIC QUESTION: dir="rtl", text-right, dark circle on the RIGHT */
                     <div dir="rtl" className="space-y-1 text-right font-arabic">
                       <div className="flex items-start gap-2.5">
@@ -439,7 +441,6 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                   <div className="space-y-2.5 pt-1">
                     {q.options.map((optionText, oIdx) => {
                       const isSelected = selectedOptIdx === oIdx;
-                      const isOptArabic = /[\u0600-\u06FF]/.test(optionText);
                       const badgeText = optionBadges[oIdx] || `${oIdx + 1}`;
 
                       return (
@@ -447,9 +448,9 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           key={oIdx}
                           disabled={isAnswered}
                           onClick={() => handleSelectOption(qIdx, oIdx)}
-                          dir={isOptArabic ? 'rtl' : 'ltr'}
+                          dir={isRtlQuestion ? 'rtl' : 'ltr'}
                           className={`w-full p-3 sm:p-3.5 rounded-xl transition-all duration-150 flex items-center gap-3 touch-manipulation ${
-                            isOptArabic ? 'text-right justify-start' : 'text-left justify-start'
+                            isRtlQuestion ? 'text-right justify-start' : 'text-left justify-start'
                           } ${
                             isSelected
                               ? 'bg-emerald-50 dark:bg-emerald-950/90 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-xs'
@@ -465,7 +466,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                                 ? 'bg-emerald-600 text-white' 
                                 : 'bg-[#e2e8f0] dark:bg-slate-700 text-[#162e5c] dark:text-slate-200'
                             }`}
-                            style={{ fontFamily: isOptArabic ? "'Amiri', 'Noto Naskh Arabic', serif" : undefined }}
+                            style={{ fontFamily: isRtlQuestion ? "'Amiri', 'Noto Naskh Arabic', serif" : undefined }}
                           >
                             {badgeText}
                           </span>
@@ -473,10 +474,10 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           {/* Option Text */}
                           <span 
                             className={`font-bold text-[18px] sm:text-[20px] leading-snug flex-1 ${
-                              isOptArabic ? 'font-arabic text-right' : 'text-left'
+                              isRtlQuestion ? 'font-arabic text-right' : 'text-left'
                             }`}
                             style={{ 
-                              fontFamily: isOptArabic 
+                              fontFamily: isRtlQuestion 
                                 ? "'Amiri', 'Noto Naskh Arabic', serif" 
                                 : isEnglishSubject 
                                 ? "'Inter', sans-serif" 
