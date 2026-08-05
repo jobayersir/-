@@ -110,7 +110,9 @@ export async function processGeminiRequest(reqBody: any) {
 
       const contents: any[] = [];
       if (Array.isArray(history)) {
-        for (const msg of history) {
+        // Keep only last 6 messages for lightweight mobile data transmission & fast AI inference
+        const recentHistory = history.slice(-6);
+        for (const msg of recentHistory) {
           if (msg.text && (msg.role === 'user' || msg.role === 'model')) {
             contents.push({
               role: msg.role === 'user' ? 'user' : 'model',
@@ -141,7 +143,8 @@ export async function processGeminiRequest(reqBody: any) {
         parts: currentParts,
       });
 
-      const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest"];
+      // Valid fast Gemini models for @google/genai SDK
+      const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash"];
       let lastErrMessage = "";
 
       for (const modelName of candidateModels) {
@@ -151,7 +154,7 @@ export async function processGeminiRequest(reqBody: any) {
             contents,
             config: {
               systemInstruction,
-              temperature: 0.5,
+              temperature: 0.3,
             },
           });
 

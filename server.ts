@@ -7,11 +7,12 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Permissive CORS middleware for Mobile Cellular (3G/4G/5G), Wi-Fi, and WebViews
+  // Permissive CORS & Cache middleware for Mobile Cellular (3G/4G/5G), Wi-Fi, and WebViews
   app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Cache-Control");
+    res.setHeader("Keep-Alive", "timeout=15, max=100");
     if (req.method === "OPTIONS") {
       return res.sendStatus(200);
     }
