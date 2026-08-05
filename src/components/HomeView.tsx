@@ -51,7 +51,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       studentCount: 3420,
       progressPercent: 45,
       thumbnailBg: 'from-emerald-800 to-teal-900',
-      description: '১৭তম ও ১৮তম নিবন্ধনের পূর্ণাঙ্গ আরবি সাহিত্য, নাহু, সরফ, বালাগাত ও ফিকহুস সুন্নাহ্ মাস্টারকোর্স।',
+      description: 'মাদ্রাসা বিষয়ের পূর্ণাঙ্গ আরবি সাহিত্য, নাহু, সরফ, বালাগাত ও ফিকহুস সুন্নাহ্ মাস্টারকোর্স।',
     },
     {
       id: 'c2',
@@ -101,7 +101,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
     },
     {
       id: 'e2',
-      title: '১৮তম নিবন্ধন ফ্রি স্পেশাল টেস্ট - ১',
+      title: 'মাদ্রাসা বিষয়ভিত্তিক ফ্রি স্পেশাল টেস্ট - ১',
       titleArabic: 'الاختبار العام المجاني',
       category: 'free',
       durationMinutes: 30,
@@ -132,10 +132,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
     { rank: 3, name: 'কারি মোশতাক মাহমুদ', position: '৩য় স্থান', points: 2650, avatar: 'K', bg: 'from-amber-600 to-amber-800' },
   ];
 
-  // Latest NTRCA Updates
+  // Latest Updates
   const updates = [
-    { title: '১৮তম মাদ্রাসা শিক্ষক নিবন্ধন লিখিত পরীক্ষার তারিখ দ্রুতই প্রকাশিত হচ্ছে।', date: '৩ আগস্ট ২০২৬' },
-    { title: 'প্রভাষক (আরবি) পদের সংশোধিত সিলেবাসে বালাগাত ও ফিকহ্ অংশে নম্বর পুনর্বণ্টন।', date: '১ আগস্ট ২০২৬' },
+    { title: 'মাদ্রাসা পরীক্ষা ও বিষয়ভিত্তিক মডেল টেস্টের সংশোধিত প্রশ্নব্যাংক হালনাগাদ করা হয়েছে।', date: '৩ আগস্ট ২০২৬' },
+    { title: 'প্রভাষক (আরবি) পদের বিষয়ে বালাগাত ও ফিকহ্ অংশে নতুন প্রশ্ন যুক্ত।', date: '১ আগস্ট ২০২৬' },
     { title: 'উস্তাদ এআই-তে যুক্ত হলো আল-কুরআন ও হাদিসের সরাসরি রেফারেন্স অনুবাদ সিস্টেম।', date: '৩০ জুলাই ২০২৬' },
   ];
 
@@ -151,13 +151,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="max-w-2xl space-y-4">
             <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>তামরীন একাডেমি (TAMREEN ACADEMY) • ১৮তম নিবন্ধন বিশেষ প্রস্তুতি</span>
+              <span>তামরীন একাডেমি (TAMREEN ACADEMY) • বিশেষ বিষয়ভিত্তিক প্রস্তুতি</span>
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
               বিসমিল্লাহির রহমানির রহিম <br />
               <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-amber-200 bg-clip-text text-transparent">
-                মাদ্রাসা শিক্ষক নিবন্ধন সফলতার বিশ্বস্ত সঙ্গী
+                মাদ্রাসা বিষয়ভিত্তিক পরীক্ষা সফলতার বিশ্বস্ত সঙ্গী
               </span>
             </h1>
 
@@ -431,7 +431,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </h3>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              আরবি ব্যাকরণের জটিল তারকীব, আয়াত বা হাদিসের ব্যাকরণিক বিশ্লেষণ এবং ১৮তম নিবন্ধনের সিলেবাস সংক্রান্ত যেকোনো জিজ্ঞাসা সাথে সাথে সমাধান পান।
+              আরবি ব্যাকরণের জটিল তারকীব, আয়াত বা হাদিসের ব্যাকরণিক বিশ্লেষণ এবং মাদ্রাসার সকল বিষয়ভিত্তিক সিলেবাস সংক্রান্ত যেকোনো জিজ্ঞাসা সাথে সাথে সমাধান পান।
             </p>
           </div>
 

@@ -12,7 +12,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'সূরা আল-ফাতিহা কুরআন মজিদের ১ম পূর্ণাঙ্গ অবতীর্ণ সূরা। অপরদিকে সূরা আল-আলাকের প্রথম ৫ আয়াত প্রথম অবতীর্ণ হয়।',
     subject: 'quran_hadith',
     cadre: ['assistant_teacher_arabic', 'lecturer_arabic', 'assistant_maulvi', 'ebtedayee_head'],
-    yearTag: '১৭তম মাদ্রাসা নিবন্ধন ২০২৩',
+    yearTag: '১৭তম মাদ্রাসা পরীক্ষা ২০২৩',
     difficulty: 'easy',
   },
   {
@@ -29,7 +29,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'যে হাদিস প্রতিটি যুগে এতো অধিক সংখ্যক রাবী বর্ণনা করেছেন যে তাদের সকলে মিলে মিথ্যা চক্রান্ত করা যৌক্তিকভাবে অসম্ভব, তাকে হাদিসে মুতাওয়াতির বলে।',
     subject: 'quran_hadith',
     cadre: ['lecturer_arabic', 'assistant_teacher_arabic', 'assistant_maulvi'],
-    yearTag: '১৬তম মাদ্রাসা নিবন্ধন ২০১৯',
+    yearTag: '১৬তম মাদ্রাসা পরীক্ষা ২০১৯',
     difficulty: 'medium',
   },
   {
@@ -46,7 +46,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'তাফসীর বিল মাছূর হলো কুরআন, হাদিস, সাহাবী ও তাবেঈগণের আসার ভিত্তিক ব্যাখ্যা। তাফসীরে ইবনে কাছীর এর একটি উৎকৃষ্ট উদাহরণ।',
     subject: 'quran_hadith',
     cadre: ['lecturer_arabic', 'assistant_teacher_arabic'],
-    yearTag: '১৫তম মাদ্রাসা নিবন্ধন ২০১৮',
+    yearTag: '১৫তম মাদ্রাসা পরীক্ষা ২০১৮',
     difficulty: 'medium',
   },
 
@@ -60,7 +60,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'শরীয়তের চার প্রধান মৌলিক দলিল: ১. কুরআন, ২. সুন্নাহ, ৩. ইজমা, ৪. কিয়াস।',
     subject: 'fiqh_usul',
     cadre: ['assistant_teacher_arabic', 'lecturer_arabic', 'assistant_maulvi', 'ebtedayee_head'],
-    yearTag: '১৭তম মাদ্রাসা নিবন্ধন ২০২৩',
+    yearTag: '১৭তম মাদ্রাসা পরীক্ষা ২০২৩',
     difficulty: 'easy',
   },
   {
@@ -77,7 +77,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'আল-হিদায়া গ্রন্থটি হানাফী ফিকহের অন্যতম প্রামাণ্য গ্রন্থ, যা আল্লামা বুরহানুদ্দীন ফারগানী আল-মারগীনানী (রহ.) রচনা করেছেন।',
     subject: 'fiqh_usul',
     cadre: ['lecturer_arabic', 'assistant_teacher_arabic', 'assistant_maulvi'],
-    yearTag: '১৬তম মাদ্রাসা নিবন্ধন ২০১৯',
+    yearTag: '১৬তম মাদ্রাসা পরীক্ষা ২০১৯',
     difficulty: 'medium',
   },
   {
@@ -94,7 +94,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'আসাবা হলো সেই সব ওয়ারিশ, যারা নির্দিষ্ট অংশীদারদের (জবুল ফুরূজ) অংশ দেয়ার পর অবশিষ্ট সম্পদের সমস্তটা পায়।',
     subject: 'fiqh_usul',
     cadre: ['lecturer_arabic', 'assistant_teacher_arabic'],
-    yearTag: '১৪তম মাদ্রাসা নিবন্ধন ২০১৭',
+    yearTag: '১৪তম মাদ্রাসা পরীক্ষা ২০১৭',
     difficulty: 'hard',
   },
 
@@ -113,7 +113,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'ইলমে নাহু বাক্যের শেষ অক্ষরের পরিবর্তন ও হরকত (ইরাব) নির্ধারণ এবং বাক্য গঠন নীতি নিয়ে আলোচনা করে। শব্দের অভ্যন্তরীণ রূপান্তর আলোচনা করে ইলমে সরফ।',
     subject: 'arabic_grammar',
     cadre: ['assistant_teacher_arabic', 'lecturer_arabic', 'assistant_maulvi', 'ebtedayee_head'],
-    yearTag: '১৭তম মাদ্রাসা নিবন্ধন ২০২৩',
+    yearTag: '১৭তম মাদ্রাসা পরীক্ষা ২০২৩',
     difficulty: 'easy',
   },
   {
@@ -125,7 +125,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'الحروف المشبهة بالفعل ৬টি: إنّ, أنّ, كأنّ, لكنّ, ليت, لعلّ। এগুলো ইসমে ফায়েল ও মেফউলের সাথে সাদৃশ্যপূর্ণ কাজ করে।',
     subject: 'arabic_grammar',
     cadre: ['assistant_teacher_arabic', 'lecturer_arabic', 'assistant_maulvi'],
-    yearTag: '১৫তম মাদ্রাসা নিবন্ধন ২০১৮',
+    yearTag: '১৫তম মাদ্রাসা পরীক্ষা ২০১৮',
     difficulty: 'medium',
   },
   {
@@ -137,7 +137,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'كان এবং এর সমগোত্রীয় ফিলগুলো জুমলায়ে ইসমিয়ার উপর প্রবেশ করে ইসমকে পেশ (মরফু) এবং খবরকে জবর (মনসুব) প্রদান করে। তাই ফাসিহাতান হলো খবরে কানা।',
     subject: 'arabic_grammar',
     cadre: ['lecturer_arabic', 'assistant_teacher_arabic'],
-    yearTag: '১৬তম মাদ্রাসা নিবন্ধন ২০১৯',
+    yearTag: '১৬তম মাদ্রাসা পরীক্ষা ২০১৯',
     difficulty: 'medium',
   },
 
@@ -150,7 +150,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: '১৯০৭ সালে মহামহোপাধ্যায় হরপ্রসাদ শাস্ত্রী নেপালের রাজদরবারের রয়্যাল লাইব্রেরি থেকে চর্যাপদের পুঁথি আবিষ্কার করেন।',
     subject: 'bangla',
     cadre: ['all'],
-    yearTag: '১৭তম নিবন্ধন ২০২৩',
+    yearTag: '১৭তম প্রশ্নপত্র ২০২৩',
     difficulty: 'easy',
   },
   {
@@ -161,7 +161,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'ক্ষমার যোগ্য = ক্ষমার্হ। ক্ষমার যোগ্য নয় = অক্ষমনীয়।',
     subject: 'bangla',
     cadre: ['all'],
-    yearTag: '১৬তম নিবন্ধন ২০১৯',
+    yearTag: '১৬তম প্রশ্নপত্র ২০১৯',
     difficulty: 'easy',
   },
 
@@ -179,7 +179,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: "Who এর পরিবর্তে 'By whom' বসে + Auxiliary verb (were) + subject (you) + V3 (taught) + object (Arabic)?",
     subject: 'english',
     cadre: ['all'],
-    yearTag: '১৭তম নিবন্ধন ২০২৩',
+    yearTag: '১৭তম প্রশ্নপত্র ২০২৩',
     difficulty: 'medium',
   },
   {
@@ -190,7 +190,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'Benevolent শব্দের অর্থ দয়ালু বা দানশীল, যার সমার্থক শব্দ Generous, Kind, Altruistic।',
     subject: 'english',
     cadre: ['all'],
-    yearTag: '১৫তম নিবন্ধন ২০১৮',
+    yearTag: '১৫তম প্রশ্নপত্র ২০১৮',
     difficulty: 'easy',
   },
 
@@ -203,7 +203,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'সমবাহু ত্রিভুজের ক্ষেত্রফল = (√3/4) × a²। এখানে a = 4, সুতরাং (√3/4) × 16 = 4√3 বর্গ সেমি।',
     subject: 'mathematics',
     cadre: ['all'],
-    yearTag: '১৭তম নিবন্ধন ২০২৩',
+    yearTag: '১৭তম প্রশ্নপত্র ২০২৩',
     difficulty: 'medium',
   },
 
@@ -216,7 +216,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: '১৯৭৮ খ্রিষ্টাব্দে বাংলাদেশ মাদ্রাসা শিক্ষা বোর্ড অধ্যাদেশ অনুযায়ী স্বতন্ত্র বোর্ডের রূপ লাভ করে।',
     subject: 'general_knowledge',
     cadre: ['all'],
-    yearTag: '১৬তম মাদ্রাসা নিবন্ধন ২০১৯',
+    yearTag: '১৬তম মাদ্রাসা পরীক্ষা ২০১৯',
     difficulty: 'medium',
   },
   {
@@ -227,7 +227,7 @@ export const QUESTION_BANK: MCQQuestion[] = [
     explanation: 'হযরত ওমর (রা.) ইসলামী রাষ্ট্রব্যবস্থায় সুসংগঠিত বায়তুল মাল, দেওয়ান ও প্রশাসনিক কাঠামো গড়ে তোলেন।',
     subject: 'islamic_history',
     cadre: ['assistant_teacher_arabic', 'lecturer_arabic', 'lecturer_islamic_history', 'assistant_maulvi'],
-    yearTag: '১৭তম মাদ্রাসা নিবন্ধন ২০২৩',
+    yearTag: '১৭তম মাদ্রাসা পরীক্ষা ২০২৩',
     difficulty: 'easy',
   }
 ];

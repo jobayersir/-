@@ -119,7 +119,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     },
     {
       id: 'ex-free-1',
-      title: '১৮তম নিবন্ধন ফ্রি প্রি-রেজিস্ট্রেশন ফুল মক টেস্ট',
+      title: 'বিশেষ বিষয়ভিত্তিক ফ্রি প্রি-রেজিস্ট্রেশন ফুল মক টেস্ট',
       titleArabic: 'اختبار التسجيل العام المجاني الكامل',
       category: 'free',
       durationMinutes: 45,
@@ -232,7 +232,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     },
     {
       id: 'ex-comp-2',
-      title: '১৭তম শিক্ষক নিবন্ধন বিগত বছরের প্রশ্ন সমাধান টেস্ট',
+      title: 'মাদ্রাসা বিষয়ভিত্তিক বিগত বছরের প্রশ্ন সমাধান টেস্ট',
       titleArabic: 'اختبار حل أسئلة الامتحان السابق',
       category: 'completed',
       durationMinutes: 50,
@@ -907,11 +907,16 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
               <div className="flex items-center space-x-2">
                 <Crown className="w-6 h-6 text-amber-500 shrink-0" />
                 <div>
-                  <h3 className="font-black text-lg text-slate-950 dark:text-slate-100 flex items-center space-x-1.5">
-                    <span>লিডারবোর্ড</span>
+                  <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 text-[10px] font-black text-emerald-800 dark:text-emerald-300 mb-1">
+                    {viewingLeaderboardExam.isPremium 
+                      ? 'প্রিমিয়াম পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা' 
+                      : 'ফ্রি পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা'}
+                  </div>
+                  <h3 className="font-black text-sm sm:text-base text-slate-950 dark:text-slate-100 flex items-center space-x-1.5">
+                    <span>বিষয়ের মেধা তালিকা</span>
                   </h3>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 font-bold truncate max-w-[220px] sm:max-w-xs">
-                    {viewingLeaderboardExam.title}
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-extrabold truncate max-w-[220px] sm:max-w-xs">
+                    বিষয়: {viewingLeaderboardExam.title}
                   </p>
                 </div>
               </div>
@@ -920,6 +925,22 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                 className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
               >
                 <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter Tabs in Exam Modal (এই পরীক্ষা, এই সপ্তাহে, এই মাসে, সর্বকালের) */}
+            <div className="flex items-center gap-1 p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-xl text-[11px] font-bold">
+              <button className="flex-1 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-black shadow-xs">
+                এই পরীক্ষা
+              </button>
+              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50">
+                এই সপ্তাহে
+              </button>
+              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50">
+                এই মাসে
+              </button>
+              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50">
+                সর্বকালের
               </button>
             </div>
 
@@ -1077,7 +1098,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                 ভিআইপি প্রিমিয়াম মেম্বারশিপ
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-xs mx-auto">
-                ১৮তম মাদ্রাসা শিক্ষক নিবন্ধনের ৫০০+ প্রিমিয়াম মডেল টেস্ট ও লাইভ প্রশ্নব্যাংক অ্যাক্সেস করতে প্রিমিয়াম প্যাক আনলক করুন।
+                মাদ্রাসা বিষয়ভিত্তিক ৫০০+ প্রিমিয়াম মডেল টেস্ট ও লাইভ প্রশ্নব্যাংক অ্যাক্সেস করতে প্রিমিয়াম প্যাক আনলক করুন।
               </p>
             </div>
 

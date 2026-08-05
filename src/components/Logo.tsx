@@ -182,7 +182,7 @@ export const Logo: React.FC<LogoProps> = ({
           </div>
           {showSubtitle && (
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5">
-              তামরীন একাডেমি • মাদ্রাসা শিক্ষক নিবন্ধন প্রস্তুতি
+              তামরীন একাডেমি • মাদ্রাসা বিষয়ভিত্তিক মডেল টেস্ট প্ল্যাটফর্ম
             </span>
           )}
         </div>

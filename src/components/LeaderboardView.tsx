@@ -20,6 +20,8 @@ interface LeaderboardViewProps {
   user?: UserProfileData;
   onTabChange?: (tab: NavTab) => void;
   onBackToExam?: () => void;
+  examTitle?: string;
+  isPremiumExam?: boolean;
 }
 
 export interface LeaderboardUser {
@@ -39,13 +41,16 @@ export interface LeaderboardUser {
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ 
   user, 
   onTabChange,
-  onBackToExam 
+  onBackToExam,
+  examTitle,
+  isPremiumExam = false
 }) => {
-  const [filterPeriod, setFilterPeriod] = useState<'today' | 'weekly' | 'monthly' | 'allTime'>('today');
+  const [filterPeriod, setFilterPeriod] = useState<'thisExam' | 'weekly' | 'monthly' | 'allTime'>('thisExam');
+  const [leaderboardType, setLeaderboardType] = useState<'free' | 'premium'>(isPremiumExam ? 'premium' : 'free');
 
   // Top 3 Podium Mock Data for Tamreen Academy
   const topWinners: Record<string, LeaderboardUser[]> = {
-    today: [
+    thisExam: [
       {
         rank: 1,
         name: 'মাওলানা হাফেজ আব্দুল মালেক',
@@ -214,7 +219,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     { rank: 12, name: 'কারি নোমান আহমেদ', cadre: 'ইবতেদায়ী কারী', score: 83, maxScore: 100, accuracyPercentage: 83, timeSpentMinutes: 54, streakDays: 6, location: 'নোয়াখালী' },
   ];
 
-  const currentPodium = topWinners[filterPeriod] || topWinners.today;
+  const currentPodium = topWinners[filterPeriod] || topWinners.thisExam;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-24 animate-in fade-in duration-300">
@@ -230,13 +235,17 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           <div className="space-y-2 text-center sm:text-left">
             <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-900/80 border border-amber-400/40 text-amber-300 text-xs font-bold shadow-sm">
               <Trophy className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>তামরীন একাডেমি জাতীয় মেধা তালিকা</span>
+              <span>
+                {leaderboardType === 'premium' 
+                  ? 'প্রিমিয়াম পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা' 
+                  : 'ফ্রি পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা'}
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               অল-বাংলাদেশ মেধা তালিকা <span className="text-amber-400 font-arabic font-extrabold text-xl">(قائمة المتفوقين)</span>
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100/90 font-medium">
-              ১৮তম শিক্ষক নিবন্ধন প্রিপারেশনের সেরা পরীক্ষার্থীদের তালিকা
+              {examTitle ? `বিষয়: ${examTitle}` : 'বিষয়ভিত্তিক ও মডেল টেস্ট পরীক্ষার সেরা পরীক্ষার্থীদের তালিকা'}
             </p>
           </div>
 
@@ -250,10 +259,34 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           )}
         </div>
 
+        {/* Free vs Premium Leaderboard Switcher */}
+        <div className="relative z-10 flex items-center justify-center gap-2 mt-5 p-1 bg-black/20 rounded-2xl border border-white/10">
+          <button
+            onClick={() => setLeaderboardType('free')}
+            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+              leaderboardType === 'free'
+                ? 'bg-emerald-500 text-slate-950 shadow-md'
+                : 'text-emerald-100/70 hover:text-white'
+            }`}
+          >
+            ফ্রি মেধা তালিকা
+          </button>
+          <button
+            onClick={() => setLeaderboardType('premium')}
+            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+              leaderboardType === 'premium'
+                ? 'bg-amber-400 text-slate-950 shadow-md'
+                : 'text-emerald-100/70 hover:text-white'
+            }`}
+          >
+            প্রিমিয়াম মেধা তালিকা
+          </button>
+        </div>
+
         {/* Filter Tabs */}
-        <div className="relative z-10 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-6 p-1.5 bg-emerald-900/60 backdrop-blur-md rounded-2xl border border-emerald-700/50 w-full overflow-x-auto">
+        <div className="relative z-10 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-4 p-1.5 bg-emerald-900/60 backdrop-blur-md rounded-2xl border border-emerald-700/50 w-full overflow-x-auto">
           {[
-            { id: 'today', label: 'আজকে' },
+            { id: 'thisExam', label: 'এই পরীক্ষা' },
             { id: 'weekly', label: 'এই সপ্তাহে' },
             { id: 'monthly', label: 'এই মাসে' },
             { id: 'allTime', label: 'সর্বকালের' }

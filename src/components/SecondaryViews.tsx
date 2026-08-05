@@ -49,7 +49,7 @@ export const ProfileView: React.FC<ViewProps> = ({ user, onTabChange }) => (
         </h2>
         <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-          সহকারী শিক্ষক (আরবি) • {user.targetYear} নিবন্ধন
+          সহকারী শিক্ষক (আরবি) • মাদ্রাসা পরীক্ষা প্রস্তুতি
         </span>
       </div>
     </div>
@@ -156,7 +156,7 @@ export const PremiumView: React.FC = () => (
       <Crown className="w-12 h-12 text-slate-950 mx-auto" />
       <h2 className="text-2xl font-black">ভিআইপি প্রিমিয়াম মেম্বারশিপ প্ল্যান</h2>
       <p className="text-xs sm:text-sm font-semibold max-w-xl mx-auto text-slate-900">
-        ১৮তম মাদ্রাসা শিক্ষক নিবন্ধন পরীক্ষায় প্রথম চয়েসে টিকতে প্রিমিয়াম মেম্বার হয়ে আনলিমিটেড মক টেস্ট ও উস্তাদ এআই এক্সেস নিন।
+        মাদ্রাসা বিষয়ভিত্তিক পরীক্ষায় সর্বোচ্চ নম্বর অর্জনে প্রিমিয়াম মেম্বার হয়ে আনলিমিটেড মক টেস্ট ও উস্তাদ এআই এক্সেস নিন।
       </p>
     </div>
 

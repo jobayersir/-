@@ -65,7 +65,7 @@ export const CQ_QUESTION_BANK: CQQuestion[] = [
     subject: 'ict_pedagogy',
     marks: 10,
     cadre: ['all'],
-    yearTag: '১৭তম শিক্ষক নিবন্ধন ২০২৩',
+    yearTag: '১৭তম লিখিত পরীক্ষা ২০২৩',
     keyPoints: [
       'মাদ্রাসায় প্রজেক্টর, স্মার্ট বোর্ড ও অনলাইন প্লাটফর্মের ভূমিকা',
       'আরবি উচ্চারণ ও তাজবীদ শিখতে মাল্টিমিডিয়া এনিমেশনের ব্যবহার',

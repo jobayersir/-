@@ -38,10 +38,10 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
         <div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center">
             <BookOpen className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" />
-            বিগত বছরের প্রশ্ন ব্যাংক (Past NTRCA Madrasa Question Bank)
+            বিগত বছরের প্রশ্ন ব্যাংক (Past Madrasa Question Bank)
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            ১৭তম, ১৬তম, ১৫তম শিক্ষক নিবন্ধনের শতভাগ সঠিক সমাধান ও তথ্যবহুল ব্যাখ্যা
+            মাদ্রাসা বিষয়ভিত্তিক সকল পরীক্ষার শতভাগ সঠিক সমাধান ও তথ্যবহুল ব্যাখ্যা
           </p>
         </div>
 
@@ -64,10 +64,10 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
             className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
           >
             <option value="all">সকল সাল</option>
-            <option value="১৭তম">১৭তম নিবন্ধন ২০২৩</option>
-            <option value="১৬তম">১৬তম নিবন্ধন ২০১৯</option>
-            <option value="১৫তম">১৫তম নিবন্ধন ২০১৮</option>
-            <option value="১৪তম">১৪তম নিবন্ধন ২০১৭</option>
+            <option value="২০২৩">২০২৩ সালের প্রশ্ন</option>
+            <option value="২০১৯">২০১৯ সালের প্রশ্ন</option>
+            <option value="২০১৮">২০১৮ সালের প্রশ্ন</option>
+            <option value="২০১৭">২০১৭ সালের প্রশ্ন</option>
           </select>
         </div>
       </div>

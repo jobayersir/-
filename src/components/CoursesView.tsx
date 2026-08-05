@@ -35,11 +35,11 @@ export const CoursesView: React.FC = () => {
       studentCount: 3420,
       progressPercent: 50,
       thumbnailBg: 'from-emerald-900 via-teal-900 to-slate-900',
-      description: '১৭তম ও ১৮তম নিবন্ধনের পূর্ণাঙ্গ আরবি সাহিত্য, নাহু, সরফ, বালাগাত, তাফসীর ও ফিকহুস সুন্নাহ্ মাস্টারকোর্স।',
+      description: 'মাদ্রাসা বিষয়ের পূর্ণাঙ্গ আরবি সাহিত্য, নাহু, সরফ, বালাগাত, তাফসীর ও ফিকহুস সুন্নাহ্ মাস্টারকোর্স।',
     },
     {
       id: 'c_maulvi',
-      title: 'সহকারী মৌলভী নিবন্ধনী মাস্টারকোর্স',
+      title: 'সহকারী মৌলভী বিষয়ভিত্তিক মাস্টারকোর্স',
       titleArabic: 'دورة المدرس المساعد الشرعي الكاملة',
       cadre: 'assistant_maulvi',
       instructor: 'ওস্তাদ মুফতি ইউসুফ আল-মাদানী',

@@ -29,7 +29,7 @@ export interface MCQQuestion {
   explanationArabic?: string;
   subject: SubjectCategory;
   cadre: PostCadre[];
-  yearTag?: string; // e.g. "১৭তম মাদ্রাসা নিবন্ধন ২০২৩"
+  yearTag?: string; // e.g. "১৭তম মাদ্রাসা পরীক্ষা ২০২৩"
   difficulty: 'easy' | 'medium' | 'hard';
 }
 

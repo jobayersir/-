@@ -63,7 +63,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
             সিকিউ ও লিখিত প্রশ্ন অনুশীলন (Written Prep & AI Marking)
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            মাদ্রাসা শিক্ষক নিবন্ধন লিখিত পরীক্ষার উচ্চ নম্বর অর্জনের সেরা প্রস্তুতি
+            মাদ্রাসা বিষয়ভিত্তিক লিখিত পরীক্ষার উচ্চ নম্বর অর্জনের সেরা প্রস্তুতি
           </p>
         </div>
 

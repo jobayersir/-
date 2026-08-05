@@ -1,5 +1,5 @@
 export const SUPABASE_SQL_SCRIPT = `-- ==========================================
--- MADRASA NTRCA PREP APP - SUPABASE SQL SCHEMA
+-- MADRASA SUBJECT PREP APP - SUPABASE SQL SCHEMA
 -- ==========================================
 
 -- 1. Create Users Profile table
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   full_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   target_cadre TEXT DEFAULT 'assistant_teacher_arabic',
-  target_exam_year TEXT DEFAULT '18th NTRCA',
+  target_exam_year TEXT DEFAULT 'Madrasa Exam',
   arabic_font_preference TEXT DEFAULT 'Amiri',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

@@ -61,7 +61,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
   const [manualExplanation, setManualExplanation] = useState('');
   const [subject, setSubject] = useState<SubjectCategory>('arabic_grammar');
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
-  const [yearTag, setYearTag] = useState('১৮তম নিবন্ধন ২০২৬');
+  const [yearTag, setYearTag] = useState('মাদ্রাসা মডেল টেস্ট ২০২৬');
 
   const saveToStorage = (updatedList: MCQQuestion[]) => {
     setAllQuestions(updatedList);
@@ -256,7 +256,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 type="text"
                 value={yearTag}
                 onChange={(e) => setYearTag(e.target.value)}
-                placeholder="যেমন: ১৮তম মাদ্রাসা নিবন্ধন ২০২৬"
+                placeholder="যেমন: বিষয়ভিত্তিক মডেল টেস্ট ২০২৬"
                 className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200"
               />
             </div>

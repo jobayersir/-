@@ -53,13 +53,13 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
           <div className="max-w-2xl space-y-4">
             <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>তামরীন একাডেমি (TAMREEN ACADEMY) • NTRCA স্পেশাল ব্যাচ</span>
+              <span>তামরীন একাডেমি (TAMREEN ACADEMY) • মাদ্রাসা স্পেশাল ব্যাচ</span>
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
               বিসমিল্লাহির রহমানির রহিম <br />
               <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-amber-200 bg-clip-text text-transparent">
-                মাদ্রাসা শিক্ষক নিবন্ধন সফলতার বিশ্বস্ত সঙ্গী
+                মাদ্রাসা শিক্ষা ও পরীক্ষা সফলতার বিশ্বস্ত সঙ্গী
               </span>
             </h2>
 
@@ -156,7 +156,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             <ShieldCheck className="w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400" />
             মূল ফিচারসমূহ ও প্রস্তুতি বিভাগ
           </h3>
-          <span className="text-xs text-slate-500 dark:text-slate-400">১৮তম নিবন্ধন উপযোগী</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">বিষয়ভিত্তিক সিলেবাস উপযোগী</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -240,7 +240,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 বিগত বছরের প্রশ্ন ব্যাংক
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                ১৭তম, ১৬তম, ১৫তম সহ বিগত বছরের সকল নিবন্ধন পরীক্ষার সমাধানকৃত প্রশ্নপত্র ও ট্যাগভিত্তিক ফিল্টার।
+                আরবি, ফিকহ, হাদিস ও ইসলামিক বিষয়ের বিগত বছরের সকল পরীক্ষার সমাধানকৃত প্রশ্নপত্র ও ট্যাগভিত্তিক ফিল্টার।
               </p>
             </div>
             <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400">
@@ -304,7 +304,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             আজকের বিশেষ সাধারণ প্রশ্ন (Question of the Day)
           </span>
           <span className="text-[11px] bg-emerald-200 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2.5 py-0.5 rounded-full font-semibold">
-            ১৭তম শিক্ষক নিবন্ধন
+            ফিকহ ও উসূলে ফিকহ
           </span>
         </div>
 

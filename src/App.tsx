@@ -41,14 +41,14 @@ export default function App() {
   // User Profile Object
   const userProfile: UserProfileData = {
     name: 'মাওলানা মোঃ আব্দুল্লাহ',
-    email: 'abdullah.ntrca@gmail.com',
+    email: 'abdullah.tamreen@gmail.com',
     cadre: selectedCadre,
     isPremium: true,
     joinedDate: 'জানুয়ারি ২০২৬',
     totalSolvedQuestions: 1420,
     accuracyRate: 84,
     streakDays: 14,
-    targetYear: '১৮তম',
+    targetYear: 'মাদ্রাসা পরীক্ষা',
   };
 
   // Load local state on mount
@@ -313,7 +313,7 @@ export default function App() {
                 TAMREEN ACADEMY • তামরীন একাডেমি
               </span>
               <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) অনলাইন লার্নিং প্ল্যাটফর্ম
+                মাদ্রাসা বিষয়ের অনলাইন মডেল টেস্ট ও লার্নিং প্ল্যাটফর্ম
               </span>
             </div>
           </div>

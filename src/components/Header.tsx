@@ -108,10 +108,10 @@ export const Header: React.FC<HeaderProps> = ({
             <Logo variant="horizontal" size="md" />
             <div className="hidden lg:block border-l border-emerald-200 dark:border-slate-700 pl-3.5 py-0.5">
               <span className="block text-xs font-bold text-emerald-950 dark:text-emerald-200">
-                মাদ্রাসা শিক্ষক নিবন্ধন
+                মাদ্রাসা মডেল টেস্ট প্ল্যাটফর্ম
               </span>
               <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                NTRCA Madrasa Prep
+                Madrasa Subject Prep
               </span>
             </div>
           </div>
