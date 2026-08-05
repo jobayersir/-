@@ -119,9 +119,14 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
 
     try {
       const activeKey = userApiKey || localStorage.getItem('tamreen_gemini_api_key') || undefined;
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 sec timeout for fast mobile response
+
       const res = await fetch('/api/ustad-ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           action: 'chat',
           prompt: textToSend || 'সংযুক্ত ছবিটি বিশ্লেষণ করুন',
@@ -129,7 +134,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
           history,
           apiKey: activeKey,
         }),
-      });
+      }).finally(() => clearTimeout(timeoutId));
 
       const data = await res.json();
       if (!res.ok || data.error) {

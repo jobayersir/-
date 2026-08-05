@@ -144,7 +144,7 @@ export async function processGeminiRequest(reqBody: any) {
       });
 
       // Valid fast Gemini models for @google/genai SDK
-      const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash"];
+      const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest"];
       let lastErrMessage = "";
 
       for (const modelName of candidateModels) {
@@ -155,6 +155,7 @@ export async function processGeminiRequest(reqBody: any) {
             config: {
               systemInstruction,
               temperature: 0.3,
+              maxOutputTokens: 800,
             },
           });
 
