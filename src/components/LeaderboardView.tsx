@@ -48,6 +48,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const [filterPeriod, setFilterPeriod] = useState<'thisExam' | 'weekly' | 'monthly' | 'allTime'>('thisExam');
   const [leaderboardType, setLeaderboardType] = useState<'free' | 'premium'>(isPremiumExam ? 'premium' : 'free');
 
+  // Keep leaderboardType in sync if isPremiumExam prop changes
+  React.useEffect(() => {
+    if (isPremiumExam !== undefined) {
+      setLeaderboardType(isPremiumExam ? 'premium' : 'free');
+    }
+  }, [isPremiumExam]);
+
   // Top 3 Podium Mock Data for Tamreen Academy
   const topWinners: Record<string, LeaderboardUser[]> = {
     thisExam: [
@@ -260,28 +267,39 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         </div>
 
         {/* Free vs Premium Leaderboard Switcher */}
-        <div className="relative z-10 flex items-center justify-center gap-2 mt-5 p-1 bg-black/20 rounded-2xl border border-white/10">
-          <button
-            onClick={() => setLeaderboardType('free')}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
-              leaderboardType === 'free'
-                ? 'bg-emerald-500 text-slate-950 shadow-md'
-                : 'text-emerald-100/70 hover:text-white'
-            }`}
-          >
-            ফ্রি মেধা তালিকা
-          </button>
-          <button
-            onClick={() => setLeaderboardType('premium')}
-            className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
-              leaderboardType === 'premium'
-                ? 'bg-amber-400 text-slate-950 shadow-md'
-                : 'text-emerald-100/70 hover:text-white'
-            }`}
-          >
-            প্রিমিয়াম মেধা তালিকা
-          </button>
-        </div>
+        {isPremiumExam === undefined ? (
+          <div className="relative z-10 flex items-center justify-center gap-2 mt-5 p-1 bg-black/20 rounded-2xl border border-white/10">
+            <button
+              onClick={() => setLeaderboardType('free')}
+              className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+                leaderboardType === 'free'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md'
+                  : 'text-emerald-100/70 hover:text-white'
+              }`}
+            >
+              ফ্রি মেধা তালিকা
+            </button>
+            <button
+              onClick={() => setLeaderboardType('premium')}
+              className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+                leaderboardType === 'premium'
+                  ? 'bg-amber-400 text-slate-950 shadow-md'
+                  : 'text-emerald-100/70 hover:text-white'
+              }`}
+            >
+              প্রিমিয়াম মেধা তালিকা
+            </button>
+          </div>
+        ) : (
+          <div className="relative z-10 flex items-center justify-center mt-4">
+            <div className={`px-4 py-2 rounded-xl text-xs font-black text-slate-950 shadow-md flex items-center space-x-1.5 ${
+              isPremiumExam ? 'bg-amber-400' : 'bg-emerald-400'
+            }`}>
+              <Trophy className="w-4 h-4" />
+              <span>{isPremiumExam ? 'প্রিমিয়াম মেধা তালিকা (Premium Leaderboard)' : 'ফ্রি মেধা তালিকা (Free Leaderboard)'}</span>
+            </div>
+          </div>
+        )}
 
         {/* Filter Tabs */}
         <div className="relative z-10 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-4 p-1.5 bg-emerald-900/60 backdrop-blur-md rounded-2xl border border-emerald-700/50 w-full overflow-x-auto">

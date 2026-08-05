@@ -75,6 +75,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
   // State for viewing detailed report of a completed exam
   const [viewingReportExam, setViewingReportExam] = useState<ExtendedExamItem | null>(null);
+  const [reportFilter, setReportFilter] = useState<'all' | 'wrong' | 'correct'>('all');
 
   // State for viewing exam specific leaderboard
   const [viewingLeaderboardExam, setViewingLeaderboardExam] = useState<ExtendedExamItem | null>(null);
@@ -815,85 +816,233 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       )}
 
       {/* ========================================================= */}
-      {/* 5. COMPLETED EXAM REPORT MODAL                            */}
+      {/* 5. COMPLETED EXAM REPORT & DETAILED ANSWERS MODAL         */}
       {/* ========================================================= */}
-      {viewingReportExam && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-5 relative">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center space-x-2">
-                <BarChart2 className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-base sm:text-lg text-slate-950 dark:text-slate-100">
-                  পরীক্ষার পারফরম্যান্স রিপোর্ট
-                </h3>
-              </div>
-              <button
-                onClick={() => setViewingReportExam(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {viewingReportExam && (() => {
+        const reportQuestions = mcqQuestions.slice(0, viewingReportExam.totalQuestions || 10);
+        
+        // Filter report questions based on reportFilter ('all' | 'wrong' | 'correct')
+        const filteredReportQuestions = reportQuestions.filter((q, qIdx) => {
+          const isMockWrong = qIdx % 7 === 1; // realistic mock answer distribution matching score
+          if (reportFilter === 'wrong') return isMockWrong;
+          if (reportFilter === 'correct') return !isMockWrong;
+          return true;
+        });
 
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
-                  {viewingReportExam.title}
-                </h4>
-                <p className="text-xs text-slate-500">{viewingReportExam.subject}</p>
+        return (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-7 space-y-5 relative max-h-[90vh] flex flex-col my-auto">
+              
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-2 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base sm:text-lg text-slate-950 dark:text-slate-100 leading-snug">
+                      ব্যাখ্যা সহ উত্তর ও প্রশ্নব্যাংক
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      {viewingReportExam.title} ({viewingReportExam.subject})
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setViewingReportExam(null)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 text-center">
+              {/* Stats Summary Bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 text-center shrink-0">
                 <div>
-                  <span className="text-[11px] text-slate-400 block font-semibold">প্রাপ্ত স্কোর</span>
-                  <span className="font-extrabold text-base text-emerald-600">{viewingReportExam.score}/{viewingReportExam.totalMarks}</span>
+                  <span className="text-[11px] text-slate-400 block font-semibold">প্রাপ্ত নম্বর</span>
+                  <span className="font-extrabold text-sm sm:text-base text-emerald-600 dark:text-emerald-400">{viewingReportExam.score}/{viewingReportExam.totalMarks}</span>
                 </div>
                 <div>
                   <span className="text-[11px] text-slate-400 block font-semibold">সঠিক উত্তর</span>
-                  <span className="font-extrabold text-base text-teal-600">{viewingReportExam.correctAnswers}টি</span>
+                  <span className="font-extrabold text-sm sm:text-base text-teal-600 dark:text-teal-400">{viewingReportExam.correctAnswers || viewingReportExam.score}টি</span>
                 </div>
                 <div>
                   <span className="text-[11px] text-slate-400 block font-semibold">ভুল উত্তর</span>
-                  <span className="font-extrabold text-base text-rose-500">{viewingReportExam.wrongAnswers}টি</span>
+                  <span className="font-extrabold text-sm sm:text-base text-rose-500">{viewingReportExam.wrongAnswers || (viewingReportExam.totalMarks - (viewingReportExam.score || 0))}টি</span>
                 </div>
                 <div>
                   <span className="text-[11px] text-slate-400 block font-semibold">নির্ভুলতা</span>
-                  <span className="font-extrabold text-base text-amber-500">{viewingReportExam.accuracy}%</span>
+                  <span className="font-extrabold text-sm sm:text-base text-amber-500">{viewingReportExam.accuracy}%</span>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-slate-800 border border-emerald-100 dark:border-slate-700 space-y-2">
-                <h5 className="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center">
-                  <Sparkles className="w-4 h-4 mr-1 text-amber-500" />
-                  উস্তাদ এআই বিশ্লেষণ পরামর্শ:
-                </h5>
-                <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                  আপনার ইসলামী ইতিহাস ও সরফ বিষয়ে দখল চমৎকার। তবে আরবি ব্যাকরণের বালাগাত অংশের প্রশ্নে আরেকটু প্রস্তুতি নেওয়া প্রয়োজন।
-                </p>
+              {/* Filter Tabs for Questions (সকল, ভুল উত্তর, সঠিক উত্তর) */}
+              <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0">
+                <button
+                  onClick={() => setReportFilter('all')}
+                  className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+                    reportFilter === 'all'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+                  }`}
+                >
+                  সকল প্রশ্ন ({reportQuestions.length})
+                </button>
+                <button
+                  onClick={() => setReportFilter('wrong')}
+                  className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+                    reportFilter === 'wrong'
+                      ? 'bg-rose-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+                  }`}
+                >
+                  ভুল উত্তর ({reportQuestions.filter((_, idx) => idx % 7 === 1).length})
+                </button>
+                <button
+                  onClick={() => setReportFilter('correct')}
+                  className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
+                    reportFilter === 'correct'
+                      ? 'bg-teal-600 text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+                  }`}
+                >
+                  সঠিক উত্তর ({reportQuestions.filter((_, idx) => idx % 7 !== 1).length})
+                </button>
               </div>
 
-              {/* View Leaderboard Button inside Report Modal */}
-              <button
-                onClick={() => {
-                  setViewingLeaderboardExam(viewingReportExam);
-                  setViewingReportExam(null);
-                }}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-              >
-                <Trophy className="w-4 h-4 text-slate-950" />
-                <span>জাতীয় মেধা তালিকা দেখুন (Exam Leaderboard)</span>
-              </button>
-            </div>
+              {/* Questions List with Explanations */}
+              <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+                {filteredReportQuestions.length === 0 ? (
+                  <div className="text-center py-8 text-slate-500 text-xs font-bold">
+                    এই ক্যাটাগরিতে কোনো প্রশ্ন পাওয়া যায়নি।
+                  </div>
+                ) : (
+                  filteredReportQuestions.map((q, idx) => {
+                    const originalIndex = reportQuestions.findIndex(item => item.question === q.question);
+                    const qNum = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
+                    const isMockWrong = originalIndex % 7 === 1;
+                    const mockUserOptIdx = isMockWrong ? (q.correctAnswer + 1) % q.options.length : q.correctAnswer;
 
-            <button
-              onClick={() => setViewingReportExam(null)}
-              className="w-full py-3 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-700"
-            >
-              বন্ধ করুন
-            </button>
+                    return (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3"
+                      >
+                        {/* Question Header */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-black">
+                              প্রশ্ন {qNum}
+                            </span>
+                            <span className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400">
+                              বিষয়: {q.subject || viewingReportExam.subject}
+                            </span>
+                          </div>
+                          {isMockWrong ? (
+                            <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black flex items-center space-x-1">
+                              <XCircle className="w-3 h-3 text-rose-600" />
+                              <span>ভুল উত্তর</span>
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black flex items-center space-x-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              <span>সঠিক উত্তর</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Question Text */}
+                        <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-snug">
+                          {q.question}
+                        </h4>
+                        {q.questionArabic && (
+                          <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 font-arabic font-semibold" style={{ fontFamily: "'Amiri', serif" }}>
+                            {q.questionArabic}
+                          </p>
+                        )}
+
+                        {/* Options Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                          {q.options.map((opt, optIdx) => {
+                            const isCorrectOpt = optIdx === q.correctAnswer;
+                            const isUserSelected = optIdx === mockUserOptIdx;
+
+                            let optStyle = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300";
+                            if (isCorrectOpt) {
+                              optStyle = "bg-emerald-50 dark:bg-emerald-950/80 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-black";
+                            } else if (isUserSelected && isMockWrong) {
+                              optStyle = "bg-rose-50 dark:bg-rose-950/80 border-rose-500 text-rose-950 dark:text-rose-100 font-black";
+                            }
+
+                            return (
+                              <div
+                                key={optIdx}
+                                className={`p-2.5 rounded-xl border text-xs flex items-center justify-between transition-all ${optStyle}`}
+                              >
+                                <span className="leading-snug">{opt}</span>
+                                {isCorrectOpt && (
+                                  <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-200 dark:bg-emerald-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                    <Check className="w-3 h-3" />
+                                    <span>সঠিক উত্তর</span>
+                                  </span>
+                                )}
+                                {isUserSelected && isMockWrong && (
+                                  <span className="text-[10px] font-extrabold text-rose-700 dark:text-rose-300 bg-rose-200 dark:bg-rose-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                    <X className="w-3 h-3" />
+                                    <span>আপনার ভুল উত্তর</span>
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* 💡 EXPLANATION BOX (ব্যাখ্যা সহ উত্তর) */}
+                        <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 space-y-1 mt-2">
+                          <div className="flex items-center space-x-1.5 text-amber-900 dark:text-amber-300 font-black text-xs">
+                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                            <span>💡 বিস্তারিত ব্যাখ্যা (Explanation):</span>
+                          </div>
+                          <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
+                            {q.explanation || 'এই প্রশ্নের উত্তর সরাসরি তামরীন একাডেমির প্রমিত পাঠ্যবই ও বিগত বছরের বোর্ড প্রশ্ন রেফারেন্স অনুযায়ী সবিস্তারে ব্যাখ্যাকৃত।'}
+                          </p>
+                          {q.reference && (
+                            <div className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 pt-1">
+                              📚 রেফারেন্স: {q.reference}
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="pt-2 flex flex-col sm:flex-row gap-2 shrink-0">
+                <button
+                  onClick={() => {
+                    setViewingLeaderboardExam(viewingReportExam);
+                    setViewingReportExam(null);
+                  }}
+                  className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                >
+                  <Trophy className="w-4 h-4 text-slate-950" />
+                  <span>জাতীয় মেধা তালিকা দেখুন (Exam Leaderboard)</span>
+                </button>
+                <button
+                  onClick={() => setViewingReportExam(null)}
+                  className="px-6 py-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-700 transition-all"
+                >
+                  বন্ধ করুন
+                </button>
+              </div>
+
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ========================================================= */}
       {/* EXAM SPECIFIC LEADERBOARD MODAL (Matches Screen 3)       */}
@@ -1050,16 +1199,29 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
             {/* Bottom Modal Actions */}
             <div className="space-y-2 pt-1">
-              <button
-                onClick={() => {
-                  setViewingLeaderboardExam(null);
-                  handleShareExam(viewingLeaderboardExam);
-                }}
-                className="w-full py-3.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-              >
-                <Trophy className="w-4 h-4 text-amber-400" />
-                <span>সম্পূর্ণ লিডারবোর্ড দেখুন</span>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setViewingLeaderboardExam(null);
+                    if (onOpenLeaderboard) {
+                      onOpenLeaderboard();
+                    }
+                  }}
+                  className="flex-1 py-3.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+                >
+                  <Trophy className="w-4 h-4 text-amber-400" />
+                  <span>সম্পূর্ণ লিডারবোর্ড দেখুন</span>
+                </button>
+                <button
+                  onClick={() => {
+                    handleShareExam(viewingLeaderboardExam);
+                  }}
+                  className="px-4 py-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-sm shadow-md flex items-center justify-center space-x-1.5 transition-all active:scale-95"
+                  title="লিডারবোর্ড শেয়ার করুন"
+                >
+                  <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                </button>
+              </div>
             </div>
 
           </div>
