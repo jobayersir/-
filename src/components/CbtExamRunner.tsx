@@ -134,9 +134,12 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
     return `${pad(minutes)}:${pad(seconds)}`;
   };
 
-  // Answer selection handler
+  // Answer selection handler - locked once selected
   const handleSelectOption = (qIdx: number, optIdx: number) => {
     if (isSubmitted) return;
+    // Prevent changing answer once selected
+    if (userAnswers[qIdx] !== undefined) return;
+    
     setUserAnswers((prev) => ({
       ...prev,
       [qIdx]: optIdx
@@ -338,88 +341,118 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
         
         {!isSubmitted ? (
           /* ========================================================= */
-          /* ACTIVE EXAM CBT QUESTION CARD                             */
+          /* ACTIVE EXAM VERTICAL SCROLLABLE QUESTIONS LIST            */
           /* ========================================================= */
-          <div className="space-y-6 animate-in slide-in-from-bottom duration-200">
+          <div className="space-y-5 animate-in fade-in duration-200">
             
-            {/* Question Card Header */}
-            <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 relative overflow-hidden">
-              
-              {/* Question Serial Pill */}
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-                <div className="flex items-center space-x-2">
-                  <span className="px-3 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-black text-xs sm:text-sm border border-emerald-200 dark:border-emerald-800 shadow-2xs">
-                    প্রশ্ন {toBnNumeral(currentIdx + 1)} / {toBnNumeral(totalQuestions)}
-                  </span>
-                  {flaggedIdxs.has(currentIdx) && (
-                    <span className="px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold text-xs flex items-center space-x-1">
-                      <Flag className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                      <span>চিহ্নিত</span>
-                    </span>
-                  )}
-                </div>
+            {/* Top Lock Warning Banner (Lock Notice) */}
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-400/40 text-amber-900 dark:text-amber-200 text-xs sm:text-sm font-black flex items-center justify-center space-x-2 text-center shadow-xs">
+              <span className="text-base">🔒</span>
+              <span>একবার উত্তর সিলেক্ট করার পর আর পরিবর্তন করা যাবে না।</span>
+            </div>
 
-                <button
-                  onClick={() => handleToggleFlag(currentIdx)}
-                  className={`p-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all ${
-                    flaggedIdxs.has(currentIdx)
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-md'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+            {/* Questions Vertical Stack */}
+            {questions.map((q, qIdx) => {
+              const isAnswered = userAnswers[qIdx] !== undefined;
+              const selectedOptIdx = userAnswers[qIdx];
+              const isFlagged = flaggedIdxs.has(qIdx);
+              const qIsArabic = /[\u0600-\u06FF]/.test(q.question);
+
+              return (
+                <div 
+                  key={q.id || qIdx} 
+                  id={`q-card-${qIdx}`}
+                  className={`bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 shadow-xl border transition-all ${
+                    isAnswered 
+                      ? 'border-emerald-300 dark:border-emerald-800/80 ring-1 ring-emerald-500/20' 
+                      : 'border-slate-200 dark:border-slate-800'
                   }`}
                 >
-                  <Flag className={`w-4 h-4 ${flaggedIdxs.has(currentIdx) ? 'fill-slate-950' : ''}`} />
-                  <span className="hidden sm:inline">ফ্ল্যাগ</span>
-                </button>
-              </div>
+                  {/* Top Bar: Question Badge, Mark, Flag, Lock Status */}
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+                    <div className="flex items-center space-x-2.5">
+                      <span className={`w-8 h-8 rounded-full font-black text-xs sm:text-sm flex items-center justify-center shadow-xs ${
+                        isAnswered 
+                          ? 'bg-emerald-600 text-white' 
+                          : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                      }`}>
+                        {qIdx + 1}
+                      </span>
+                      
+                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                        ১ নম্বর
+                      </span>
 
-              {/* Question Text Area with Direction Rules */}
-              {currentQuestion && (
-                <div className="space-y-4">
-                  {/* Serial Number Display above Question */}
-                  <div className="text-emerald-700 dark:text-emerald-400 font-black text-sm sm:text-base">
-                    {langDetails?.numeral}
-                  </div>
-
-                  {/* Primary Question Text */}
-                  <div 
-                    dir={langDetails?.dir}
-                    className={`${langDetails?.align} ${langDetails?.fontClass} text-slate-950 dark:text-slate-100 font-extrabold tracking-tight`}
-                    style={{ fontFamily: langDetails?.type === 'arabic' ? "'Amiri', 'Noto Naskh Arabic', serif" : undefined }}
-                  >
-                    {currentQuestion.question}
-                  </div>
-
-                  {/* Additional Arabic Sub-question if present */}
-                  {currentQuestion.questionArabic && langDetails?.type !== 'arabic' && (
-                    <div 
-                      dir="rtl"
-                      className="text-right font-arabic text-xl sm:text-2xl text-emerald-900 dark:text-emerald-200 font-bold bg-emerald-50/70 dark:bg-emerald-950/60 p-4 rounded-2xl border border-emerald-200/80 dark:border-emerald-900/60 leading-[2.2]"
-                      style={{ fontFamily: "'Amiri', 'Noto Naskh Arabic', serif" }}
-                    >
-                      {currentQuestion.questionArabic}
+                      {isAnswered && (
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 text-[11px] font-black border border-emerald-300/80">
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          <span>উত্তর লকড্</span>
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  {/* MCQ Options List */}
-                  <div className="space-y-3 pt-4">
-                    {currentQuestion.options.map((optionText, oIdx) => {
-                      const isSelected = userAnswers[currentIdx] === oIdx;
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleToggleFlag(qIdx)}
+                        className={`p-2 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all ${
+                          isFlagged
+                            ? 'bg-amber-400 text-slate-950 font-black shadow-xs'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                        }`}
+                        title="প্রশ্ন চিহ্নিত করুন"
+                      >
+                        <Flag className={`w-3.5 h-3.5 ${isFlagged ? 'fill-slate-950' : ''}`} />
+                        <span className="hidden sm:inline">ফ্ল্যাগ</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Question Text */}
+                  <div className="space-y-3">
+                    <h3 
+                      dir={qIsArabic ? 'rtl' : 'ltr'}
+                      className={`text-slate-950 dark:text-slate-100 font-extrabold text-base sm:text-lg leading-relaxed ${
+                        qIsArabic ? 'text-right font-arabic text-xl sm:text-2xl leading-[2.2]' : 'text-left'
+                      }`}
+                      style={{ fontFamily: qIsArabic ? "'Amiri', serif" : undefined }}
+                    >
+                      {q.question}
+                    </h3>
+
+                    {q.questionArabic && !qIsArabic && (
+                      <p 
+                        dir="rtl"
+                        className="text-right font-arabic text-xl sm:text-2xl text-emerald-900 dark:text-emerald-200 font-bold bg-emerald-50/70 dark:bg-emerald-950/60 p-3.5 rounded-2xl border border-emerald-200/80 dark:border-emerald-900/60 leading-[2.2]"
+                        style={{ fontFamily: "'Amiri', serif" }}
+                      >
+                        {q.questionArabic}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Options Stack */}
+                  <div className="space-y-2.5 pt-4">
+                    {q.options.map((optionText, oIdx) => {
+                      const isSelected = selectedOptIdx === oIdx;
                       const isOptArabic = /[\u0600-\u06FF]/.test(optionText);
 
                       return (
                         <button
                           key={oIdx}
-                          onClick={() => handleSelectOption(currentIdx, oIdx)}
-                          className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-150 flex items-center justify-between touch-manipulation active:scale-[0.99] ${
+                          disabled={isAnswered}
+                          onClick={() => handleSelectOption(qIdx, oIdx)}
+                          className={`w-full text-left p-3.5 sm:p-4 rounded-2xl border transition-all duration-150 flex items-center justify-between touch-manipulation ${
                             isSelected
-                              ? 'bg-emerald-600 text-white font-extrabold border-emerald-600 shadow-xl scale-[1.01]'
-                              : 'bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 border-slate-200 dark:border-slate-700/80 hover:border-emerald-500 hover:bg-emerald-50/40 dark:hover:bg-slate-800'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/90 border-emerald-500 dark:border-emerald-600 text-slate-950 dark:text-slate-100 font-extrabold shadow-md'
+                              : isAnswered
+                              ? 'bg-slate-50 dark:bg-slate-900/50 text-slate-400 border-slate-200 dark:border-slate-800 opacity-60 cursor-not-allowed'
+                              : 'bg-slate-50 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 border-slate-200 dark:border-slate-700/80 hover:border-emerald-500 hover:bg-emerald-50/40 dark:hover:bg-slate-800 active:scale-[0.99]'
                           }`}
                         >
-                          <div className="flex items-center space-x-3.5 w-full">
-                            <span className={`w-9 h-9 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center shrink-0 shadow-2xs ${
+                          <div className="flex items-center space-x-3 w-full">
+                            <span className={`w-8 h-8 rounded-xl text-xs sm:text-sm font-black flex items-center justify-center shrink-0 ${
                               isSelected 
-                                ? 'bg-white text-emerald-800' 
+                                ? 'bg-emerald-600 text-white' 
                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
                             }`}>
                               {['ক', 'খ', 'গ', 'ঘ'][oIdx] || ['A', 'B', 'C', 'D'][oIdx]}
@@ -428,8 +461,8 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                             <span 
                               dir={isOptArabic ? 'rtl' : 'ltr'}
                               className={isOptArabic 
-                                ? 'font-arabic text-right w-full text-xl sm:text-2xl font-bold leading-[2.2]' 
-                                : 'text-left font-bold text-sm sm:text-base lg:text-lg leading-relaxed'
+                                ? 'font-arabic text-right w-full text-lg sm:text-xl font-bold leading-[2]' 
+                                : 'text-left font-bold text-sm sm:text-base leading-relaxed'
                               }
                               style={{ fontFamily: isOptArabic ? "'Amiri', serif" : undefined }}
                             >
@@ -438,16 +471,41 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           </div>
 
                           {isSelected && (
-                            <CheckCircle2 className="w-6 h-6 text-white shrink-0 ml-3" />
+                            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 ml-2" />
                           )}
                         </button>
                       );
                     })}
                   </div>
 
-                </div>
-              )}
+                  {/* Lock Indicator Footer on Card if Answered */}
+                  {isAnswered && (
+                    <div className="mt-3 pt-2 text-right">
+                      <span className="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-400 inline-flex items-center space-x-1">
+                        <span>🔒 উত্তর সংরক্ষিত ও লকড্ (পরিবর্তন করা যাবে না)</span>
+                      </span>
+                    </div>
+                  )}
 
+                </div>
+              );
+            })}
+
+            {/* Bottom Submit Banner */}
+            <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-900 to-teal-900 text-white text-center space-y-3 shadow-xl">
+              <h3 className="font-black text-base sm:text-lg text-amber-300">
+                সকল প্রশ্নের উত্তর শেষ হয়েছে?
+              </h3>
+              <p className="text-xs text-emerald-100">
+                পরীক্ষা জমা দিলে আপনার অর্জিত ফলাফল ও বিস্তারিত বিশ্লেষণ জাতীয় মেধা তালিকায় যুক্ত হবে।
+              </p>
+              <button
+                onClick={() => setShowSubmitModal(true)}
+                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-black text-sm shadow-lg hover:from-amber-500 hover:to-yellow-600 active:scale-95 transition-all inline-flex items-center space-x-2"
+              >
+                <Award className="w-5 h-5 text-slate-950" />
+                <span>পরীক্ষা সাবমিট করুন</span>
+              </button>
             </div>
 
           </div>
