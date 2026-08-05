@@ -81,7 +81,10 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 text-xs font-bold">
+                <span className="w-7 h-7 rounded-full bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                  {idx + 1}
+                </span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                   প্রশ্ন #{idx + 1}
                 </span>
                 {q.yearTag && (
@@ -107,12 +110,6 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
             <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
               {q.question}
             </h4>
-
-            {q.questionArabic && (
-              <p style={{ fontFamily: arabicFont }} className="font-arabic text-xl text-emerald-800 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/40">
-                {q.questionArabic}
-              </p>
-            )}
 
             {/* Options List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">

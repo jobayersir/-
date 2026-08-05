@@ -384,21 +384,14 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                   </button>
                 </div>
 
-                {/* Question Text (Bangla Left, Arabic Right) */}
+                {/* Question Text */}
                 <div className="space-y-3">
-                  <h3 dir="ltr" className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-950 dark:text-slate-50 leading-relaxed text-left">
-                    {toBnNum(qIdx + 1)}. {q.question}
+                  <h3 dir="ltr" className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-950 dark:text-slate-50 leading-relaxed text-left flex items-start space-x-3">
+                    <span className="w-8 h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                      {toBnNum(qIdx + 1)}
+                    </span>
+                    <span className="flex-1 pt-0.5">{q.question}</span>
                   </h3>
-
-                  {q.questionArabic && (
-                    <div
-                      dir="rtl"
-                      style={{ fontFamily: getArabicFontFamily(arabicFont) }}
-                      className="text-2xl sm:text-3xl text-emerald-950 dark:text-emerald-200 leading-[2.2] font-bold font-arabic bg-emerald-50/60 dark:bg-emerald-950/40 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right"
-                    >
-                      {formatArabicText(q.questionArabic, harakatVisible)}
-                    </div>
-                  )}
                 </div>
 
                 {/* Options Grid */}
@@ -528,21 +521,14 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
             </button>
           </div>
 
-          {/* Question Text (Bangla & Arabic) */}
+          {/* Question Text */}
           <div className="space-y-3">
-            <h3 dir="ltr" className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug text-left">
-              {toBnNum(currentIndex + 1)}. {currentQ.question}
+            <h3 dir="ltr" className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 leading-snug text-left flex items-start space-x-3">
+              <span className="w-8 h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                {toBnNum(currentIndex + 1)}
+              </span>
+              <span className="flex-1 pt-0.5">{currentQ.question}</span>
             </h3>
-            
-            {currentQ.questionArabic && (
-              <p
-                dir="rtl"
-                style={{ fontFamily: getArabicFontFamily(arabicFont) }}
-                className="text-xl sm:text-2xl text-emerald-800 dark:text-emerald-300 leading-relaxed font-arabic bg-emerald-50/50 dark:bg-emerald-950/30 p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-right"
-              >
-                {formatArabicText(currentQ.questionArabic, harakatVisible)}
-              </p>
-            )}
           </div>
 
           {/* Options Grid */}

@@ -411,10 +411,10 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                   
                   {/* Question Heading */}
                   {isRtl ? (
-                    /* ARABIC QUESTION: dir="rtl", text-right, dark circle on the RIGHT */
+                    /* ARABIC QUESTION: dir="rtl", text-right, green circle on the RIGHT */
                     <div dir="rtl" className="space-y-1 text-right font-arabic">
                       <div className="flex items-start gap-2.5">
-                        <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#162e5c] dark:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-1 shadow-xs font-sans">
+                        <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-1 shadow-xs font-sans">
                           {serialBadgeText}
                         </span>
                         <h3 
@@ -426,10 +426,10 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                       </div>
                     </div>
                   ) : (
-                    /* BANGLA / ENGLISH QUESTION: dir="ltr", text-left, dark circle on the LEFT */
+                    /* BANGLA / ENGLISH QUESTION: dir="ltr", text-left, green circle on the LEFT */
                     <div dir="ltr" className="space-y-1 text-left">
                       <div className="flex items-start gap-2.5">
-                        <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#162e5c] dark:bg-emerald-800 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-0.5 shadow-xs font-sans">
+                        <span className="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shrink-0 mt-0.5 shadow-xs font-sans">
                           {serialBadgeText}
                         </span>
                         <h3 
@@ -635,31 +635,6 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               </div>
             </div>
 
-            {/* Subject Performance Breakdown */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
-              <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-                <BarChart2 className="w-5 h-5 text-emerald-600" />
-                <span>বিষয়ভিত্তিক দক্ষতা (Subject Performance)</span>
-              </h3>
-
-              <div className="space-y-3.5">
-                {subjectPerformance.map((sub, idx) => (
-                  <div key={idx} className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-200">
-                      <span>{sub.name}</span>
-                      <span className="text-emerald-600 dark:text-emerald-400">{sub.percentage}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                      <div
-                        className={`${sub.color} h-full rounded-full transition-all duration-700 ease-out`}
-                        style={{ width: `${sub.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Question Review Section */}
             <div ref={reviewSectionRef} className="space-y-4 pt-2">
               <div className="flex items-center justify-between">
@@ -692,9 +667,14 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                     >
                       {/* Status Header */}
                       <div className="flex items-center justify-between pb-3 border-b border-slate-200/60 dark:border-slate-800">
-                        <span className="text-xs font-black text-slate-700 dark:text-slate-300">
-                          প্রশ্ন {toBnNumeral(idx + 1)}.
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm inline-flex items-center justify-center shrink-0 shadow-xs font-sans">
+                            {toBnNumeral(idx + 1)}
+                          </span>
+                          <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                            প্রশ্ন {toBnNumeral(idx + 1)}.
+                          </span>
+                        </div>
 
                         {isCorrect ? (
                           <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white font-extrabold text-[11px] flex items-center space-x-1">
@@ -718,12 +698,6 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                         <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-relaxed">
                           {q.question}
                         </h4>
-
-                        {q.questionArabic && (
-                          <p className="font-arabic text-right text-lg sm:text-xl text-emerald-950 dark:text-emerald-200 font-bold bg-emerald-50/50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-100 dark:border-emerald-900/40 leading-[2.1]">
-                            {q.questionArabic}
-                          </p>
-                        )}
                       </div>
 
                       {/* Answers Breakdown */}
