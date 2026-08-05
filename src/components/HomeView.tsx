@@ -423,11 +423,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="space-y-3 max-w-xl">
             <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-teal-800/80 text-teal-300 text-xs font-bold border border-teal-500/30">
               <Bot className="w-4 h-4 text-amber-300" />
-              <span>২৪/৭ আপনার এআই টিউটর (Ustad AI)</span>
+              <span>২৪/৭ আপনার এআই টিউটর (Tamreen AI)</span>
             </div>
 
             <h3 className="text-xl sm:text-2xl font-extrabold text-white">
-              নাহু, সরফ বা ফিকহ বিষয়ে যেকোনো প্রশ্ন করুন উস্তাদ এআই-কে!
+              নাহু, সরফ বা ফিকহ বিষয়ে যেকোনো প্রশ্ন করুন তামরীন AI-কে!
             </h3>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -440,7 +440,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             className="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow-xl flex items-center space-x-2 whitespace-nowrap transition-all hover:scale-105"
           >
             <Sparkles className="w-4 h-4 fill-slate-950" />
-            <span>উস্তাদ এআই প্রশ্ন করুন</span>
+            <span>তামরীন AI প্রশ্ন করুন</span>
           </button>
         </div>
       </section>

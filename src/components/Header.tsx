@@ -66,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
     },
     {
       id: '2',
-      title: 'উস্তাদ এআই আপডেট',
+      title: 'তামরীন AI আপডেট',
       description: 'নাহু ও সরফের কঠিন বাক্য বিশ্লেষণের জন্য নতুন মডেল যুক্ত হয়েছে।',
       timeAgo: '১ ঘণ্টা আগে',
       isRead: false,
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'home', label: 'Home', labelBn: 'হোম', icon: Home },
     { id: 'exams', label: 'Exams', labelBn: 'পরীক্ষা দিন', icon: FileCheck2 },
     { id: 'courses', label: 'Courses', labelBn: 'কোর্স', icon: GraduationCap },
-    { id: 'ustad_ai', label: 'AI Assistant', labelBn: 'উস্তাদ AI', icon: null, isSpecial: true },
+    { id: 'ustad_ai', label: 'AI Assistant', labelBn: 'তামরীন AI', icon: null, isSpecial: true },
   ];
 
   return (

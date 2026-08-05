@@ -96,7 +96,7 @@ export const UstadAiLogo: React.FC<UstadAiLogoProps> = ({
         <div className="flex flex-col text-left">
           <div className="flex items-center space-x-1.5">
             <span className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100">
-              উস্তাদ এআই
+              তামরীন AI
             </span>
             <span className="px-1.5 py-0.2 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-[10px] font-extrabold border border-emerald-500/20">
               মাদ্রাসা টিউটর

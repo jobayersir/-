@@ -37,7 +37,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
     {
       id: 'welcome-1',
       sender: 'ustad',
-      text: `আমি তামরীন উস্তাদ AI। আরবি বাংলা ও ইংরেজির যে কোন বিষয় জানতে আমাকে জিজ্ঞাস করুন`,
+      text: `আমি তামরীন AI। আরবি, বাংলা ও ইংরেজির যেকোনো বিষয় জানতে আমাকে জিজ্ঞেস করুন।`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -121,7 +121,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
       const activeKey = userApiKey || localStorage.getItem('tamreen_gemini_api_key') || undefined;
       
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 sec timeout for fast mobile response
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 sec timeout for detailed responses
 
       const res = await fetch('/api/ustad-ai', {
         method: 'POST',
@@ -214,7 +214,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-base sm:text-lg font-extrabold text-white">
-                উস্তাদ এআই (Ustad AI)
+                তামরীন AI (Tamreen AI)
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/30">
                 PRO 3.6
@@ -366,11 +366,11 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                           className={
                             isPureArabic
                               ? isUstad
-                                ? 'text-center text-emerald-950 dark:text-emerald-100 text-[24px] font-bold py-1 leading-[2.1]'
-                                : 'text-center text-white text-[24px] font-bold py-1 leading-[2.1]'
+                                ? 'text-center text-emerald-950 dark:text-emerald-100 text-[20px] font-bold py-1 leading-[2.0]'
+                                : 'text-center text-white text-[20px] font-bold py-1 leading-[2.0]'
                               : isUstad
-                              ? 'text-left text-slate-900 dark:text-emerald-50 text-[18px] font-medium leading-[1.9]'
-                              : 'text-left text-white text-[18px] font-medium leading-[1.9]'
+                              ? 'text-left text-slate-900 dark:text-emerald-50 text-[16px] font-medium leading-[1.8]'
+                              : 'text-left text-white text-[16px] font-medium leading-[1.8]'
                           }
                         >
                           {formattedText}
@@ -415,8 +415,8 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
           {loading && (
             <div className="flex items-center space-x-3">
               <UstadAiLogo size="sm" />
-              <div className="bg-slate-100 dark:bg-slate-800/80 p-3.5 rounded-2xl text-[18px] text-slate-600 dark:text-slate-300 font-medium animate-pulse text-left">
-                উস্তাদ এআই নাহু, সরফ ও ফিকহ রেফারেন্স থেকে উত্তর সাজাচ্ছেন...
+              <div className="bg-slate-100 dark:bg-slate-800/80 p-3.5 rounded-2xl text-[16px] text-slate-600 dark:text-slate-300 font-medium animate-pulse text-left">
+                তামরীন AI নাহু, সরফ ও ফিকহ রেফারেন্স থেকে বিস্তারিত উত্তর সাজাচ্ছেন...
               </div>
             </div>
           )}
@@ -485,7 +485,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
               type="text"
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
-              placeholder={isRecording ? 'আপনার কথা শুনছি...' : 'উস্তাদ এআই-কে জিজ্ঞেস করুন...'}
+              placeholder={isRecording ? 'আপনার কথা শুনছি...' : 'তামরীন AI-কে জিজ্ঞেস করুন...'}
               className="flex-1 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
             />
 

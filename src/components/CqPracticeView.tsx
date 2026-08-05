@@ -176,7 +176,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
               <div className="flex items-center justify-between">
                 <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center">
                   <Sparkles className="w-4 h-4 mr-1.5 text-amber-500" />
-                  আপনার নিজের উত্তর লিখুন এবং উস্তাদ এআই দ্বারা মূল্যায়ন করান:
+                  আপনার নিজের উত্তর লিখুন এবং তামরীন AI দ্বারা মূল্যায়ন করান:
                 </h4>
               </div>
 

@@ -11,7 +11,7 @@ function generateSmartFallbackResponse(userPrompt: string, action?: string, ques
     const wordCount = userAnswer ? userAnswer.trim().split(/\s+/).length : 0;
     const obtained = Math.min(marks, Math.max(Math.floor(marks * 0.75), Math.floor((wordCount / 50) * marks)));
 
-    return `উস্তাদ এআই মূল্যায়ন রিপোর্ট:
+    return `তামরীন AI মূল্যায়ন রিপোর্ট:
 প্রশ্ন: ${title} (পূর্ণমান: ${marks})
 
 ১. প্রাপ্ত নম্বর: ${obtained} / ${marks}
@@ -37,7 +37,7 @@ function generateSmartFallbackResponse(userPrompt: string, action?: string, ques
 
   // 3. Arabic / Nahu / Saraf queries
   if (promptLower.includes('نحو') || promptLower.includes('صرف') || promptLower.includes('নাহু') || promptLower.includes('সরফ') || promptLower.includes('আরবি') || promptLower.includes('عربي')) {
-    return `উস্তাদ এআই উত্তর:
+    return `তামরীন AI উত্তর:
 আপনার প্রশ্ন: "${userPrompt}"
 
 ১. আরবি ব্যাকরণে (النحو والصرف) বাক্যের কাঠামোগত সঠিকতা ও কালভিত্তিক শব্দ রূপান্তর অত্যন্ত গুরুত্বপূর্ণ।
@@ -47,7 +47,7 @@ function generateSmartFallbackResponse(userPrompt: string, action?: string, ques
 
   // 4. NTRCA / Teacher registration queries
   if (promptLower.includes('ntrca') || promptLower.includes('নিবন্ধন') || promptLower.includes('পরীক্ষা') || promptLower.includes('মাদ্রাসা')) {
-    return `উস্তাদ এআই মাদ্রাসা নিবন্ধন সহায়িকা:
+    return `তামরীন AI মাদ্রাসা নিবন্ধন সহায়িকা:
 আপনার প্রশ্ন: "${userPrompt}"
 
 ১. মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) পরীক্ষার প্রিলিমিনারি ও লিখিত উভয় পর্বের জন্য বিষয়ভিত্তিক প্রস্তুতি প্রয়োজন।
@@ -56,7 +56,7 @@ function generateSmartFallbackResponse(userPrompt: string, action?: string, ques
   }
 
   // 5. General academic / Islamic response fallback
-  return `উস্তাদ এআই উত্তর:
+  return `তামরীন AI উত্তর:
 আপনার প্রশ্ন: "${userPrompt}"
 
 ১. শিক্ষাক্রম ও বিষয়ভিত্তিক যেকোনো প্রশ্নের সমাধান পেতে প্রশ্নটি স্পষ্ট করে লিখুন।
@@ -98,15 +98,15 @@ export async function processGeminiRequest(reqBody: any) {
         },
       });
 
-      const systemInstruction = `আপনি "তামরীন উস্তাদ AI" (Tamreen Ustad AI) - বাংলা, আরবি ও ইংরেজি ভাষার শিক্ষাক্রম, সাধারণ জ্ঞান এবং মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) পরীক্ষার বিশেষজ্ঞ AI গৃহশিক্ষক।
+      const systemInstruction = `আপনি "তামরীন AI" (Tamreen AI) - বাংলা, আরবি ও ইংরেজি ভাষার শিক্ষাক্রম, সাধারণ জ্ঞান এবং মাদ্রাসা শিক্ষক নিবন্ধন (NTRCA) পরীক্ষার বিশেষজ্ঞ AI গৃহশিক্ষক।
 
 কঠোর নির্দেশনাাবলী:
-১. ব্যবহারকারীর সুনির্দিষ্ট প্রশ্নের সরাসরি, নির্ভুল ও পূর্ণাঙ্গ উত্তর প্রদান করুন।
+১. ব্যবহারকারীর সুনির্দিষ্ট প্রশ্নের সরাসরি, সম্পূর্ণ নির্ভুল, পরিচ্ছন্ন ও সুবিন্যস্ত উত্তর প্রদান করুন।
 ২. আপনি বাংলা, আরবি ও ইংরেজি—এই তিনটি ভাষায় সমানভাবে পারদর্শী। ব্যবহারকারী যে ভাষায় প্রশ্ন করবেন, সেই ভাষায় পরিষ্কার ও প্রাঞ্জলভাবে উত্তর দিন।
-৩. উত্তর স্বাভাবিকভাবে সংক্ষেপে, মূল পয়েন্টে ও বুলেট পয়েন্টে লিখুন।
+৩. উত্তরগুলো সবসময় বিষয়বস্তু অনুযায়ী বিস্তারিত, তথ্যবহুল, সুস্পষ্ট এবং সম্পূর্ণভাবে উপস্থাপন করুন। উত্তর যেন মাঝপথে কখনো কেটে না যায় বা অসম্পূর্ণ না থাকে।
 ৪. উত্তর তৈরিতে কখনোই স্টার চিহ্ন (*) বা হ্যাশ চিহ্ন (#) বা মার্কডাউন হেডিং চিহ্ন ব্যবহার করবেন না।
 ৫. তালিকা বা পয়েন্টের জন্য নম্বর (১. ২. ৩.) বা বুলেট চিহ্ন (•) ব্যবহার করুন।
-৬. আরবি শব্দ, বাক্য বা আয়াতে স্পষ্ট হরকতসহ (জের, জবর, পেশ) আরবি হরফে লিখুন।`;
+৬. আরবি শব্দ, বাক্য বা আয়াতে স্পষ্ট হরকতসহ (জের, জবর, পেশ) আরবি হরফে সুন্দর করে সাজিয়ে লিখুন।`;
 
       const contents: any[] = [];
       if (Array.isArray(history)) {
@@ -155,7 +155,7 @@ export async function processGeminiRequest(reqBody: any) {
             config: {
               systemInstruction,
               temperature: 0.3,
-              maxOutputTokens: 800,
+              maxOutputTokens: 3000,
             },
           });
 
