@@ -337,28 +337,35 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
                   <div className="space-y-3">
                     {msg.text.split('\n').map((line, lIdx) => {
                       if (!line.trim()) return <div key={lIdx} className="h-2" />;
-                      const isArabicLine = /[\u0600-\u06FF]/.test(line);
-                      const formattedText = isArabicLine
+                      
+                      // Clean line of non-letter characters to check leading script
+                      const cleanedLine = line.replace(/[\d\s\p{P}\p{S}]/gu, '');
+                      const startsWithArabic = /^[\u0600-\u06FF]/.test(cleanedLine);
+                      const hasBanglaOrEnglish = /[\u0980-\u09FFa-zA-Z]/.test(line);
+
+                      // Pure Arabic lines (verses, Hadith text without Bangla/English body text)
+                      const isPureArabic = startsWithArabic && !hasBanglaOrEnglish;
+                      const formattedText = isPureArabic
                         ? formatArabicText(line, harakatVisible)
                         : line;
 
                       return (
                         <p
                           key={lIdx}
-                          dir={isArabicLine ? 'rtl' : 'ltr'}
+                          dir={isPureArabic ? 'rtl' : 'ltr'}
                           style={{
-                            fontFamily: isArabicLine
+                            fontFamily: isPureArabic
                               ? getArabicFontFamily(arabicFont)
                               : getBengaliFontFamily(bengaliFont),
                           }}
                           className={
-                            isArabicLine
+                            isPureArabic
                               ? isUstad
-                                ? 'text-right text-emerald-950 dark:text-emerald-100 text-xl sm:text-2xl font-bold py-1 leading-[2.0]'
-                                : 'text-right text-white text-xl sm:text-2xl font-bold py-1 leading-[2.0]'
+                                ? 'text-center text-emerald-950 dark:text-emerald-100 text-[24px] font-bold py-1 leading-[2.1]'
+                                : 'text-center text-white text-[24px] font-bold py-1 leading-[2.1]'
                               : isUstad
-                              ? 'text-left text-slate-900 dark:text-emerald-50 text-sm sm:text-base font-medium leading-relaxed'
-                              : 'text-left text-white text-sm sm:text-base font-medium leading-relaxed'
+                              ? 'text-left text-slate-900 dark:text-emerald-50 text-[18px] font-medium leading-[1.9]'
+                              : 'text-left text-white text-[18px] font-medium leading-[1.9]'
                           }
                         >
                           {formattedText}
@@ -403,7 +410,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
           {loading && (
             <div className="flex items-center space-x-3">
               <UstadAiLogo size="sm" />
-              <div className="bg-slate-100 dark:bg-slate-800/80 p-3.5 rounded-2xl text-xs text-slate-600 dark:text-slate-300 font-medium animate-pulse">
+              <div className="bg-slate-100 dark:bg-slate-800/80 p-3.5 rounded-2xl text-[18px] text-slate-600 dark:text-slate-300 font-medium animate-pulse text-left">
                 উস্তাদ এআই নাহু, সরফ ও ফিকহ রেফারেন্স থেকে উত্তর সাজাচ্ছেন...
               </div>
             </div>

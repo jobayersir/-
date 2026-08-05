@@ -373,12 +373,14 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               const selectedOptIdx = userAnswers[qIdx];
               
               // Clean question text to check whether it starts with Arabic
+              const hasBanglaInQ = /[\u0980-\u09FF]/.test(q.question);
               const cleanedQ = q.question.replace(/[\d\s\p{P}\p{S}]/gu, '');
               const isArabicStart = /^[\u0600-\u06FF]/.test(cleanedQ);
 
               // Direction rule:
-              // "আরবি দ্বারা প্রশ্ন শুরু হলে ডান দিক দিবে বাংলা দারা শুরু হলে বাম দিক।"
-              const isRtl = isArabicStart;
+              // Bangla/English questions start from the left (dir="ltr", text-left)
+              // Only pure Arabic questions start from the right
+              const isRtl = isArabicStart && !hasBanglaInQ;
 
               // Serial number badge string inside dark circle:
               // Arabic question -> Arabic numeral (١, ٢, ٣...)
@@ -416,8 +418,8 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           {serialBadgeText}
                         </span>
                         <h3 
-                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[20px] sm:text-[24px] leading-relaxed flex-1 pt-0.5"
-                          style={{ fontFamily: "'Amiri', 'Noto Naskh Arabic', serif" }}
+                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[14px] sm:text-[15px] leading-relaxed flex-1 pt-0.5"
+                          style={{ fontFamily: "'Noto Naskh Arabic', 'Traditional Arabic', serif" }}
                         >
                           {q.question}
                         </h3>
@@ -431,8 +433,8 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           {serialBadgeText}
                         </span>
                         <h3 
-                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[18px] sm:text-[20px] leading-snug flex-1 pt-0.5"
-                          style={{ fontFamily: isEnglishSubject ? "'Inter', sans-serif" : "'Noto Serif Bengali', 'Noto Serif', serif" }}
+                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[14px] sm:text-[15px] leading-snug flex-1 pt-0.5"
+                          style={{ fontFamily: isEnglishSubject ? "'Inter', sans-serif" : "'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif" }}
                         >
                           {q.question}
                         </h3>
@@ -469,22 +471,22 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                                 ? 'bg-emerald-600 text-white' 
                                 : 'bg-[#e2e8f0] dark:bg-slate-700 text-[#162e5c] dark:text-slate-200'
                             }`}
-                            style={{ fontFamily: isRtl ? "'Amiri', 'Noto Naskh Arabic', serif" : undefined }}
+                            style={{ fontFamily: isRtl ? "'Noto Naskh Arabic', 'Traditional Arabic', serif" : undefined }}
                           >
                             {badgeText}
                           </span>
 
                           {/* Option Text */}
                           <span 
-                            className={`font-bold text-[16px] sm:text-[18px] leading-snug flex-1 ${
+                            className={`font-bold text-[14px] leading-snug flex-1 ${
                               isRtl ? 'font-arabic text-right' : 'text-left'
                             }`}
                             style={{ 
                               fontFamily: isRtl 
-                                ? "'Amiri', 'Noto Naskh Arabic', serif" 
+                                ? "'Noto Naskh Arabic', 'Traditional Arabic', serif" 
                                 : isEnglishSubject 
                                 ? "'Inter', sans-serif" 
-                                : "'Noto Serif Bengali', 'Noto Serif', serif" 
+                                : "'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif" 
                             }}
                           >
                             {optionText}

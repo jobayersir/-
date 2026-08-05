@@ -3,39 +3,82 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  body {
-    font-family: 'Hind Siliguri', 'Anek Bangla', 'Noto Serif Bengali', system-ui, -apple-system, sans-serif;
-    line-height: 1.85;
-    color: #0f172a; /* Slate 900 for high-contrast crisp text in light mode */
+  *, ::before, ::after {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif;
+    line-height: 1.9;
+    letter-spacing: 0;
+    word-spacing: normal;
+    color: #0f172a;
+  }
+
+  /* Universal Headings & Paragraph Alignment Rules */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif;
+    text-align: left;
+    letter-spacing: 0;
+  }
+
+  p {
+    line-height: 1.9;
   }
 }
 
-/* Premium Font Utilities */
-.font-bengali {
-  font-family: 'Hind Siliguri', 'Anek Bangla', sans-serif;
-  line-height: 1.8;
-}
-
-.font-bengali-display {
-  font-family: 'Anek Bangla', 'Hind Siliguri', sans-serif;
-  line-height: 1.75;
-}
-
+/* Unified Premium Font Utilities */
+.font-bengali,
+.font-bengali-display,
 .font-bengali-serif {
-  font-family: 'Noto Serif Bengali', serif;
+  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
   line-height: 1.9;
 }
 
-.font-arabic, .font-amiri {
-  font-family: 'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', 'Traditional Arabic', serif;
-  line-height: 2.2 !important;
+.font-arabic,
+.font-amiri,
+.font-naskh {
+  font-family: 'Noto Naskh Arabic', 'Traditional Arabic', serif !important;
+  line-height: 2.1 !important;
 }
 
-.font-naskh {
-  font-family: 'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', serif;
-  line-height: 2.2 !important;
+.font-english {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  line-height: 1.6;
+}
+
+/* Specific Typography Presets */
+.text-body-bengali {
+  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
+  font-size: 18px;
+  line-height: 1.9;
+  text-align: justify;
+}
+
+.text-heading-bengali {
+  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.9;
+  text-align: left;
+}
+
+.text-subheading-bengali {
+  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.9;
+  text-align: left;
+}
+
+.text-arabic-para {
+  font-family: 'Noto Naskh Arabic', 'Traditional Arabic', serif !important;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 2.1;
+  text-align: center;
 }
 
 /* Custom scrollbar */
