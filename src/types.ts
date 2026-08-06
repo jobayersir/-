@@ -138,6 +138,12 @@ export interface CourseItem {
   progressPercent: number;
   thumbnailBg: string;
   description: string;
+  badgeType?: 'live' | 'exam' | 'recorded' | 'free';
+  sheetsCount?: number;
+  examsCount?: number;
+  classesCount?: number;
+  priceText?: string;
+  isEnrolled?: boolean;
 }
 
 export interface UserProfileData {
