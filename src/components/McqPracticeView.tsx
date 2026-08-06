@@ -390,7 +390,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                     <span className="w-8 h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                       {toBnNum(qIdx + 1)}
                     </span>
-                    <span className="flex-1 pt-0.5">{q.question}</span>
+                    <span className="flex-1 pt-0.5">{formatArabicText(q.question, harakatVisible)}</span>
                   </h3>
                 </div>
 
@@ -414,7 +414,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
                     }
 
                     const isOptArabic = /[\u0600-\u06FF]/.test(opt);
-                    const formattedOpt = isOptArabic ? formatArabicText(opt, harakatVisible) : opt;
+                    const formattedOpt = formatArabicText(opt, harakatVisible);
 
                     return (
                       <button

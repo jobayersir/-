@@ -28,19 +28,22 @@ import {
 } from 'lucide-react';
 import { ExtendedExamItem } from './ExamsView';
 import { MCQQuestion } from '../types';
+import { formatArabicText } from '../utils/arabic';
 
 interface CbtExamRunnerProps {
   exam: ExtendedExamItem;
   questions: MCQQuestion[];
   onClose: () => void;
   onOpenLeaderboard?: (exam?: ExtendedExamItem) => void;
+  harakatVisible?: boolean;
 }
 
 export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
   exam,
   questions,
   onClose,
-  onOpenLeaderboard
+  onOpenLeaderboard,
+  harakatVisible = true
 }) => {
   // Active Question Index
   const [currentIdx, setCurrentIdx] = useState<number>(0);
@@ -421,7 +424,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           className="text-slate-900 dark:text-slate-100 font-extrabold text-[14px] sm:text-[15px] leading-relaxed flex-1 pt-0.5"
                           style={{ fontFamily: "'Noto Naskh Arabic', 'Traditional Arabic', serif" }}
                         >
-                          {q.question}
+                          {formatArabicText(q.question, harakatVisible)}
                         </h3>
                       </div>
                     </div>
@@ -436,7 +439,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           className="text-slate-900 dark:text-slate-100 font-extrabold text-[14px] sm:text-[15px] leading-snug flex-1 pt-0.5"
                           style={{ fontFamily: isEnglishSubject ? "'Inter', sans-serif" : "'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif" }}
                         >
-                          {q.question}
+                          {formatArabicText(q.question, harakatVisible)}
                         </h3>
                       </div>
                     </div>
@@ -447,6 +450,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                     {q.options.map((optionText, oIdx) => {
                       const isSelected = selectedOptIdx === oIdx;
                       const badgeText = optionBadges[oIdx] || `${oIdx + 1}`;
+                      const formattedOptionText = formatArabicText(optionText, harakatVisible);
 
                       return (
                         <button
@@ -489,7 +493,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                                 : "'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif" 
                             }}
                           >
-                            {optionText}
+                            {formattedOptionText}
                           </span>
 
                           {isSelected && (
@@ -640,7 +644,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               <div className="flex items-center justify-between">
                 <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 flex items-center space-x-2">
                   <HelpCircle className="w-5 h-5 text-emerald-600" />
-                  <span>প্রশ্নোত্তর রিভিউ ও ব্যাখ্যা (Question Review)</span>
+                  <span>উত্তর ও বিস্তারিত ব্যাখ্যা</span>
                 </h3>
                 <span className="text-xs text-slate-500 font-semibold">
                   মোট {totalQuestions}টি প্রশ্ন
@@ -670,9 +674,6 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                         <div className="flex items-center space-x-2">
                           <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm inline-flex items-center justify-center shrink-0 shadow-xs font-sans">
                             {toBnNumeral(idx + 1)}
-                          </span>
-                          <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-200">
-                            প্রশ্ন {toBnNumeral(idx + 1)}.
                           </span>
                         </div>
 

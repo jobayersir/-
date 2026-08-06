@@ -84,9 +84,6 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
                 <span className="w-7 h-7 rounded-full bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
                   {idx + 1}
                 </span>
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  প্রশ্ন #{idx + 1}
-                </span>
                 {q.yearTag && (
                   <span className="text-xs text-slate-500 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-full font-medium">
                     {q.yearTag}
