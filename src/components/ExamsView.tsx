@@ -952,7 +952,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         </div>
 
                         {/* Question Text */}
-                        <h4 className="font-bold text-base sm:text-lg text-slate-900 dark:text-slate-100 leading-snug">
+                        <h4 className="font-bold text-[17px] text-slate-900 dark:text-slate-100 leading-snug">
                           {q.question}
                         </h4>
                         {q.questionArabic && (

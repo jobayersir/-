@@ -104,7 +104,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
               </button>
             </div>
 
-            <h4 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
+            <h4 className="text-[17px] font-bold text-slate-900 dark:text-slate-100">
               {q.question}
             </h4>
 
