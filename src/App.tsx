@@ -51,6 +51,66 @@ export default function App() {
     targetYear: 'মাদ্রাসা পরীক্ষা',
   };
 
+  // Navigation handler synchronized with browser history for mobile back button support
+  const handleNavigateTab = (tab: NavTab, replace: boolean = false) => {
+    if (isProfileSideSheetOpen) {
+      setIsProfileSideSheetOpen(false);
+    }
+    
+    setActiveTab(tab);
+    
+    const hash = `#${tab}`;
+    if (replace) {
+      window.history.replaceState({ tab }, '', hash);
+    } else if (window.history.state?.tab !== tab) {
+      window.history.pushState({ tab }, '', hash);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenProfileSideSheet = () => {
+    setIsProfileSideSheetOpen(true);
+    window.history.pushState({ tab: activeTab, drawerOpen: true }, '', `#${activeTab}`);
+  };
+
+  const handleCloseProfileSideSheet = () => {
+    setIsProfileSideSheetOpen(false);
+  };
+
+  // Sync initial tab with URL hash & handle popstate for mobile back button
+  useEffect(() => {
+    const VALID_TABS: NavTab[] = [
+      'home', 'exams', 'courses', 'ustad_ai', 'dashboard', 'profile', 
+      'my_courses', 'bookmarks', 'wrong_questions', 'history', 
+      'leaderboard', 'admin', 'premium', 'settings', 'mcq', 'cq', 
+      'qbank', 'glossary', 'deployment'
+    ];
+
+    const initialHash = window.location.hash.replace('#', '') as NavTab;
+    const initialTab = VALID_TABS.includes(initialHash) ? initialHash : 'home';
+    setActiveTab(initialTab);
+    window.history.replaceState({ tab: initialTab }, '', `#${initialTab}`);
+
+    const handlePopState = (event: PopStateEvent) => {
+      setIsProfileSideSheetOpen(false);
+
+      if (event.state && event.state.tab) {
+        setActiveTab(event.state.tab as NavTab);
+      } else {
+        const currentHash = window.location.hash.replace('#', '') as NavTab;
+        if (VALID_TABS.includes(currentHash)) {
+          setActiveTab(currentHash);
+        } else {
+          setActiveTab('home');
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Load local state on mount
   useEffect(() => {
     try {
@@ -167,7 +227,7 @@ export default function App() {
         darkMode={darkMode}
         onToggleDarkMode={handleToggleDarkMode}
         activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab)}
+        onTabChange={(tab) => handleNavigateTab(tab)}
         bengaliFont={bengaliFont}
         onChangeBengaliFont={setBengaliFont}
         arabicFont={arabicFont}
@@ -175,21 +235,21 @@ export default function App() {
         harakatVisible={harakatVisible}
         onToggleHarakat={() => setHarakatVisible(!harakatVisible)}
         user={userProfile}
-        onOpenProfileSideSheet={() => setIsProfileSideSheetOpen(true)}
+        onOpenProfileSideSheet={handleOpenProfileSideSheet}
       />
 
       {/* Mobile Fixed Bottom Navigation (Only 4 items: Home, Exams, Courses, Ustad AI) */}
       <Navigation 
         activeTab={activeTab} 
-        onTabChange={(tab) => setActiveTab(tab)} 
+        onTabChange={(tab) => handleNavigateTab(tab)} 
       />
 
       {/* Profile Side Sheet Drawer */}
       <ProfileSideSheet
         isOpen={isProfileSideSheetOpen}
-        onClose={() => setIsProfileSideSheetOpen(false)}
+        onClose={handleCloseProfileSideSheet}
         activeTab={activeTab}
-        onSelectTab={(tab) => setActiveTab(tab)}
+        onSelectTab={(tab) => handleNavigateTab(tab)}
         user={userProfile}
         onToggleTheme={handleToggleDarkMode}
         isDarkMode={darkMode}
@@ -199,12 +259,12 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 md:pb-12">
         {activeTab === 'home' && (
           <HomeView 
-            onTabChange={(tab) => setActiveTab(tab)} 
+            onTabChange={(tab) => handleNavigateTab(tab)} 
           />
         )}
 
         {activeTab === 'exams' && (
-          <ExamsView mcqQuestions={QUESTION_BANK} onOpenLeaderboard={() => setActiveTab('leaderboard')} />
+          <ExamsView mcqQuestions={QUESTION_BANK} onOpenLeaderboard={() => handleNavigateTab('leaderboard')} />
         )}
 
         {activeTab === 'courses' && (
@@ -224,7 +284,7 @@ export default function App() {
         )}
 
         {activeTab === 'profile' && (
-          <ProfileView user={userProfile} onTabChange={setActiveTab} />
+          <ProfileView user={userProfile} onTabChange={handleNavigateTab} />
         )}
 
         {activeTab === 'my_courses' && (
@@ -232,11 +292,11 @@ export default function App() {
         )}
 
         {activeTab === 'bookmarks' && (
-          <BookmarksView user={userProfile} onTabChange={setActiveTab} />
+          <BookmarksView user={userProfile} onTabChange={handleNavigateTab} />
         )}
 
         {activeTab === 'wrong_questions' && (
-          <WrongQuestionsView user={userProfile} onTabChange={setActiveTab} />
+          <WrongQuestionsView user={userProfile} onTabChange={handleNavigateTab} />
         )}
 
         {activeTab === 'history' && (
@@ -258,7 +318,7 @@ export default function App() {
         {activeTab === 'settings' && (
           <SettingsView 
             user={userProfile} 
-            onTabChange={setActiveTab}
+            onTabChange={handleNavigateTab}
             selectedCadre={selectedCadre}
             onSelectCadre={setSelectedCadre}
             darkMode={darkMode}
@@ -319,15 +379,15 @@ export default function App() {
           </div>
 
           <div className="flex items-center space-x-4 text-xs font-semibold">
-            <button onClick={() => setActiveTab('exams')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
+            <button onClick={() => handleNavigateTab('exams')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
               মক টেস্ট
             </button>
             <span>•</span>
-            <button onClick={() => setActiveTab('courses')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
+            <button onClick={() => handleNavigateTab('courses')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
               কোর্সসমূহ
             </button>
             <span>•</span>
-            <button onClick={() => setActiveTab('ustad_ai')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
+            <button onClick={() => handleNavigateTab('ustad_ai')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
               উস্তাদ AI
             </button>
             <span>•</span>
