@@ -421,7 +421,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           {serialBadgeText}
                         </span>
                         <h3 
-                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[14px] sm:text-[15px] leading-relaxed flex-1 pt-0.5"
+                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[15px] sm:text-[16px] leading-relaxed flex-1 pt-0.5"
                           style={{ fontFamily: "'Noto Naskh Arabic', 'Traditional Arabic', serif" }}
                         >
                           {formatArabicText(q.question, harakatVisible)}
@@ -436,7 +436,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                           {serialBadgeText}
                         </span>
                         <h3 
-                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[14px] sm:text-[15px] leading-snug flex-1 pt-0.5"
+                          className="text-slate-900 dark:text-slate-100 font-extrabold text-[15px] sm:text-[16px] leading-snug flex-1 pt-0.5"
                           style={{ fontFamily: isEnglishSubject ? "'Inter', sans-serif" : "'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif" }}
                         >
                           {formatArabicText(q.question, harakatVisible)}
@@ -696,7 +696,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
 
                       {/* Question Text */}
                       <div className="pt-3 space-y-2">
-                        <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-relaxed">
+                        <h4 className="font-bold text-base sm:text-lg text-slate-900 dark:text-slate-100 leading-relaxed">
                           {q.question}
                         </h4>
                       </div>
