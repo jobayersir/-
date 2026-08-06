@@ -345,17 +345,15 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         <div className="absolute -left-12 -top-12 w-52 h-52 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="space-y-2 text-center sm:text-left">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-900/80 border border-amber-400/40 text-amber-300 text-xs font-bold shadow-sm">
-              <Trophy className="w-4 h-4 text-amber-400 animate-pulse" />
-              <span>
-                {leaderboardType === 'premium' 
-                  ? 'প্রিমিয়াম পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা' 
-                  : 'ফ্রি পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা'}
-              </span>
+          <div className="space-y-1.5 text-center sm:text-left">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-900/80 border border-amber-400/40 text-amber-300 text-xs font-bold shadow-xs">
+              <Trophy className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <span>লাইভ মেধা তালিকা</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              অল-বাংলাদেশ মেধা তালিকা <span className="text-amber-400 font-arabic font-extrabold text-xl">(قائمة المتفوقين)</span>
+            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              {leaderboardType === 'premium' 
+                ? 'প্রিমিয়াম পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা' 
+                : 'ফ্রি পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা'}
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100/90 font-medium">
               {examTitle ? `বিষয়: ${examTitle}` : 'বিষয়ভিত্তিক ও মডেল টেস্ট পরীক্ষার সেরা পরীক্ষার্থীদের তালিকা'}
@@ -402,7 +400,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               isPremiumExam ? 'bg-amber-400' : 'bg-emerald-400'
             }`}>
               <Trophy className="w-4 h-4" />
-              <span>{isPremiumExam ? 'প্রিমিয়াম মেধা তালিকা (Premium Leaderboard)' : 'ফ্রি মেধা তালিকা (Free Leaderboard)'}</span>
+              <span>{isPremiumExam ? 'প্রিমিয়াম মেধা তালিকা' : 'ফ্রি মেধা তালিকা'}</span>
             </div>
           </div>
         )}
@@ -434,87 +432,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       </div>
 
       {/* ========================================================= */}
-      {/* TOP PERFORMERS ANALYTICS CARD                              */}
-      {/* ========================================================= */}
-      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white border border-emerald-800/50 shadow-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-emerald-800/40 pb-3">
-          <div className="flex items-center space-x-2.5">
-            <div className="p-2 rounded-2xl bg-amber-400/20 text-amber-300 border border-amber-400/30">
-              <BarChart2 className="w-5 h-5 text-amber-400" />
-            </div>
-            <div>
-              <h2 className="font-black text-base sm:text-lg text-white">
-                সেরা পরীক্ষার্থীদের বিস্তারিত এনালাইটিক্স (Top Performers Analytics)
-              </h2>
-              <p className="text-[11px] sm:text-xs text-emerald-200/80 font-medium">
-                জাতীয় মেধা তালিকায় শীর্ষ ১০ জন পরীক্ষার্থীর গড় পরিসংখ্যান
-              </p>
-            </div>
-          </div>
-          <span className="hidden sm:inline-flex px-3 py-1 bg-emerald-800/60 text-emerald-200 text-xs font-bold rounded-full border border-emerald-700/50">
-            লাইভ ইনসাইটস
-          </span>
-        </div>
-
-        {/* 4-Stat Grid Analytics */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-          <div className="p-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 space-y-1">
-            <div className="flex items-center justify-center space-x-1 text-emerald-400 text-[10px] font-bold">
-              <Target className="w-3.5 h-3.5" />
-              <span>গড় স্কোর</span>
-            </div>
-            <strong className="text-lg sm:text-xl font-black text-amber-300 block">৯৪.৫%</strong>
-            <span className="text-[9px] text-slate-400 block font-medium">শীর্ষ ১০ পরীক্ষার্থী</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 space-y-1">
-            <div className="flex items-center justify-center space-x-1 text-emerald-400 text-[10px] font-bold">
-              <Timer className="w-3.5 h-3.5" />
-              <span>প্রশ্নপ্রতি গড় সময়</span>
-            </div>
-            <strong className="text-lg sm:text-xl font-black text-white block">২৪ সে.</strong>
-            <span className="text-[9px] text-slate-400 block font-medium">দ্রুততম উত্তর রেকর্ড</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 space-y-1">
-            <div className="flex items-center justify-center space-x-1 text-emerald-400 text-[10px] font-bold">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>সামগ্রিক এক্যুরেসি</span>
-            </div>
-            <strong className="text-lg sm:text-xl font-black text-emerald-300 block">৯৫.২%</strong>
-            <span className="text-[9px] text-slate-400 block font-medium">সঠিক উত্তরের হার</span>
-          </div>
-
-          <div className="p-3 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 space-y-1">
-            <div className="flex items-center justify-center space-x-1 text-emerald-400 text-[10px] font-bold">
-              <Users className="w-3.5 h-3.5" />
-              <span>অংশগ্রহণকারী</span>
-            </div>
-            <strong className="text-lg sm:text-xl font-black text-amber-300 block">৪,৮৫০+</strong>
-            <span className="text-[9px] text-slate-400 block font-medium">সক্রিয় শিক্ষক প্রার্থী</span>
-          </div>
-        </div>
-
-        {/* Top Performer Overall Progress Gauge Bar */}
-        <div className="p-3 rounded-2xl bg-emerald-950/60 border border-emerald-800/40 space-y-1.5">
-          <div className="flex justify-between items-center text-xs font-bold">
-            <span className="text-emerald-200 flex items-center space-x-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>শীর্ষস্থান অর্জনকারীদের গড় এক্যুরেসি থ্রেশহোল্ড:</span>
-            </span>
-            <span className="text-amber-300 font-black">৯৫.২%</span>
-          </div>
-          <AccuracyProgressBar accuracy={95.2} showLabel={false} />
-        </div>
-      </div>
-
-      {/* ========================================================= */}
       {/* TOP 3 WINNERS PODIUM DESIGN                               */}
       {/* ========================================================= */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-6">
         <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 text-center flex items-center justify-center space-x-2">
           <Sparkles className="w-5 h-5 text-amber-500" />
-          <span>শীর্ষ ৩ বিজয়ী (Top Performers Podium)</span>
+          <span>শীর্ষ ৩ বিজয়ী</span>
         </h2>
 
         {/* Podium Layout */}
@@ -597,7 +520,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
             <div className="w-full mt-1 h-32 sm:h-36 rounded-t-2xl bg-gradient-to-t from-amber-500/30 via-amber-400/20 to-amber-300/10 dark:from-amber-900/40 dark:to-slate-800 border-2 border-amber-400/50 flex flex-col items-center justify-center p-2 shadow-lg">
               <span className="text-2xl sm:text-3xl font-black text-amber-500">১</span>
-              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400">জাতীয় চ্যাম্পিয়ন</span>
+              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400">চ্যাম্পিয়ন</span>
             </div>
           </div>
 
@@ -644,117 +567,131 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       </div>
 
       {/* ========================================================= */}
-      {/* CURRENT USER HIGHLIGHTED CARD (My Rank with Green Glow)   */}
+      {/* CURRENT USER HIGHLIGHTED CARD (My Rank - Slim Bar)        */}
       {/* ========================================================= */}
-      <div className="relative p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-600/10 via-emerald-500/15 to-teal-500/10 dark:from-emerald-950/90 dark:to-teal-950/90 border-2 border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.35)] backdrop-blur-md transition-all space-y-3">
+      <div className="relative p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-600/10 via-emerald-500/15 to-teal-500/10 dark:from-emerald-950/90 dark:to-teal-950/90 border border-emerald-500/80 shadow-md backdrop-blur-md transition-all space-y-2">
         
-        <div className="flex items-center justify-between border-b border-emerald-500/30 pb-2.5">
-          <div className="flex items-center space-x-2">
-            <UserCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            <span className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
-              আপনার অবস্থান (MY RANK PERFORMANCE)
-            </span>
-          </div>
-          <div className="flex items-center space-x-2">
-            {renderRankBadge(currentUser.rank)}
-            <span className="px-3 py-1 rounded-full bg-emerald-600 text-white font-black text-xs shadow-sm">
-              জাতীয় অবস্থান: #{currentUser.rank}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-4 w-full sm:w-auto">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xl flex items-center justify-center shadow-lg border-2 border-emerald-300 shrink-0">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center space-x-2.5">
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-sm border border-emerald-300">
               #{currentUser.rank}
-            </div>
+            </span>
             <div>
-              <h3 className="font-extrabold text-base sm:text-lg text-slate-950 dark:text-slate-100 flex items-center space-x-2">
-                <span>{currentUser.name}</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-[10px] font-bold">
+              <div className="flex items-center space-x-1.5">
+                <h3 className="font-black text-xs sm:text-sm text-slate-900 dark:text-slate-100">
+                  {currentUser.name}
+                </h3>
+                <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-bold">
                   আপনি
                 </span>
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">
-                {currentUser.cadre} • {currentUser.location}
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium">
+                আপনার মেধা অবস্থান • {currentUser.cadre} ({currentUser.location})
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-emerald-500/20 pt-2 sm:pt-0">
-            <div className="text-center px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-200 dark:border-emerald-800">
-              <span className="text-[10px] text-slate-400 block font-semibold">প্রাপ্ত নম্বর</span>
-              <strong className="text-emerald-700 dark:text-emerald-300 text-sm font-black">{currentUser.score}/{currentUser.maxScore}</strong>
+          <div className="flex items-center space-x-3 sm:space-x-4 text-right">
+            <div className="text-right">
+              <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা</span>
+              <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                {currentUser.totalExamsTaken || 16}টি
+              </span>
             </div>
-            <div className="text-center px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-200 dark:border-emerald-800">
-              <span className="text-[10px] text-slate-400 block font-semibold">প্রশ্নপ্রতি সময়</span>
-              <strong className="text-slate-900 dark:text-slate-100 text-sm font-black">{currentUser.avgTimePerQuestionSec || 31} সে.</strong>
+            <div className="text-right">
+              <span className="text-[9px] text-slate-400 block font-medium">প্রাপ্ত নম্বর</span>
+              <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
+                {currentUser.score}/{currentUser.maxScore}
+              </span>
             </div>
-            <div className="text-center px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-200 dark:border-emerald-800">
-              <span className="text-[10px] text-slate-400 block font-semibold">স্ট্রিক</span>
-              <strong className="text-amber-500 text-sm font-black">{currentUser.streakDays} দিন 🔥</strong>
+            <div className="text-right">
+              <span className="text-[9px] text-slate-400 block font-medium">প্রশ্নপ্রতি সময়</span>
+              <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                {currentUser.avgTimePerQuestionSec || 31} সে.
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-[9px] text-slate-400 block font-medium">এক্যুরেসি</span>
+              <span className="font-black text-xs text-amber-600 dark:text-amber-400">
+                {currentUser.accuracyPercentage}%
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Current User Accuracy Bar */}
-        <div className="pt-1">
-          <AccuracyProgressBar accuracy={currentUser.accuracyPercentage} />
+        {/* Compact Thin Accuracy Progress Line */}
+        <div className="w-full h-1.5 rounded-full bg-emerald-950/20 dark:bg-slate-700/80 overflow-hidden">
+          <div 
+            className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 transition-all duration-500"
+            style={{ width: `${Math.min(100, Math.max(0, currentUser.accuracyPercentage))}%` }}
+          />
         </div>
       </div>
 
       {/* ========================================================= */}
-      {/* REMAINING USERS LIST WITH ACCURACY BARS & BADGES          */}
+      {/* REMAINING USERS LIST (SLIM / COMPACT LINE ITEM FORMAT)     */}
       {/* ========================================================= */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
-        <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-3">
+        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
           <span>অন্যান্য পরীক্ষার্থীদের র‍্যাঙ্কিং</span>
-          <span className="text-xs font-normal text-slate-500">মোট পরীক্ষার্থী: ৪,৮৫০+</span>
+          <span className="text-xs font-semibold text-slate-500">মোট পরীক্ষার্থী: ৪,৮৫০+</span>
         </h3>
 
-        <div className="space-y-3">
+        {/* Compact Table / List Header */}
+        <div className="hidden sm:flex items-center justify-between px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+          <div className="flex items-center space-x-3">
+            <span className="w-8 text-center">ক্রম</span>
+            <span>পরীক্ষার্থীর নাম</span>
+          </div>
+          <div className="flex items-center space-x-6 pr-2">
+            <span>পরীক্ষা সংখ্যা</span>
+            <span>গড় এক্যুরেসি</span>
+            <span>লাস্ট পয়েন্ট</span>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
           {remainingUsers.map((u) => (
             <div
               key={u.rank}
-              className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/80 space-y-2.5 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-colors"
+              className="py-2 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/60 flex items-center justify-between hover:bg-emerald-50/60 dark:hover:bg-slate-800 transition-colors"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3.5">
-                  <span className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-extrabold text-xs flex items-center justify-center shrink-0">
-                    #{u.rank}
-                  </span>
-
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-sm flex items-center justify-center shrink-0">
-                    {u.name.charAt(0)}
-                  </div>
-
-                  <div>
-                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <h4 className="font-bold text-xs sm:text-sm text-slate-950 dark:text-slate-100 leading-snug">
-                        {u.name}
-                      </h4>
-                      {renderRankBadge(u.rank)}
-                    </div>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      {u.cadre} • {u.location}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4 text-right shrink-0">
-                  <div>
-                    <span className="font-black text-xs sm:text-sm text-emerald-700 dark:text-emerald-400 block">
-                      {u.score} পয়েন্ট
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-semibold block">
-                      {u.avgTimePerQuestionSec ? `⚡ ${u.avgTimePerQuestionSec} সে./প্রশ্ন` : `সময়: ${u.timeSpentMinutes} মি.`}
-                    </span>
-                  </div>
+              {/* 1. Serial Number & 2. Name */}
+              <div className="flex items-center space-x-3 min-w-0">
+                <span className="w-7 h-7 rounded-lg bg-slate-200/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                  #{u.rank}
+                </span>
+                <div className="min-w-0 space-y-0.5">
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
+                    {u.name}
+                  </h4>
+                  <p className="text-[10px] text-slate-500 font-medium truncate">
+                    {u.cadre} • {u.location}
+                  </p>
                 </div>
               </div>
 
-              {/* Visual Accuracy Progress Bar for User */}
-              <AccuracyProgressBar accuracy={u.accuracyPercentage} compact />
+              {/* 3. Stats: Exams Count, Average Accuracy, Last Points */}
+              <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
+                  <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                    {u.totalExamsTaken || (12 + (10 - u.rank))}টি
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
+                  <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
+                    {u.accuracyPercentage}%
+                  </span>
+                </div>
+                <div className="text-right min-w-[55px]">
+                  <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
+                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                    {u.score}
+                  </span>
+                </div>
+              </div>
             </div>
           ))}
         </div>

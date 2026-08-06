@@ -1011,59 +1011,72 @@ export const CoursesView: React.FC = () => {
                       <span className="text-[11px] font-bold text-slate-400">মোট পরীক্ষার্থী: ১,২৪০ জন</span>
                     </div>
 
-                    <div className="space-y-2">
+                    {/* Compact Table / List Header */}
+                    <div className="hidden sm:flex items-center justify-between px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                      <div className="flex items-center space-x-3">
+                        <span className="w-8 text-center">ক্রম</span>
+                        <span>পরীক্ষার্থীর নাম</span>
+                      </div>
+                      <div className="flex items-center space-x-6 pr-2">
+                        <span>পরীক্ষা সংখ্যা</span>
+                        <span>গড় এক্যুরেসি</span>
+                        <span>পয়েন্ট</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
                       {[
-                        { rank: 4, name: 'মুফতি আব্দুর রহমান', cadre: 'লেকচারার (হাদিস)', percentage: '৯২.০%', points: '৯২০ pts', accuracy: '৯৪%', exams: '২২টি', badge: '🏅 টপ ৫' },
-                        { rank: 5, name: 'তানজিলা তাসনিম', cadre: 'সহকারী শিক্ষিকা (বাংলা)', percentage: '৯০.৫%', points: '৯০৫ pts', accuracy: '৯২%', exams: '২০টি', badge: '🏅 টপ ৫' },
-                        { rank: 6, name: 'আরিফুল ইসলাম শাহিন', cadre: 'প্রভাষক (ফেকাহ)', percentage: '৮৯.০%', points: '৮৯০ pts', accuracy: '৯০%', exams: '১৯টি', badge: '🌟 টপ ১০' },
-                        { rank: 7, name: 'ফারহানা ইয়াসমিন', cadre: 'সহকারী শিক্ষক (ইংরেজি)', percentage: '৮৮.৫%', points: '৮৮৫ pts', accuracy: '৮৯%', exams: '১৮টি', badge: '🌟 টপ ১০' },
-                        { rank: 8, name: 'মোঃ জাহিদ হাসান', cadre: 'সহকারী মৌলভী', percentage: '৮৭.০%', points: '৮৭০ pts', accuracy: '৮৮%', exams: '১৭টি', badge: '🌟 টপ ১০' },
-                        { rank: 9, name: 'সামিয়া আকতার', cadre: 'প্রভাষক (আরবি)', percentage: '৮৫.৫%', points: '৮৫৫ pts', accuracy: '৮৬%', exams: '১৬টি', badge: '🌟 টপ ১০' },
-                        { rank: 10, name: 'হাফেজ রাশেদুল ইসলাম', cadre: 'সহকারী শিক্ষক (গণিত)', percentage: '৮৪.০%', points: '৮৪০ pts', accuracy: '৮৫%', exams: '১৫টি', badge: '🌟 টপ ১০' },
+                        { rank: 4, name: 'মুফতি আব্দুর রহমান', cadre: 'লেকচারার (হাদিস)', percentage: '৯২.০%', points: '৯২০', accuracy: '৯৪%', exams: '২২টি', badge: '🏅 টপ ৫' },
+                        { rank: 5, name: 'তানজিলা তাসনিম', cadre: 'সহকারী শিক্ষিকা (বাংলা)', percentage: '৯০.৫%', points: '৯০৫', accuracy: '৯২%', exams: '২০টি', badge: '🏅 টপ ৫' },
+                        { rank: 6, name: 'আরিফুল ইসলাম শাহিন', cadre: 'প্রভাষক (ফেকাহ)', percentage: '৮৯.০%', points: '৮৯০', accuracy: '৯০%', exams: '১৯টি', badge: '🌟 টপ ১০' },
+                        { rank: 7, name: 'ফারহানা ইয়াসমিন', cadre: 'সহকারী শিক্ষক (ইংরেজি)', percentage: '৮৮.৫%', points: '৮৮৫', accuracy: '৮৯%', exams: '১৮টি', badge: '🌟 টপ ১০' },
+                        { rank: 8, name: 'মোঃ জাহিদ হাসান', cadre: 'সহকারী মৌলভী', percentage: '৮৭.০%', points: '৮৭০', accuracy: '৮৮%', exams: '১৭টি', badge: '🌟 টপ ১০' },
+                        { rank: 9, name: 'সামিয়া আকতার', cadre: 'প্রভাষক (আরবি)', percentage: '৮৫.৫%', points: '৮৫৫', accuracy: '৮৬%', exams: '১৬টি', badge: '🌟 টপ ১০' },
+                        { rank: 10, name: 'হাফেজ রাশেদুল ইসলাম', cadre: 'সহকারী শিক্ষক (গণিত)', percentage: '৮৪.০%', points: '৮৪০', accuracy: '৮৫%', exams: '১৫টি', badge: '🌟 টপ ১০' },
                       ].map((student) => (
                         <div
                           key={student.rank}
-                          className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all hover:bg-emerald-50/40 dark:hover:bg-slate-800/80"
+                          className="py-2 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/60 flex items-center justify-between hover:bg-emerald-50/60 dark:hover:bg-slate-800 transition-colors"
                         >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-black text-xs flex items-center justify-center shrink-0">
+                          {/* 1. Serial Number & 2. Name */}
+                          <div className="flex items-center space-x-3 min-w-0">
+                            <span className="w-7 h-7 rounded-lg bg-slate-200/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
                               #{student.rank}
-                            </div>
-                            <div>
+                            </span>
+                            <div className="min-w-0 space-y-0.5">
                               <div className="flex items-center space-x-2">
-                                <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-slate-100">
+                                <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
                                   {student.name}
-                                </span>
-                                <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                </h4>
+                                <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                                   {student.badge}
                                 </span>
                               </div>
-                              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 block">
-                                {student.cadre} • {student.exams}
-                              </span>
+                              <p className="text-[10px] text-slate-500 font-medium truncate">
+                                {student.cadre}
+                              </p>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between sm:justify-end space-x-3 sm:space-x-4 pl-11 sm:pl-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-200/50 dark:border-slate-800">
-                            <div className="text-left sm:text-right">
-                              <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block leading-tight">
-                                {student.percentage}
+                          {/* 3. Stats: Exams Count, Average Accuracy, Points */}
+                          <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
+                            <div className="text-right">
+                              <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
+                              <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                                {student.exams}
                               </span>
-                              <span className="text-[9px] font-bold text-slate-400">স্কোর</span>
                             </div>
-
-                            <div className="text-left sm:text-right">
-                              <span className="text-xs font-black text-amber-600 dark:text-amber-400 block leading-tight">
-                                {student.points}
-                              </span>
-                              <span className="text-[9px] font-bold text-slate-400">পয়েন্ট</span>
-                            </div>
-
-                            <div className="text-left sm:text-right">
-                              <span className="text-xs font-black text-slate-700 dark:text-slate-300 block leading-tight">
+                            <div className="text-right">
+                              <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
+                              <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
                                 {student.accuracy}
                               </span>
-                              <span className="text-[9px] font-bold text-slate-400">এক্যুরেসি</span>
+                            </div>
+                            <div className="text-right min-w-[55px]">
+                              <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
+                              <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                                {student.points}
+                              </span>
                             </div>
                           </div>
                         </div>
