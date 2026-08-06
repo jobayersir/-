@@ -328,26 +328,30 @@ export const CoursesView: React.FC = () => {
             const isEnrolled = course.isEnrolled;
             
             const borderAccentClass = isEnrolled
-              ? 'border-l-[5px] border-l-emerald-600 dark:border-l-emerald-400'
+              ? 'border-l-[5px] border-l-emerald-600 dark:border-l-emerald-500'
               : course.badgeType === 'recorded'
               ? 'border-l-[5px] border-l-purple-600 dark:border-l-purple-500'
               : 'border-l-[5px] border-l-amber-500 dark:border-l-amber-400';
 
             const cardBgClass = isEnrolled
-              ? 'bg-emerald-50/40 dark:bg-emerald-950/25 border-emerald-200/90 dark:border-emerald-800/70'
+              ? 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/50'
               : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800/90';
 
             return (
               <div
                 key={course.id}
-                className={`${cardBgClass} rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 p-2.5 sm:p-3.5 ${borderAccentClass} flex items-center space-x-3 sm:space-x-4`}
+                onClick={() => {
+                  setActiveCourse(course);
+                  window.history.pushState({ tab: 'courses', subview: 'courseDetail' }, '', `#course-${course.id}`);
+                }}
+                className={`group cursor-pointer ${cardBgClass} rounded-2xl border shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:scale-[1.01] active:scale-[0.985] transition-all duration-200 p-2.5 sm:p-3.5 ${borderAccentClass} flex items-center space-x-3 sm:space-x-4`}
               >
                 {/* Left Thumbnail Banner Emblem Box */}
                 <div className={`w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-xl ${
                   isEnrolled 
-                    ? 'bg-gradient-to-br from-emerald-100/90 via-teal-50 to-slate-100 dark:from-emerald-950 dark:via-teal-950 dark:to-slate-900 border-emerald-200 dark:border-emerald-800' 
+                    ? 'bg-gradient-to-br from-emerald-100/80 via-teal-50 to-slate-100 dark:from-slate-800 dark:via-emerald-950/60 dark:to-slate-900 border-emerald-200/90 dark:border-emerald-800/70' 
                     : 'bg-gradient-to-br from-amber-50/90 via-amber-100/40 to-slate-100 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 border-slate-200/80 dark:border-slate-700/80'
-                } p-2 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-inner`}>
+                } p-2 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-inner transform group-hover:scale-[1.03] transition-transform duration-300 ease-out`}>
                   
                   {/* Logo mark */}
                   <div className={`w-6 h-6 rounded-full ${
@@ -361,7 +365,7 @@ export const CoursesView: React.FC = () => {
                   {/* Ribbon Badge Banner */}
                   <div className={`w-full ${
                     isEnrolled
-                      ? 'bg-emerald-800 text-emerald-100 border-emerald-500/50'
+                      ? 'bg-emerald-800 text-emerald-50 border-emerald-600/50'
                       : 'bg-[#1e293b] text-white border-amber-400/40'
                   } py-0.5 px-1 rounded text-[8px] sm:text-[9px] font-extrabold tracking-tight truncate border shadow-xs`}>
                     {course.badgeType === 'exam' ? 'এক্সাম ব্যাচ-১' : course.badgeType === 'recorded' ? 'রেকর্ডেড ব্যাচ' : 'ফ্রি এক্সাম ব্যাচ'}
@@ -428,8 +432,8 @@ export const CoursesView: React.FC = () => {
                     {/* Left: Enrolled Badge or Price */}
                     <div>
                       {course.isEnrolled ? (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700 text-[11px] sm:text-xs font-extrabold">
-                          <Check className="w-3.5 h-3.5 stroke-[3] text-emerald-700 dark:text-emerald-300" />
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-100/90 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800 text-[11px] sm:text-xs font-extrabold">
+                          <Check className="w-3.5 h-3.5 stroke-[3] text-emerald-700 dark:text-emerald-400" />
                           <span>ভর্তি সম্পন্ন</span>
                         </span>
                       ) : (
@@ -441,11 +445,12 @@ export const CoursesView: React.FC = () => {
 
                     {/* Right: Primary Action Button */}
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setActiveCourse(course);
                         window.history.pushState({ tab: 'courses', subview: 'courseDetail' }, '', `#course-${course.id}`);
                       }}
-                      className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-lg sm:rounded-xl font-bold text-xs shadow-sm transition-all active:scale-95 flex items-center space-x-1 ${
+                      className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-lg sm:rounded-xl font-extrabold text-xs shadow-sm transition-all group-hover:scale-[1.04] active:scale-90 flex items-center space-x-1 ${
                         isEnrolled
                           ? 'bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 shadow-emerald-600/20'
                           : 'bg-[#132238] hover:bg-[#0b1526] text-white dark:bg-slate-800 dark:hover:bg-slate-700'
