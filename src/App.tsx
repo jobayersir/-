@@ -90,7 +90,14 @@ export default function App() {
     const initialHash = window.location.hash.replace('#', '') as NavTab;
     const initialTab = VALID_TABS.includes(initialHash) ? initialHash : 'home';
     setActiveTab(initialTab);
-    window.history.replaceState({ tab: initialTab }, '', `#${initialTab}`);
+
+    // Initialize history stack so back button doesn't exit the app on first back tap
+    if (initialTab !== 'home') {
+      window.history.replaceState({ tab: 'home', isRoot: true }, '', '#home');
+      window.history.pushState({ tab: initialTab }, '', `#${initialTab}`);
+    } else {
+      window.history.replaceState({ tab: 'home', isRoot: true }, '', '#home');
+    }
 
     const handlePopState = (event: PopStateEvent) => {
       setIsProfileSideSheetOpen(false);
@@ -98,12 +105,9 @@ export default function App() {
       if (event.state && event.state.tab) {
         setActiveTab(event.state.tab as NavTab);
       } else {
-        const currentHash = window.location.hash.replace('#', '') as NavTab;
-        if (VALID_TABS.includes(currentHash)) {
-          setActiveTab(currentHash);
-        } else {
-          setActiveTab('home');
-        }
+        // If popped state is null or missing tab, keep user in app on 'home' page
+        setActiveTab('home');
+        window.history.pushState({ tab: 'home', isRoot: true }, '', '#home');
       }
     };
 

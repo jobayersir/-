@@ -99,6 +99,17 @@ export const CoursesView: React.FC = () => {
     },
   ];
 
+  // Listen for popstate to close active course modal when back button is pressed
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if (activeCourse) {
+        setActiveCourse(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeCourse]);
+
   const cadreFilters = [
     { id: 'all', label: 'সকল কোর্স' },
     { id: 'lecturer_arabic', label: 'আরবি প্রভাষক' },
@@ -229,7 +240,10 @@ export const CoursesView: React.FC = () => {
             {/* Action Buttons */}
             <div className="p-5 pt-0">
               <button
-                onClick={() => setActiveCourse(course)}
+                onClick={() => {
+                  setActiveCourse(course);
+                  window.history.pushState({ tab: 'courses', subview: 'courseDetail' }, '', `#course-${course.id}`);
+                }}
                 className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2 transition-all"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />

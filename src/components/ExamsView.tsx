@@ -80,9 +80,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
   // State for viewing exam specific leaderboard
   const [viewingLeaderboardExam, setViewingLeaderboardExam] = useState<ExtendedExamItem | null>(null);
 
-  // Global toast notification message
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
   // State for Premium Upgrade Modal
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
@@ -252,27 +249,9 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     },
   ];
 
-  // Listen for shared exam ID in URL parameters (e.g. ?examId=ex-free-1)
-  React.useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const sharedExamId = params.get('examId') || params.get('exam');
-      if (sharedExamId) {
-        const matched = examsList.find((e) => e.id === sharedExamId);
-        if (matched) {
-          setActiveExam(matched);
-          setToastMessage(`শেয়ারকৃত "${matched.title}" ফ্রি পরীক্ষায় আপনাকে স্বাগতম!`);
-          setTimeout(() => setToastMessage(null), 4500);
-        }
-      }
-    } catch (e) {
-      console.error('URL parameter check error', e);
-    }
-  }, []);
-
   // Handle Share Exam Deep Link
   const handleShareExam = async (exam: ExtendedExamItem) => {
-    const shareUrl = `${window.location.origin}${window.location.pathname}?examId=${exam.id}`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}#exams`;
     const shareData = {
       title: `তামরীন একাডেমি: ${exam.title}`,
       text: `তামরীন একাডেমিতে "${exam.title}" ফ্রি পরীক্ষায় অংশ নিয়ে সরাসরি আপনার প্রস্তুতি যাচাই করুন!`,
@@ -282,19 +261,14 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     try {
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
-        setToastMessage('পরীক্ষার লিঙ্ক সফলভাবে শেয়ার করা হয়েছে!');
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl);
-        setToastMessage('ফ্রি পরীক্ষার লিঙ্ক কপি করা হয়েছে! যেকোনো সোশ্যাল মিডিয়া বা মেসেঞ্জারে পাঠিয়ে দিন।');
       }
     } catch (err) {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(shareUrl);
-        setToastMessage('ফ্রি পরীক্ষার লিঙ্ক কপি করা হয়েছে!');
       }
     }
-
-    setTimeout(() => setToastMessage(null), 3500);
   };
 
   const categories = [
@@ -350,15 +324,38 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     return 0; // default latest order
   });
 
+  // History popstate listener for subviews / active exam
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if (activeExam) {
+        setActiveExam(null);
+      }
+      if (viewingReportExam) {
+        setViewingReportExam(null);
+      }
+      if (viewingLeaderboardExam) {
+        setViewingLeaderboardExam(null);
+      }
+      if (showPremiumModal) {
+        setShowPremiumModal(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeExam, viewingReportExam, viewingLeaderboardExam, showPremiumModal]);
+
   const handleStartExam = (exam: ExtendedExamItem) => {
     if (exam.isPremium) {
       setShowPremiumModal(true);
+      window.history.pushState({ tab: 'exams', subview: 'premiumModal' }, '', '#exams-premium');
       return;
     }
     setActiveExam(exam);
     setCurrentQuestionIdx(0);
     setUserAnswers({});
     setIsExamSubmitted(false);
+    window.history.pushState({ tab: 'exams', subview: 'activeExam', examId: exam.id }, '', `#exams-runner-${exam.id}`);
   };
 
   const handleSelectOption = (questionIdx: number, optionIdx: number) => {
@@ -753,14 +750,20 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                   {isCompleted ? (
                     <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={() => setViewingReportExam(exam)}
+                        onClick={() => {
+                          setViewingReportExam(exam);
+                          window.history.pushState({ tab: 'exams', subview: 'report' }, '', '#exams-report');
+                        }}
                         className="py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center space-x-1.5 transition-all active:scale-95"
                       >
                         <BarChart2 className="w-4 h-4 text-emerald-600" />
                         <span>ব্যাখ্যা সহ উত্তর</span>
                       </button>
                       <button
-                        onClick={() => setViewingLeaderboardExam(exam)}
+                        onClick={() => {
+                          setViewingLeaderboardExam(exam);
+                          window.history.pushState({ tab: 'exams', subview: 'leaderboard' }, '', '#exams-leaderboard');
+                        }}
                         className="py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-1.5 transition-all active:scale-95"
                       >
                         <Trophy className="w-4 h-4 text-slate-950" />
@@ -1225,16 +1228,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
             </div>
 
           </div>
-        </div>
-      )}
-
-      {/* Global Notification Toast */}
-      {toastMessage && (
-        <div className="fixed bottom-20 inset-x-0 mx-auto z-50 max-w-md w-[92%] bg-slate-950/95 text-white p-4 rounded-2xl shadow-2xl border border-emerald-400/60 text-xs font-bold flex items-center space-x-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
-            <Sparkles className="w-5 h-5 text-amber-400" />
-          </div>
-          <p className="leading-snug text-slate-100">{toastMessage}</p>
         </div>
       )}
 
