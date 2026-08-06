@@ -308,9 +308,9 @@ export const CoursesView: React.FC = () => {
       {/* ========================================================= */}
       {/* 2. COURSE CARDS LIST (EXACT MATCH FOR USER SCREENSHOT)     */}
       {/* ========================================================= */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredCourses.length === 0 ? (
-          <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3">
+          <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
             <BookOpen className="w-10 h-10 text-slate-400 mx-auto" />
             <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
               এই ক্যাটাগরিতে কোনো কোর্স পাওয়া যায়নি।
@@ -324,110 +324,132 @@ export const CoursesView: React.FC = () => {
           </div>
         ) : (
           filteredCourses.map((course) => {
-            // Determine left border color accent based on course badge type / enrolled status
-            const borderAccentColor = course.isEnrolled
-              ? 'border-l-4 border-l-emerald-500'
-              : course.badgeType === 'exam'
-              ? 'border-l-4 border-l-amber-500'
+            // Determine border accent, card background, and thumbnail styling based on enrollment & badge
+            const isEnrolled = course.isEnrolled;
+            
+            const borderAccentClass = isEnrolled
+              ? 'border-l-[5px] border-l-emerald-600 dark:border-l-emerald-400'
               : course.badgeType === 'recorded'
-              ? 'border-l-4 border-l-indigo-500'
-              : 'border-l-4 border-l-teal-500';
+              ? 'border-l-[5px] border-l-purple-600 dark:border-l-purple-500'
+              : 'border-l-[5px] border-l-amber-500 dark:border-l-amber-400';
+
+            const cardBgClass = isEnrolled
+              ? 'bg-emerald-50/40 dark:bg-emerald-950/25 border-emerald-200/90 dark:border-emerald-800/70'
+              : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800/90';
 
             return (
               <div
                 key={course.id}
-                className={`bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800/90 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden ${borderAccentColor} flex flex-col sm:flex-row items-stretch`}
+                className={`${cardBgClass} rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 p-2.5 sm:p-3.5 ${borderAccentClass} flex items-center space-x-3 sm:space-x-4`}
               >
                 {/* Left Thumbnail Banner Emblem Box */}
-                <div className="w-full sm:w-48 lg:w-56 shrink-0 p-5 bg-gradient-to-br from-amber-50/70 via-emerald-50/50 to-slate-50 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-800 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                <div className={`w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-xl ${
+                  isEnrolled 
+                    ? 'bg-gradient-to-br from-emerald-100/90 via-teal-50 to-slate-100 dark:from-emerald-950 dark:via-teal-950 dark:to-slate-900 border-emerald-200 dark:border-emerald-800' 
+                    : 'bg-gradient-to-br from-amber-50/90 via-amber-100/40 to-slate-100 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 border-slate-200/80 dark:border-slate-700/80'
+                } p-2 flex flex-col items-center justify-between text-center relative overflow-hidden shadow-inner`}>
                   
-                  {/* Outer Frame Box Graphic */}
-                  <div className="w-full p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 shadow-sm space-y-2 relative">
-                    
-                    {/* Emblem Logo */}
-                    <div className="w-8 h-8 mx-auto rounded-full bg-emerald-600 text-white flex items-center justify-center font-extrabold text-xs shadow-md">
-                      ত
-                    </div>
-
-                    {/* Badge Category Title */}
-                    <span className="inline-block px-2.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-900 dark:text-amber-300 font-extrabold text-[10px]">
-                      {course.badgeType === 'exam' ? 'এক্সাম ব্যাচ' : course.badgeType === 'recorded' ? 'রেকর্ডেড ব্যাচ' : 'ফ্রি এক্সাম ব্যাচ'}
-                    </span>
-
-                    {/* Course Title inside banner */}
-                    <h4 className="font-extrabold text-xs text-slate-900 dark:text-slate-100 line-clamp-2 leading-tight">
-                      {course.title}
-                    </h4>
-
-                    {/* Decorative Footer motif line */}
-                    <div className="w-12 h-0.5 bg-amber-400 mx-auto rounded-full" />
+                  {/* Logo mark */}
+                  <div className={`w-6 h-6 rounded-full ${
+                    isEnrolled
+                      ? 'bg-emerald-700 text-white border border-emerald-400'
+                      : 'bg-slate-900 text-amber-400 border border-amber-400/60'
+                  } flex items-center justify-center font-black text-[10px] shadow-sm mt-0.5`}>
+                    ত
                   </div>
+
+                  {/* Ribbon Badge Banner */}
+                  <div className={`w-full ${
+                    isEnrolled
+                      ? 'bg-emerald-800 text-emerald-100 border-emerald-500/50'
+                      : 'bg-[#1e293b] text-white border-amber-400/40'
+                  } py-0.5 px-1 rounded text-[8px] sm:text-[9px] font-extrabold tracking-tight truncate border shadow-xs`}>
+                    {course.badgeType === 'exam' ? 'এক্সাম ব্যাচ-১' : course.badgeType === 'recorded' ? 'রেকর্ডেড ব্যাচ' : 'ফ্রি এক্সাম ব্যাচ'}
+                  </div>
+
+                  {/* Course Title Line inside graphic */}
+                  <p className="text-[9px] font-bold text-slate-800 dark:text-slate-200 line-clamp-1 leading-tight px-0.5">
+                    {course.title}
+                  </p>
+
+                  {/* Bottom ornament line */}
+                  <div className={`w-8 h-0.5 ${isEnrolled ? 'bg-emerald-500' : 'bg-amber-400/80'} rounded-full mb-0.5`} />
                 </div>
 
-                {/* Right Details & Actions Container */}
-                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
+                {/* Right Details Container */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5 space-y-2">
                   
-                  <div className="space-y-2.5">
-                    {/* Title */}
-                    <h3 className="font-extrabold text-base sm:text-lg text-slate-900 dark:text-slate-100 leading-snug">
-                      {course.title}
-                    </h3>
+                  {/* Title */}
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-snug truncate">
+                    {course.title}
+                  </h3>
 
-                    {/* Enrolled Badge or Enrolled Tag */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                      {course.isEnrolled ? (
-                        <span className="inline-flex items-center space-x-1 px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-bold text-xs">
-                          <Check className="w-3.5 h-3.5 stroke-[3] text-emerald-600" />
-                          <span>ভর্তি সম্পন্ন</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center space-x-1 px-3 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-900 dark:text-amber-300 font-bold text-xs">
-                          <Users className="w-3.5 h-3.5 text-amber-600" />
+                  {/* Enrolled Badge OR Student Count Tag */}
+                  <div className="space-y-1">
+                    {!course.isEnrolled && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          course.badgeType === 'recorded'
+                            ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/80 dark:text-purple-200'
+                            : 'bg-amber-100/80 text-amber-900 dark:bg-amber-950/80 dark:text-amber-200'
+                        }`}>
+                          <Users className="w-3 h-3 text-current" />
                           <span>{course.studentCount} জন ভর্তি</span>
                         </span>
-                      )}
-
-                      {/* Video / Sheet / Exam counts */}
-                      <div className="text-slate-500 dark:text-slate-400 font-semibold text-xs flex items-center space-x-1.5">
-                        {course.classesCount && (
-                          <span>• {course.classesCount} ক্লাস</span>
-                        )}
-                        {course.sheetsCount && (
-                          <span>• {course.sheetsCount} শিট</span>
-                        )}
-                        {course.examsCount && (
-                          <span>• {course.examsCount} পরীক্ষা</span>
-                        )}
                       </div>
+                    )}
+
+                    {/* Meta info (classes, sheets, exams) */}
+                    <div className="text-slate-500 dark:text-slate-400 font-medium text-[11px] sm:text-xs flex items-center space-x-2">
+                      {course.classesCount && (
+                        <span className="flex items-center space-x-1">
+                          <Clock className="w-3 h-3 text-slate-400" />
+                          <span>{course.classesCount} ক্লাস</span>
+                        </span>
+                      )}
+                      {course.sheetsCount && (
+                        <span className="flex items-center space-x-1">
+                          <FileText className="w-3 h-3 text-slate-400" />
+                          <span>{course.sheetsCount} শিট</span>
+                        </span>
+                      )}
+                      {course.examsCount && (
+                        <span className="flex items-center space-x-1">
+                          <FileSpreadsheet className="w-3 h-3 text-slate-400" />
+                          <span>{course.examsCount} পরীক্ষা</span>
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Bottom Row: Price & Action Buttons */}
-                  <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                  {/* Bottom Row: Status/Price on Left & Button on Right */}
+                  <div className="pt-1 flex items-center justify-between">
                     
-                    {/* Left: Price or Enrolled text */}
+                    {/* Left: Enrolled Badge or Price */}
                     <div>
                       {course.isEnrolled ? (
-                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-100/80 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800 text-[11px] sm:text-xs font-extrabold">
-                          <Check className="w-3.5 h-3.5 stroke-[3] text-emerald-700 dark:text-emerald-400" />
+                        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-900/80 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700 text-[11px] sm:text-xs font-extrabold">
+                          <Check className="w-3.5 h-3.5 stroke-[3] text-emerald-700 dark:text-emerald-300" />
                           <span>ভর্তি সম্পন্ন</span>
                         </span>
                       ) : (
-                        <div className="flex items-baseline space-x-1">
-                          <span className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100">
-                            {course.priceText || 'ফ্রি'}
-                          </span>
-                        </div>
+                        <span className="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100">
+                          {course.priceText || 'ফ্রি'}
+                        </span>
                       )}
                     </div>
 
-                    {/* Right: Action Button */}
+                    {/* Right: Primary Action Button */}
                     <button
                       onClick={() => {
                         setActiveCourse(course);
                         window.history.pushState({ tab: 'courses', subview: 'courseDetail' }, '', `#course-${course.id}`);
                       }}
-                      className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl font-bold text-xs bg-[#1a2332] hover:bg-[#111827] text-white dark:bg-slate-800 dark:hover:bg-slate-700 shadow-sm transition-all active:scale-95 flex items-center space-x-1.5"
+                      className={`px-4 py-1.5 sm:px-5 sm:py-2 rounded-lg sm:rounded-xl font-bold text-xs shadow-sm transition-all active:scale-95 flex items-center space-x-1 ${
+                        isEnrolled
+                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 shadow-emerald-600/20'
+                          : 'bg-[#132238] hover:bg-[#0b1526] text-white dark:bg-slate-800 dark:hover:bg-slate-700'
+                      }`}
                     >
                       {course.isEnrolled ? (
                         <>
