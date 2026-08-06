@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { CourseItem, PostCadre } from '../types';
+import React, { useState, useEffect, useRef } from 'react';
+import { CourseItem, PostCadre, CourseContentItem } from '../types';
+import { getStoredCourses, saveCoursesToStorage } from '../data/coursesData';
 import { 
   GraduationCap, 
   BookOpen, 
@@ -26,18 +27,23 @@ import {
   Library,
   BookOpenCheck,
   ScrollText,
+  Calendar,
+  BookmarkCheck,
   School,
   Globe,
   ArrowLeft,
   Lock,
-  Trophy
+  Unlock,
+  Trophy,
+  ShieldCheck,
+  Settings
 } from 'lucide-react';
 
 export const CoursesView: React.FC = () => {
   const [selectedCadre, setSelectedCadre] = useState<PostCadre | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCourse, setActiveCourse] = useState<CourseItem | null>(null);
-  const [detailTab, setDetailTab] = useState<'plan' | 'sheets' | 'exams' | 'leaderboard'>('plan');
+  const [detailTab, setDetailTab] = useState<'plan' | 'routine' | 'syllabus' | 'sheets' | 'exams' | 'leaderboard'>('plan');
   const [showEnrollAlert, setShowEnrollAlert] = useState(false);
 
   const cadreScrollRef = useRef<HTMLDivElement>(null);
@@ -48,144 +54,30 @@ export const CoursesView: React.FC = () => {
     }
   };
 
-  const [coursesList, setCoursesList] = useState<CourseItem[]>([
-    {
-      id: 'c_general_free',
-      title: 'জেনারেল',
-      titleArabic: 'المواد العامة (البنغالية، الإنجليزية، الرياضيات)',
-      cadre: 'general_subject',
-      instructor: 'প্রফেসর মোঃ রফিকুল ইসলাম',
-      totalModules: 24,
-      completedModules: 24,
-      isPremium: false,
-      rating: 4.9,
-      studentCount: 14200,
-      progressPercent: 100,
-      thumbnailBg: 'from-amber-600 via-amber-700 to-slate-900',
-      description: '৯ম শিক্ষক নিবন্ধন ও মাদ্রাসা পরীক্ষার জেনারেল অংশ (বাংলা, ইংরেজি, গণিত ও জিকে) ফ্রি এক্সাম ব্যাচ।',
-      badgeType: 'free',
-      sheetsCount: 20,
-      examsCount: 25,
-      classesCount: 30,
-      priceText: 'ফ্রি',
-      isEnrolled: true,
-    },
-    {
-      id: 'c_maulvi_exam1',
-      title: 'সহকারী মৌলবি এক্সাম ব্যাচ- ১',
-      titleArabic: 'دفعة الامتحانات لـ المدرس المساعد الشرعي 1',
-      cadre: 'assistant_maulvi',
-      instructor: 'ওস্তাদ মুফতি ইউসুফ আল-মাদানী',
-      totalModules: 34,
-      completedModules: 12,
-      isPremium: true,
-      rating: 4.8,
-      studentCount: 91,
-      progressPercent: 35,
-      thumbnailBg: 'from-amber-700 via-orange-800 to-slate-900',
-      description: 'সহকারী মৌলভী পদের জন্য বিশেষ অধ্যায়ভিত্তিক মডেল টেস্ট, লাইভ উত্তরপত্র রিভিউ ও ওস্তাদ সলভ সেসন।',
-      badgeType: 'exam',
-      sheetsCount: 36,
-      examsCount: 34,
-      classesCount: 15,
-      priceText: '৳৪৫০+',
-      isEnrolled: false,
-    },
-    {
-      id: 'c_maulvi_subjective',
-      title: 'সহকারী মৌলবি সাবজেক্টিভ কোর্স',
-      titleArabic: 'الدورة الموضوعية لـ المدرس المساعد الشرعي',
-      cadre: 'assistant_maulvi',
-      instructor: 'মাওলানা ড. আহমেদ হাসান',
-      totalModules: 36,
-      completedModules: 36,
-      isPremium: true,
-      rating: 4.9,
-      studentCount: 635,
-      progressPercent: 100,
-      thumbnailBg: 'from-indigo-900 via-purple-950 to-slate-950',
-      description: 'আল-কুরআন, আল-হাদিস, আকাইদ ও ফিকহ সিলেবাসের সম্পূর্ণ এইচডি ভিডিও লেকচার ও রিভিশন শিট।',
-      badgeType: 'recorded',
-      sheetsCount: 36,
-      examsCount: 20,
-      classesCount: 36,
-      priceText: '৳৭৫০',
-      isEnrolled: true,
-    },
-    {
-      id: 'c_lecturer_subjective',
-      title: 'আরবি প্রভাষক সাবজেক্টিভ কোর্স',
-      titleArabic: 'الدورة الموضوعية الكاملة لـ محاضر اللغة العربية',
-      cadre: 'lecturer_arabic',
-      instructor: 'মাওলানা ড. আহমেদ হাসান',
-      totalModules: 42,
-      completedModules: 0,
-      isPremium: true,
-      rating: 4.9,
-      studentCount: 722,
-      progressPercent: 0,
-      thumbnailBg: 'from-emerald-900 via-teal-950 to-slate-950',
-      description: 'নাহু, সরফ, বালাগাত, তাফসীর ও ফিকহুস সুন্নাহ্ মাস্টারকোর্স সম্পূর্ণ এইচডি রেকর্ডেড লেকচারসহ।',
-      badgeType: 'recorded',
-      sheetsCount: 45,
-      examsCount: 30,
-      classesCount: 42,
-      priceText: '৳৯৫০',
-      isEnrolled: false,
-    },
-    {
-      id: 'c_ebtedayee_head',
-      title: 'ইবতেদায়ী মৌলবি ও কারী শিক্ষক কোর্স',
-      titleArabic: 'دورة إعداد معلم المعهد الابتدائي الشرعي والقارئ',
-      cadre: 'ebtedayee_head',
-      instructor: 'ক্বারী মাওলানা ওবায়দুল্লাহ',
-      totalModules: 28,
-      completedModules: 14,
-      isPremium: false,
-      rating: 4.8,
-      studentCount: 1850,
-      progressPercent: 50,
-      thumbnailBg: 'from-teal-800 via-emerald-900 to-slate-900',
-      description: 'ইবতেদায়ী প্রধান, মৌলভী ও কারী শিক্ষক নিয়োগ পরীক্ষার তাজবীদ, আরবি ব্যাকরণ ও পেডাগজি কোর্স।',
-      badgeType: 'live',
-      sheetsCount: 25,
-      examsCount: 18,
-      classesCount: 28,
-      priceText: '৳৫০০',
-      isEnrolled: false,
-    },
-    {
-      id: 'c_general_special',
-      title: 'জেনারেল সাবজেক্ট মাস্টারকোর্স (বাংলা, ইংরেজি, গণিত)',
-      titleArabic: 'دورة المواد العامة الشاملة',
-      cadre: 'general_subject',
-      instructor: 'প্রফেসর মোঃ রফিকুল ইসলাম',
-      totalModules: 40,
-      completedModules: 0,
-      isPremium: true,
-      rating: 4.8,
-      studentCount: 3400,
-      progressPercent: 0,
-      thumbnailBg: 'from-blue-900 via-slate-900 to-slate-950',
-      description: 'সকল ক্যাডারের ১০০ নম্বরের সাধারণ অংশের সর্বোচ্চ প্রস্তুতির ভিডিও লেকচার, সুপার শর্টকাট ট্রিকস ও শিট।',
-      badgeType: 'recorded',
-      sheetsCount: 40,
-      examsCount: 25,
-      classesCount: 40,
-      priceText: '৳৬৫০',
-      isEnrolled: false,
-    },
-  ]);
+  const [coursesList, setCoursesList] = useState<CourseItem[]>(() => getStoredCourses());
+
+  // Listen for admin edits dynamically across views
+  useEffect(() => {
+    const reloadCourses = () => {
+      const updated = getStoredCourses();
+      setCoursesList(updated);
+      if (activeCourse) {
+        const refreshed = updated.find((c) => c.id === activeCourse.id);
+        if (refreshed) setActiveCourse(refreshed);
+      }
+    };
+
+    window.addEventListener('tamreen_courses_updated', reloadCourses);
+    return () => window.removeEventListener('tamreen_courses_updated', reloadCourses);
+  }, [activeCourse]);
 
   const handleEnrollCourse = (courseId: string) => {
-    setCoursesList((prev) =>
-      prev.map((item) =>
-        item.id === courseId ? { ...item, isEnrolled: true } : item
-      )
-    );
-    setActiveCourse((prev) =>
-      prev && prev.id === courseId ? { ...prev, isEnrolled: true } : prev
-    );
+    const updated = coursesList.map((c) => (c.id === courseId ? { ...c, isEnrolled: true, studentCount: c.studentCount + 1 } : c));
+    setCoursesList(updated);
+    saveCoursesToStorage(updated);
+    if (activeCourse?.id === courseId) {
+      setActiveCourse({ ...activeCourse, isEnrolled: true, studentCount: activeCourse.studentCount + 1 });
+    }
   };
 
   // Listen for popstate to close active course modal when back button is pressed
@@ -605,7 +497,9 @@ export const CoursesView: React.FC = () => {
             {/* Leaderboard tab is shown ONLY if enrolled */}
             <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
               {[
-                { id: 'plan', label: 'কোর্স প্ল্যান', icon: ScrollText },
+                { id: 'plan', label: 'কোর্স সম্পর্কে বিস্তারিত', icon: ScrollText },
+                { id: 'routine', label: 'রুটিন', icon: Calendar },
+                { id: 'syllabus', label: 'সিলেবাস', icon: BookmarkCheck },
                 { id: 'sheets', label: 'PDF শিট', icon: FileText },
                 { id: 'exams', label: 'পরীক্ষা', icon: PenTool },
                 ...(activeCourse.isEnrolled ? [{ id: 'leaderboard', label: 'লিডারবোর্ড', icon: Trophy }] : [])
@@ -632,164 +526,347 @@ export const CoursesView: React.FC = () => {
             {/* Tab Contents */}
             <div className="space-y-2.5">
               
-              {/* PLAN TAB */}
-              {detailTab === 'plan' && (
-                <div className="space-y-2.5">
-                  {[
-                    { id: 1, title: 'কোর্স রুটিন ও ওরিয়েন্টেশন নির্দেশিকা', code: 'Plan- 01', size: '১.২ মেগাবাইট' },
-                    { id: 2, title: 'অধ্যায়ভিত্তিক পূর্ণাঙ্গ নম্বর বণ্টন ও সিলেবাস', code: 'Plan- 02', size: '২.৫ মেগাবাইট' },
-                    { id: 3, title: 'মাদরাসা শিক্ষক নিবন্ধনের বিশেষ প্রশ্ন ব্যাংক সমাধান', code: 'Plan- 03', size: '৩.১ মেগাবাইট' },
-                    { id: 4, title: 'লাইভ সলভ ক্লাস ও ওস্তাদ পরামর্শ সূচি', code: 'Plan- 04', size: '১.৮ মেগাবাইট' },
-                  ].map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        if (!activeCourse.isEnrolled) {
-                          setShowEnrollAlert(true);
-                        }
-                      }}
-                      className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
-                        !activeCourse.isEnrolled ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 min-w-0 pr-2">
-                        <div className={`p-2.5 rounded-xl shrink-0 ${
-                          activeCourse.isEnrolled ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                        }`}>
+              {/* PLAN / COURSE DETAILS TAB */}
+              {detailTab === 'plan' && (() => {
+                const isPlanUnlocked = activeCourse.isEnrolled || activeCourse.isPlanLocked === false;
+                const plansToRender = (activeCourse.customPlans && activeCourse.customPlans.length > 0)
+                  ? activeCourse.customPlans
+                  : [
+                      { id: 'p1', title: 'কোর্স রূপরেখা ও অরিয়েন্টেশন নির্দেশিকা', code: 'Details- 01', sizeOrTime: '১.২ মেগাবাইট' },
+                      { id: 'p2', title: 'অধ্যায়ভিত্তিক পূর্ণাঙ্গ নম্বর বণ্টন গাইড', code: 'Details- 02', sizeOrTime: '২.৫ মেগাবাইট' },
+                    ];
+
+                return (
+                  <div className="space-y-3">
+                    {/* Course Overview Card */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 shadow-2xs space-y-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="p-2 rounded-xl bg-emerald-600 text-white shrink-0">
                           <ScrollText className="w-5 h-5" />
                         </div>
-                        <div className="min-w-0">
-                          <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
-                            {item.title}
-                          </h4>
-                          <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
-                            {item.code} • {item.size}
+                        <div>
+                          <h3 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-slate-100">
+                            {activeCourse.title} - বিস্তারিত তথ্য
+                          </h3>
+                          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                            {activeCourse.subText || 'মাদ্রাসা শিক্ষক নিবন্ধন প্রস্তুতি'}
                           </span>
                         </div>
                       </div>
 
-                      <div>
-                        {!activeCourse.isEnrolled ? (
-                          <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400">
-                            <Lock className="w-4 h-4" />
-                          </div>
-                        ) : (
-                          <button className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs">
-                            <Download className="w-4 h-4" />
-                          </button>
-                        )}
+                      <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {activeCourse.description || 'এই কোর্সে এনরোল করার মাধ্যমে আপনি পাবেন সম্পূর্ণ সিলেবাসভিত্তিক অনলাইন ক্লাস, বিষয়ভিত্তিক ও অধ্যায়ভিত্তিক মডেল টেস্ট, এক্সক্লুসিভ PDF নোট এবং ওস্তাদ সাপোর্ট।'}
+                      </p>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-slate-700/60 text-center">
+                          <span className="text-[10px] font-bold text-slate-400 block">মোট পরীক্ষা</span>
+                          <span className="text-xs font-black text-slate-800 dark:text-slate-200">{activeCourse.examsCount || 25}+ টি</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-slate-700/60 text-center">
+                          <span className="text-[10px] font-bold text-slate-400 block">PDF শিট</span>
+                          <span className="text-xs font-black text-slate-800 dark:text-slate-200">{activeCourse.sheetsCount || 40}+ টি</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-slate-700/60 text-center col-span-2 sm:col-span-1">
+                          <span className="text-[10px] font-bold text-slate-400 block">ফ্রি / ফি</span>
+                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{activeCourse.isFreeCourse ? 'সম্পূর্ণ ফ্রি' : `৳${activeCourse.discountPrice}`}</span>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+
+                    {/* Downloadable Plan / Outline Files */}
+                    <div className="space-y-2.5">
+                      <h4 className="text-xs font-extrabold text-slate-500 uppercase tracking-wider px-1">কোর্স ডকুমেন্ট ও নির্দেশিকা</h4>
+                      {plansToRender.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            if (!isPlanUnlocked) {
+                              setShowEnrollAlert(true);
+                            }
+                          }}
+                          className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                            !isPlanUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3 min-w-0 pr-2">
+                            <div className={`p-2.5 rounded-xl shrink-0 ${
+                              isPlanUnlocked ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                            }`}>
+                              <ScrollText className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                                {item.title}
+                              </h4>
+                              <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                                {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div>
+                            {!isPlanUnlocked ? (
+                              <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
+                                <Lock className="w-4 h-4 text-amber-600" />
+                                <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
+                              </div>
+                            ) : (
+                              <button className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs flex items-center space-x-1">
+                                <Download className="w-4 h-4" />
+                                <span className="text-xs font-bold hidden sm:inline">ডাউনলোড</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ROUTINE TAB */}
+              {detailTab === 'routine' && (() => {
+                const isRoutineUnlocked = activeCourse.isEnrolled || activeCourse.isRoutineLocked === false;
+                const routinesToRender = (activeCourse.customRoutines && activeCourse.customRoutines.length > 0)
+                  ? activeCourse.customRoutines
+                  : [
+                      { id: 'r1', title: 'সাপ্তাহিক লাইভ ক্লাস ও পরীক্ষা রুটিন (সংশোধিত সূচি)', code: 'রুটিন- 01', sizeOrTime: 'প্রতিদিন রাত ৮:০০ টা' },
+                      { id: 'r2', title: 'মডেল টেস্ট সূচি ও সলভ সেসন টাইমটেবিল', code: 'রুটিন- 02', sizeOrTime: 'সপ্তাহে ৩ দিন' },
+                      { id: 'r3', title: 'বিষয়ভিত্তিক অধ্যায় রিভিশন ও ওস্তাদ গাইডলাইন সূচি', code: 'রুটিন- 03', sizeOrTime: 'সাপ্তাহিক বিশেষ' },
+                    ];
+
+                return (
+                  <div className="space-y-2.5">
+                    {routinesToRender.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          if (!isRoutineUnlocked) {
+                            setShowEnrollAlert(true);
+                          }
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                          !isRoutineUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3 min-w-0 pr-2">
+                          <div className={`p-2.5 rounded-xl shrink-0 ${
+                            isRoutineUnlocked ? 'bg-amber-100 dark:bg-amber-950 text-amber-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                          }`}>
+                            <Calendar className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                              {item.title}
+                            </h4>
+                            <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                              {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          {!isRoutineUnlocked ? (
+                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
+                              <Lock className="w-4 h-4 text-amber-600" />
+                              <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
+                            </div>
+                          ) : (
+                            <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
+                              <Download className="w-3.5 h-3.5" />
+                              <span>দেখুন/ডাউনলোড</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {/* SYLLABUS TAB */}
+              {detailTab === 'syllabus' && (() => {
+                const isSyllabusUnlocked = activeCourse.isEnrolled || activeCourse.isSyllabusLocked === false;
+                const syllabusesToRender = (activeCourse.customSyllabuses && activeCourse.customSyllabuses.length > 0)
+                  ? activeCourse.customSyllabuses
+                  : [
+                      { id: 'syl1', title: '৯ম মাদ্রাসা শিক্ষক নিবন্ধন সম্পূর্ণ সিলেবাস (১০০ নম্বর)', code: 'সিলেবাস 01', sizeOrTime: 'PDF (২.০ MB)' },
+                      { id: 'syl2', title: 'বিষয়ভিত্তিক মার্ক ডিস্ট্রিবিউশন ও মানবণ্টন গাইড', code: 'সিলেবাস 02', sizeOrTime: 'PDF (১.৫ MB)' },
+                      { id: 'syl3', title: 'অধ্যায়ভিত্তিক গুরুত্বপূর্ণ টপিক ও প্রশ্ন বিশ্লেষণ সূচি', code: 'সিলেবাস 03', sizeOrTime: 'PDF (১.৮ MB)' },
+                    ];
+
+                return (
+                  <div className="space-y-2.5">
+                    {syllabusesToRender.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          if (!isSyllabusUnlocked) {
+                            setShowEnrollAlert(true);
+                          }
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                          !isSyllabusUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3 min-w-0 pr-2">
+                          <div className={`p-2.5 rounded-xl shrink-0 ${
+                            isSyllabusUnlocked ? 'bg-purple-100 dark:bg-purple-950 text-purple-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                          }`}>
+                            <BookmarkCheck className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                              {item.title}
+                            </h4>
+                            <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                              {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          {!isSyllabusUnlocked ? (
+                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
+                              <Lock className="w-4 h-4 text-amber-600" />
+                              <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
+                            </div>
+                          ) : (
+                            <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
+                              <Download className="w-3.5 h-3.5" />
+                              <span>ডাউনলোড</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
 
               {/* SHEETS TAB */}
-              {detailTab === 'sheets' && (
-                <div className="space-y-2.5">
-                  {[
-                    { id: 1, title: 'Exam- 01 মাকামাতু কুফিয়্যাহ.pdf', code: 'PDF Sheet 01' },
-                    { id: 2, title: 'Exam- 02-সূরা বাকারা.pdf', code: 'PDF Sheet 02' },
-                    { id: 3, title: 'Exam- 03 কিতাবুল ঈমান.pdf', code: 'PDF Sheet 03' },
-                    { id: 4, title: 'Exam- 04 আল-হাদিস ও সানাদ হ্যান্ডআউট.pdf', code: 'PDF Sheet 04' },
-                    { id: 5, title: 'Exam- 05 নাহু ও সরফ তারকীব রুলস.pdf', code: 'PDF Sheet 05' },
-                  ].map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        if (!activeCourse.isEnrolled) {
-                          setShowEnrollAlert(true);
-                        }
-                      }}
-                      className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
-                        !activeCourse.isEnrolled ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 min-w-0 pr-2">
-                        <div className={`p-2.5 rounded-xl shrink-0 ${
-                          activeCourse.isEnrolled ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                        }`}>
-                          <FileText className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
-                            {item.title}
-                          </h4>
-                          <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
-                            {item.code}
-                          </span>
-                        </div>
-                      </div>
+              {detailTab === 'sheets' && (() => {
+                const isSheetsUnlocked = activeCourse.isEnrolled || activeCourse.isSheetsLocked === false;
+                const sheetsToRender = (activeCourse.customSheets && activeCourse.customSheets.length > 0)
+                  ? activeCourse.customSheets
+                  : [
+                      { id: 's1', title: 'Exam- 01 মাকামাতু কুফিয়্যাহ.pdf', code: 'PDF Sheet 01', sizeOrTime: '১.৮ মেগাবাইট' },
+                      { id: 's2', title: 'Exam- 02-সূরা বাকারা.pdf', code: 'PDF Sheet 02', sizeOrTime: '২.১ মেগাবাইট' },
+                      { id: 's3', title: 'Exam- 03 কিতাবুল ঈমান.pdf', code: 'PDF Sheet 03', sizeOrTime: '১.৪ মেগাবাইট' },
+                      { id: 's4', title: 'Exam- 04 আল-হাদিস ও সানাদ হ্যান্ডআউট.pdf', code: 'PDF Sheet 04', sizeOrTime: '২.৯ মেগাবাইট' },
+                      { id: 's5', title: 'Exam- 05 নাহু ও সরফ তারকীব রুলস.pdf', code: 'PDF Sheet 05', sizeOrTime: '১.৬ মেগাবাইট' },
+                    ];
 
-                      <div>
-                        {!activeCourse.isEnrolled ? (
-                          <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400">
-                            <Lock className="w-4 h-4" />
+                return (
+                  <div className="space-y-2.5">
+                    {sheetsToRender.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          if (!isSheetsUnlocked) {
+                            setShowEnrollAlert(true);
+                          }
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                          !isSheetsUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3 min-w-0 pr-2">
+                          <div className={`p-2.5 rounded-xl shrink-0 ${
+                            isSheetsUnlocked ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                          }`}>
+                            <FileText className="w-5 h-5" />
                           </div>
-                        ) : (
-                          <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
-                            <Download className="w-3.5 h-3.5" />
-                            <span>ডাউনলোড</span>
-                          </button>
-                        )}
+                          <div className="min-w-0">
+                            <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                              {item.title}
+                            </h4>
+                            <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                              {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          {!isSheetsUnlocked ? (
+                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
+                              <Lock className="w-4 h-4 text-amber-600" />
+                              <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
+                            </div>
+                          ) : (
+                            <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
+                              <Download className="w-3.5 h-3.5" />
+                              <span>ডাউনলোড</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                );
+              })()}
 
               {/* EXAMS TAB */}
-              {detailTab === 'exams' && (
-                <div className="space-y-2.5">
-                  {[
-                    { id: 1, title: 'পরীক্ষা 01: আল-কুরআন ও তাফসীর মডেল টেস্ট', qCount: '৫০টি প্রশ্ন', time: '৩০ মিনিট' },
-                    { id: 2, title: 'পরীক্ষা 02: আল-হাদিস ও সানাদ মডেল টেস্ট', qCount: '৫০টি প্রশ্ন', time: '৩০ মিনিট' },
-                    { id: 3, title: 'পরীক্ষা 03: নাহু ও সরফ অধ্যায় মডেল টেস্ট', qCount: '৫০টি প্রশ্ন', time: '৩০ মিনিট' },
-                    { id: 4, title: 'পরীক্ষা 04: ফিকহ ও মূল মাসআলা মডেল টেস্ট', qCount: '১০০টি প্রশ্ন', time: '৬০ মিনিট' },
-                  ].map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => {
-                        if (!activeCourse.isEnrolled) {
-                          setShowEnrollAlert(true);
-                        }
-                      }}
-                      className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
-                        !activeCourse.isEnrolled ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 min-w-0 pr-2">
-                        <div className={`p-2.5 rounded-xl shrink-0 ${
-                          activeCourse.isEnrolled ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                        }`}>
-                          <PenTool className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
-                            {item.title}
-                          </h4>
-                          <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
-                            {item.qCount} • {item.time}
-                          </span>
-                        </div>
-                      </div>
+              {detailTab === 'exams' && (() => {
+                const isExamsUnlocked = activeCourse.isEnrolled || activeCourse.isExamsLocked === false;
+                const examsToRender = (activeCourse.customExams && activeCourse.customExams.length > 0)
+                  ? activeCourse.customExams
+                  : [
+                      { id: 'e1', title: 'পরীক্ষা 01: আল-কুরআন ও তাফসীর মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+                      { id: 'e2', title: 'পরীক্ষা 02: আল-হাদিস ও সানাদ মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+                      { id: 'e3', title: 'পরীক্ষা 03: নাহু ও সরফ অধ্যায় মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+                      { id: 'e4', title: 'পরীক্ষা 04: ফিকহ ও মূল মাসআলা মডেল টেস্ট', code: '১০০টি প্রশ্ন', sizeOrTime: '৬০ মিনিট' },
+                    ];
 
-                      <div>
-                        {!activeCourse.isEnrolled ? (
-                          <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400">
-                            <Lock className="w-4 h-4" />
+                return (
+                  <div className="space-y-2.5">
+                    {examsToRender.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          if (!isExamsUnlocked) {
+                            setShowEnrollAlert(true);
+                          }
+                        }}
+                        className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                          !isExamsUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3 min-w-0 pr-2">
+                          <div className={`p-2.5 rounded-xl shrink-0 ${
+                            isExamsUnlocked ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                          }`}>
+                            <PenTool className="w-5 h-5" />
                           </div>
-                        ) : (
-                          <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
-                            <Play className="w-3 h-3 fill-white" />
-                            <span>পরীক্ষা দিন</span>
-                          </button>
-                        )}
+                          <div className="min-w-0">
+                            <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                              {item.title}
+                            </h4>
+                            <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                              {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          {!isExamsUnlocked ? (
+                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
+                              <Lock className="w-4 h-4 text-amber-600" />
+                              <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
+                            </div>
+                          ) : (
+                            <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
+                              <Play className="w-3 h-3 fill-white" />
+                              <span>পরীক্ষা দিন</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                );
+              })()}
 
               {/* LEADERBOARD TAB (ENROLLED ONLY) */}
               {detailTab === 'leaderboard' && activeCourse.isEnrolled && (

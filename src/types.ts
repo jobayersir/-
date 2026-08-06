@@ -124,6 +124,14 @@ export interface ExamItem {
   scheduledTime?: string;
 }
 
+export interface CourseContentItem {
+  id: string;
+  title: string;
+  code?: string;
+  sizeOrTime?: string;
+  isLocked?: boolean; // Override individual lock status
+}
+
 export interface CourseItem {
   id: string;
   title: string;
@@ -144,6 +152,21 @@ export interface CourseItem {
   classesCount?: number;
   priceText?: string;
   isEnrolled?: boolean;
+  
+  // Admin dynamic options
+  isFreeCourse?: boolean;
+  isPlanLocked?: boolean; // true = locked by default, false = open for all
+  isRoutineLocked?: boolean; // true = locked by default, false = open for all
+  isSyllabusLocked?: boolean; // true = locked by default, false = open for all
+  isSheetsLocked?: boolean; // true = locked by default, false = open for all
+  isExamsLocked?: boolean; // true = locked by default, false = open for all
+  
+  // Admin custom items list
+  customPlans?: CourseContentItem[];
+  customRoutines?: CourseContentItem[];
+  customSyllabuses?: CourseContentItem[];
+  customSheets?: CourseContentItem[];
+  customExams?: CourseContentItem[];
 }
 
 export interface UserProfileData {
