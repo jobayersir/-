@@ -103,6 +103,13 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
     setShowExplanations((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
+  // Auto scroll to top when exam is submitted so summary and questions start from top
+  useEffect(() => {
+    if (examSubmitted) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [examSubmitted]);
+
   const handleSubmitExam = () => {
     setExamSubmitted(true);
     setTimerActive(false);
@@ -122,6 +129,11 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
 
     const timeTaken = (questions.length * 60) - timeLeft;
     onSaveResult(correct, questions.length, Math.max(timeTaken, 10));
+
+    // Smooth scroll to top
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 50);
   };
 
   const handleAskUstadAi = async (q: MCQQuestion) => {

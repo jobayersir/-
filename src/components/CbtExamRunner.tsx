@@ -69,6 +69,17 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [timeUsedSeconds, setTimeUsedSeconds] = useState<number>(0);
 
+  // Auto scroll smoothly to top when exam is submitted so summary stats & Q1 are visible
+  useEffect(() => {
+    if (isSubmitted) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const mainContainer = document.querySelector('.overflow-y-auto');
+      if (mainContainer) {
+        mainContainer.scrollTop = 0;
+      }
+    }
+  }, [isSubmitted]);
+
   // Explanation Accordion Open States for Question Review
   const [openExplanations, setOpenExplanations] = useState<Record<number, boolean>>({});
 
@@ -183,6 +194,11 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       initialExps[idx] = idx < 3;
     });
     setOpenExplanations(initialExps);
+
+    // Smooth scroll to top automatically
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 50);
   };
 
   // Calculate Exam Statistics
