@@ -27,14 +27,18 @@ import {
   BookOpenCheck,
   ScrollText,
   School,
-  Globe
+  Globe,
+  ArrowLeft,
+  Lock,
+  Trophy
 } from 'lucide-react';
 
 export const CoursesView: React.FC = () => {
   const [selectedCadre, setSelectedCadre] = useState<PostCadre | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCourse, setActiveCourse] = useState<CourseItem | null>(null);
-  const [activeTab, setActiveTab] = useState<'videos' | 'sheets' | 'exams'>('videos');
+  const [detailTab, setDetailTab] = useState<'plan' | 'sheets' | 'exams' | 'leaderboard'>('plan');
+  const [showEnrollAlert, setShowEnrollAlert] = useState(false);
 
   const cadreScrollRef = useRef<HTMLDivElement>(null);
 
@@ -44,7 +48,7 @@ export const CoursesView: React.FC = () => {
     }
   };
 
-  const coursesList: CourseItem[] = [
+  const [coursesList, setCoursesList] = useState<CourseItem[]>([
     {
       id: 'c_general_free',
       title: 'জেনারেল',
@@ -171,7 +175,18 @@ export const CoursesView: React.FC = () => {
       priceText: '৳৬৫০',
       isEnrolled: false,
     },
-  ];
+  ]);
+
+  const handleEnrollCourse = (courseId: string) => {
+    setCoursesList((prev) =>
+      prev.map((item) =>
+        item.id === courseId ? { ...item, isEnrolled: true } : item
+      )
+    );
+    setActiveCourse((prev) =>
+      prev && prev.id === courseId ? { ...prev, isEnrolled: true } : prev
+    );
+  };
 
   // Listen for popstate to close active course modal when back button is pressed
   React.useEffect(() => {
@@ -476,144 +491,420 @@ export const CoursesView: React.FC = () => {
       </div>
 
       {/* ========================================================= */}
-      {/* 3. COURSE DETAIL MODAL                                   */}
+      {/* 3. COURSE DETAIL SCREEN (FULL VIEW)                      */}
       {/* ========================================================= */}
       {activeCourse && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-6">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-3 sm:p-6 pb-28 animate-in fade-in duration-200">
+          <div className="max-w-3xl mx-auto space-y-4">
             
-            {/* Modal Header */}
-            <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-4">
-              <div>
-                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                  তামরীন একাডেমি কোর্স প্যানেল
+            {/* Top Navigation */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => {
+                  setActiveCourse(null);
+                  window.history.pushState({ tab: 'courses' }, '', '#courses');
+                }}
+                className="flex items-center space-x-2 text-slate-800 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 font-extrabold text-xs sm:text-sm py-1.5 px-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-850 transition-all active:scale-95"
+              >
+                <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+                <span>হোমে ফিরুন</span>
+              </button>
+
+              {activeCourse.isEnrolled && (
+                <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/90 text-emerald-800 dark:text-emerald-300 text-xs font-black border border-emerald-300 dark:border-emerald-800 shadow-2xs">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>ভর্তি সক্রিয়</span>
                 </span>
-                <h3 className="font-extrabold text-xl text-slate-900 dark:text-slate-100 mt-0.5">
+              )}
+            </div>
+
+            {/* Banner Header Card */}
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm p-3.5 sm:p-5 space-y-4 overflow-hidden">
+              
+              {/* Graphic Poster Header */}
+              <div className="relative rounded-2xl bg-gradient-to-br from-amber-50 via-amber-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 border border-amber-300/50 dark:border-slate-700/80 p-6 sm:p-8 text-center flex flex-col items-center justify-center space-y-2.5 overflow-hidden shadow-inner">
+                
+                {/* Top Right Badge */}
+                <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700 px-3 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-2xs">
+                  {activeCourse.badgeType === 'exam' ? 'Exam Batch' : activeCourse.badgeType === 'recorded' ? 'Recorded Batch' : 'Free Batch'}
+                </div>
+
+                {/* Emblem Seal */}
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400/90 flex items-center justify-center font-black text-xl sm:text-2xl shadow-md transform hover:scale-105 transition-transform">
+                  ত
+                </div>
+
+                {/* Sub Banner Ribbon */}
+                <div className="bg-[#182638] text-amber-300 px-4 py-1 rounded-lg text-xs font-extrabold tracking-wide border border-amber-400/40 shadow-2xs">
+                  {activeCourse.badgeType === 'exam' ? 'এক্সাম ব্যাচ-১' : activeCourse.badgeType === 'recorded' ? 'রেকর্ডেড ব্যাচ' : 'ফ্রি এক্সাম ব্যাচ'}
+                </div>
+
+                {/* Course Main Title Banner */}
+                <h1 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-slate-100 max-w-lg leading-tight pt-1">
                   {activeCourse.title}
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  ইনস্ট্রাক্টর: <span className="font-bold text-slate-700 dark:text-slate-300">{activeCourse.instructor}</span>
+                </h1>
+
+                {/* Instructor */}
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                  ৯ম শিক্ষক নিয়োগ • <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">{activeCourse.instructor}</span>
                 </p>
               </div>
-              <button
-                onClick={() => setActiveCourse(null)}
-                className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
 
-            {/* Tabs for Syllabus Content */}
-            <div className="flex space-x-2 border-b border-slate-100 dark:border-slate-800 pb-2">
-              <button
-                onClick={() => setActiveTab('videos')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  activeTab === 'videos'
-                    ? 'bg-emerald-600 text-white shadow-md'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                }`}
-              >
-                📹 ভিডিও লেকচার ({activeCourse.classesCount || 20})
-              </button>
-              <button
-                onClick={() => setActiveTab('sheets')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  activeTab === 'sheets'
-                    ? 'bg-emerald-600 text-white shadow-md'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                }`}
-              >
-                📄 লেকচার শিট ({activeCourse.sheetsCount || 15})
-              </button>
-              <button
-                onClick={() => setActiveTab('exams')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  activeTab === 'exams'
-                    ? 'bg-emerald-600 text-white shadow-md'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                }`}
-              >
-                📝 মডেল টেস্ট ({activeCourse.examsCount || 10})
-              </button>
-            </div>
+              {/* Statistics Row (3 Pills + Enrolled Pill) */}
+              <div className="space-y-2.5">
+                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 px-1">
+                  {activeCourse.title}
+                </h2>
 
-            {/* Tab Content List */}
-            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-              {activeTab === 'videos' && [
-                { title: 'মডিউল ১: আল-কুরআন ও তাজবীদ সম্পূর্ণ রুলস', time: '৪৫ মিনিট', status: 'সম্পন্ন' },
-                { title: 'মডিউল ২: নাহু - ফেএল ও ফায়েল তারকীব বিশ্লেষণ', time: '৫০ মিনিট', status: 'সম্পন্ন' },
-                { title: 'মডিউল ৩: সরফ - আবওয়াব ও মাসদার পরিবর্তন নিয়ম', time: '৪০ মিনিট', status: 'নতুন' },
-                { title: 'মডিউল ৪: ফিকহুস সুন্নাহ্ ও প্রধান মাসআলাসমূহ', time: '৫৫ মিনিট', status: 'নতুন' },
-              ].map((item, idx) => (
-                <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
-                      <Video className="w-4 h-4" />
-                    </div>
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                  {/* Sheet Count Pill */}
+                  <div className="bg-amber-100/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 p-2.5 sm:p-3 rounded-2xl flex items-center justify-center space-x-2 text-center sm:text-left">
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-amber-800 dark:text-amber-400 shrink-0" />
                     <div>
-                      <span className="font-bold text-slate-800 dark:text-slate-200 block">{item.title}</span>
-                      <span className="text-[10px] text-slate-400">{item.time}</span>
+                      <span className="font-black text-sm sm:text-base text-amber-950 dark:text-amber-200 block leading-tight">
+                        {activeCourse.sheetsCount || 36}
+                      </span>
+                      <span className="text-[10px] sm:text-xs font-bold text-amber-800 dark:text-amber-400">শিট</span>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-[11px] shadow-sm hover:bg-emerald-700">
-                    প্লে করুন
-                  </button>
-                </div>
-              ))}
 
-              {activeTab === 'sheets' && [
-                { title: 'বিশেষ আরবি ব্যাকরণ ও নাহু নোট শিট (PDF)', size: '২.৪ মেগাবাইট' },
-                { title: 'আল-হাদিস ও সানাদ পরিচিতি হ্যান্ডআউট', size: '১.৮ মেগাবাইট' },
-                { title: 'ইবতেদায়ী শিক্ষাবিজ্ঞান ও পেডাগজি শিট', size: '৩.১ মেগাবাইট' },
-              ].map((item, idx) => (
-                <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
-                      <FileText className="w-4 h-4" />
-                    </div>
+                  {/* Exam Count Pill */}
+                  <div className="bg-emerald-100/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 p-2.5 sm:p-3 rounded-2xl flex items-center justify-center space-x-2 text-center sm:text-left">
+                    <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-800 dark:text-emerald-400 shrink-0" />
                     <div>
-                      <span className="font-bold text-slate-800 dark:text-slate-200 block">{item.title}</span>
-                      <span className="text-[10px] text-slate-400">{item.size}</span>
+                      <span className="font-black text-sm sm:text-base text-emerald-950 dark:text-emerald-200 block leading-tight">
+                        {activeCourse.examsCount || 34}
+                      </span>
+                      <span className="text-[10px] sm:text-xs font-bold text-emerald-800 dark:text-emerald-400">পরীক্ষা</span>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 rounded-xl bg-slate-800 text-white font-bold text-[11px] shadow-sm flex items-center space-x-1">
-                    <Download className="w-3.5 h-3.5" />
-                    <span>ডাউনলোড</span>
-                  </button>
-                </div>
-              ))}
 
-              {activeTab === 'exams' && [
-                { title: 'মডেল টেস্ট ১: নাহু ও সরফ অধ্যায়', qCount: '৫০টি প্রশ্ন' },
-                { title: 'মডেল টেস্ট ২: আল-কুরআন ও তাফসীর', qCount: '৫০টি প্রশ্ন' },
-                { title: 'মডেল টেস্ট ৩: ফিকহ ও মূল মাসআলা', qCount: '১০০টি প্রশ্ন' },
-              ].map((item, idx) => (
-                <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
-                      <HelpCircle className="w-4 h-4" />
-                    </div>
+                  {/* Model Test Pill */}
+                  <div className="bg-sky-100/70 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-800/60 p-2.5 sm:p-3 rounded-2xl flex items-center justify-center space-x-2 text-center sm:text-left">
+                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-sky-800 dark:text-sky-400 shrink-0" />
                     <div>
-                      <span className="font-bold text-slate-800 dark:text-slate-200 block">{item.title}</span>
-                      <span className="text-[10px] text-slate-400">{item.qCount}</span>
+                      <span className="font-black text-sm sm:text-base text-sky-950 dark:text-sky-200 block leading-tight">
+                        ৭
+                      </span>
+                      <span className="text-[10px] sm:text-xs font-bold text-sky-800 dark:text-sky-400">ফুল মডেল</span>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold text-[11px] shadow-sm hover:bg-emerald-700">
-                    পরীক্ষা দিন
-                  </button>
                 </div>
-              ))}
+
+                {/* Enrolled Students Pill */}
+                <div className="bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/90 py-2.5 px-4 rounded-xl text-center flex items-center justify-center space-x-2 text-slate-800 dark:text-slate-200 font-extrabold text-xs sm:text-sm">
+                  <Users className="w-4 h-4 text-slate-500" />
+                  <span>{activeCourse.studentCount} জন ভর্তি হয়েছেন</span>
+                </div>
+              </div>
+
             </div>
 
-            {/* Footer Action */}
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-              <button
-                onClick={() => setActiveCourse(null)}
-                className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md"
-              >
-                বন্ধ করুন
-              </button>
+            {/* Sub-Nav Action Buttons */}
+            {/* Selected tab turns GREEN as requested */}
+            {/* Leaderboard tab is shown ONLY if enrolled */}
+            <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
+              {[
+                { id: 'plan', label: 'কোর্স প্ল্যান', icon: ScrollText },
+                { id: 'sheets', label: 'PDF শিট', icon: FileText },
+                { id: 'exams', label: 'পরীক্ষা', icon: PenTool },
+                ...(activeCourse.isEnrolled ? [{ id: 'leaderboard', label: 'লিডারবোর্ড', icon: Trophy }] : [])
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = detailTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setDetailTab(tab.id as any)}
+                    className={`px-4 py-2.5 rounded-2xl font-black text-xs sm:text-sm flex items-center space-x-2 whitespace-nowrap transition-all duration-200 active:scale-95 shadow-2xs ${
+                      isActive
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/40'
+                        : 'bg-white dark:bg-slate-800/90 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
+
+            {/* Tab Contents */}
+            <div className="space-y-2.5">
+              
+              {/* PLAN TAB */}
+              {detailTab === 'plan' && (
+                <div className="space-y-2.5">
+                  {[
+                    { id: 1, title: 'কোর্স রুটিন ও ওরিয়েন্টেশন নির্দেশিকা', code: 'Plan- 01', size: '১.২ মেগাবাইট' },
+                    { id: 2, title: 'অধ্যায়ভিত্তিক পূর্ণাঙ্গ নম্বর বণ্টন ও সিলেবাস', code: 'Plan- 02', size: '২.৫ মেগাবাইট' },
+                    { id: 3, title: 'মাদরাসা শিক্ষক নিবন্ধনের বিশেষ প্রশ্ন ব্যাংক সমাধান', code: 'Plan- 03', size: '৩.১ মেগাবাইট' },
+                    { id: 4, title: 'লাইভ সলভ ক্লাস ও ওস্তাদ পরামর্শ সূচি', code: 'Plan- 04', size: '১.৮ মেগাবাইট' },
+                  ].map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        if (!activeCourse.isEnrolled) {
+                          setShowEnrollAlert(true);
+                        }
+                      }}
+                      className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                        !activeCourse.isEnrolled ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3 min-w-0 pr-2">
+                        <div className={`p-2.5 rounded-xl shrink-0 ${
+                          activeCourse.isEnrolled ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}>
+                          <ScrollText className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                            {item.title}
+                          </h4>
+                          <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                            {item.code} • {item.size}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        {!activeCourse.isEnrolled ? (
+                          <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400">
+                            <Lock className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <button className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs">
+                            <Download className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* SHEETS TAB */}
+              {detailTab === 'sheets' && (
+                <div className="space-y-2.5">
+                  {[
+                    { id: 1, title: 'Exam- 01 মাকামাতু কুফিয়্যাহ.pdf', code: 'PDF Sheet 01' },
+                    { id: 2, title: 'Exam- 02-সূরা বাকারা.pdf', code: 'PDF Sheet 02' },
+                    { id: 3, title: 'Exam- 03 কিতাবুল ঈমান.pdf', code: 'PDF Sheet 03' },
+                    { id: 4, title: 'Exam- 04 আল-হাদিস ও সানাদ হ্যান্ডআউট.pdf', code: 'PDF Sheet 04' },
+                    { id: 5, title: 'Exam- 05 নাহু ও সরফ তারকীব রুলস.pdf', code: 'PDF Sheet 05' },
+                  ].map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        if (!activeCourse.isEnrolled) {
+                          setShowEnrollAlert(true);
+                        }
+                      }}
+                      className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                        !activeCourse.isEnrolled ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3 min-w-0 pr-2">
+                        <div className={`p-2.5 rounded-xl shrink-0 ${
+                          activeCourse.isEnrolled ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}>
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                            {item.title}
+                          </h4>
+                          <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                            {item.code}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        {!activeCourse.isEnrolled ? (
+                          <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400">
+                            <Lock className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
+                            <Download className="w-3.5 h-3.5" />
+                            <span>ডাউনলোড</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* EXAMS TAB */}
+              {detailTab === 'exams' && (
+                <div className="space-y-2.5">
+                  {[
+                    { id: 1, title: 'পরীক্ষা 01: আল-কুরআন ও তাফসীর মডেল টেস্ট', qCount: '৫০টি প্রশ্ন', time: '৩০ মিনিট' },
+                    { id: 2, title: 'পরীক্ষা 02: আল-হাদিস ও সানাদ মডেল টেস্ট', qCount: '৫০টি প্রশ্ন', time: '৩০ মিনিট' },
+                    { id: 3, title: 'পরীক্ষা 03: নাহু ও সরফ অধ্যায় মডেল টেস্ট', qCount: '৫০টি প্রশ্ন', time: '৩০ মিনিট' },
+                    { id: 4, title: 'পরীক্ষা 04: ফিকহ ও মূল মাসআলা মডেল টেস্ট', qCount: '১০০টি প্রশ্ন', time: '৬০ মিনিট' },
+                  ].map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        if (!activeCourse.isEnrolled) {
+                          setShowEnrollAlert(true);
+                        }
+                      }}
+                      className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
+                        !activeCourse.isEnrolled ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3 min-w-0 pr-2">
+                        <div className={`p-2.5 rounded-xl shrink-0 ${
+                          activeCourse.isEnrolled ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                        }`}>
+                          <PenTool className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
+                            {item.title}
+                          </h4>
+                          <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
+                            {item.qCount} • {item.time}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        {!activeCourse.isEnrolled ? (
+                          <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400">
+                            <Lock className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
+                            <Play className="w-3 h-3 fill-white" />
+                            <span>পরীক্ষা দিন</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* LEADERBOARD TAB (ENROLLED ONLY) */}
+              {detailTab === 'leaderboard' && activeCourse.isEnrolled && (
+                <div className="space-y-3 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div>
+                      <h3 className="font-black text-base text-slate-900 dark:text-slate-100 flex items-center space-x-2">
+                        <Trophy className="w-5 h-5 text-amber-500" />
+                        <span>ব্যাচ মেধা তালিকা (Leaderboard)</span>
+                      </h3>
+                      <p className="text-xs text-slate-500">সকল মডেল টেস্টের গড় স্কোরের ভিত্তিতে র‍্যাংকিং</p>
+                    </div>
+                    <span className="px-3 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 font-extrabold text-xs rounded-full border border-amber-300">
+                      শীর্ষ ১০
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      { rank: 1, name: 'মোঃ আব্দুল্লাহ মারুফ', score: '৯৮%', badge: '🥇 ১ম স্থান', avatarBg: 'bg-amber-500 text-white' },
+                      { rank: 2, name: 'ফারহানা ইয়াসমিন', score: '৯৫%', badge: '🥈 ২য় স্থান', avatarBg: 'bg-slate-400 text-white' },
+                      { rank: 3, name: 'সাইফুল ইসলাম রাফি', score: '৯২%', badge: '🥉 ৩য় স্থান', avatarBg: 'bg-amber-700 text-white' },
+                      { rank: 4, name: 'মুফতি আব্দুর রহমান', score: '৯০%', badge: '৪র্থ স্থান', avatarBg: 'bg-emerald-600 text-white' },
+                      { rank: 5, name: 'তানজিলা তাসনিম', score: '৮৯%', badge: '৫ম স্থান', avatarBg: 'bg-emerald-600 text-white' },
+                    ].map((student) => (
+                      <div key={student.rank} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-8 h-8 rounded-full font-black text-xs flex items-center justify-center ${student.avatarBg}`}>
+                            {student.rank}
+                          </div>
+                          <div>
+                            <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-slate-100 block">
+                              {student.name}
+                            </span>
+                            <span className="text-[10px] text-emerald-600 font-bold">{student.badge}</span>
+                          </div>
+                        </div>
+                        <span className="font-black text-sm text-slate-800 dark:text-slate-200">
+                          {student.score}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Sticky Bottom Bar */}
+            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-4 shadow-2xl">
+              <div className="max-w-3xl mx-auto flex items-center justify-between">
+                
+                <div>
+                  <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
+                    {activeCourse.priceText || '৳৪৫০'}
+                  </span>
+                  <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 ml-1.5 font-bold">
+                    শিটসহ
+                  </span>
+                </div>
+
+                {activeCourse.isEnrolled ? (
+                  <div className="flex items-center space-x-2">
+                    <span className="px-4 py-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-black text-xs sm:text-sm border border-emerald-300/80">
+                      ✓ ভর্তি সম্পন্ন
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleEnrollCourse(activeCourse.id)}
+                    className="px-6 py-2.5 sm:py-3 rounded-xl bg-[#132238] hover:bg-[#0a1322] text-white font-extrabold text-xs sm:text-sm shadow-lg flex items-center space-x-2 active:scale-95 transition-all"
+                  >
+                    <span>ভর্তি হন</span>
+                    <ChevronRight className="w-4 h-4 stroke-[3]" />
+                  </button>
+                )}
+
+              </div>
+            </div>
+
+            {/* Locked Modal Prompt */}
+            {showEnrollAlert && (
+              <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 text-center space-y-4 border border-slate-200 dark:border-slate-800 shadow-2xl">
+                  <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+                    <Lock className="w-6 h-6 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
+                      কনটেন্টটি লক করা রয়েছে
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      এই শিট ও পরীক্ষা ব্যবহারের জন্য আপনাকে প্রথমে কোর্সটিতে ভর্তি হতে হবে।
+                    </p>
+                  </div>
+                  <div className="pt-2 flex space-x-2">
+                    <button
+                      onClick={() => setShowEnrollAlert(false)}
+                      className="flex-1 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs"
+                    >
+                      বাতিল
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowEnrollAlert(false);
+                        handleEnrollCourse(activeCourse.id);
+                      }}
+                      className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-md"
+                    >
+                      এখনই ভর্তি হন
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
