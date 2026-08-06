@@ -6,7 +6,7 @@ export const DEFAULT_COURSES: CourseItem[] = [
     title: 'জেনারেল',
     titleArabic: 'المواد العامة (البنغالية، الإنجليزية، الرياضيات)',
     cadre: 'general_subject',
-    instructor: 'প্রফেসর মোঃ রফিকুল ইসলাম',
+    instructor: 'ওস্তাদ প্যানেল ও বিষয়ভিত্তিক বিশেষজ্ঞ',
     totalModules: 24,
     completedModules: 24,
     isPremium: false,
@@ -226,7 +226,7 @@ export const DEFAULT_COURSES: CourseItem[] = [
     title: 'জেনারেল সাবজেক্ট মাস্টারকোর্স (বাংলা, ইংরেজি, গণিত)',
     titleArabic: 'دورة المواد العامة الشاملة',
     cadre: 'general_subject',
-    instructor: 'প্রফেসর মোঃ রফিকুল ইসলাম',
+    instructor: 'ওস্তাদ প্যানেল ও বিষয়ভিত্তিক বিশেষজ্ঞ',
     totalModules: 40,
     completedModules: 0,
     isPremium: true,
@@ -252,7 +252,19 @@ export const getStoredCourses = (): CourseItem[] => {
   try {
     const saved = localStorage.getItem('tamreen_courses_data');
     if (saved) {
-      return JSON.parse(saved);
+      const courses: CourseItem[] = JSON.parse(saved);
+      let updated = false;
+      const sanitized = courses.map(c => {
+        if (c.instructor === 'প্রফেসর মোঃ রফিকুল ইসলাম') {
+          updated = true;
+          return { ...c, instructor: 'ওস্তাদ প্যানেল ও বিষয়ভিত্তিক বিশেষজ্ঞ' };
+        }
+        return c;
+      });
+      if (updated) {
+        saveCoursesToStorage(sanitized);
+      }
+      return sanitized;
     }
   } catch (e) {
     console.error('Failed to load courses from localStorage', e);
