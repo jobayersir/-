@@ -271,8 +271,8 @@ export const CoursesView: React.FC = () => {
                     isEnrolled
                       ? 'bg-emerald-700 text-white border border-emerald-400'
                       : 'bg-slate-900 text-amber-400 border border-amber-400/60'
-                  } flex items-center justify-center font-black text-[10px] shadow-sm mt-0.5`}>
-                    ত
+                  } flex items-center justify-center p-0.5 shadow-sm mt-0.5`}>
+                    <Logo variant="icon" size="xs" />
                   </div>
 
                   {/* Ribbon Badge Banner */}
@@ -420,7 +420,7 @@ export const CoursesView: React.FC = () => {
             <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden">
               
               {/* Premium Compact Graphic/Image Poster Banner */}
-              <div className="relative w-full h-44 sm:h-56 bg-slate-950 rounded-3xl overflow-hidden flex items-end">
+              <div className="relative w-full h-40 sm:h-52 bg-slate-950 rounded-t-3xl overflow-hidden flex items-end">
                 {activeCourse.bannerUrl ? (
                   <img
                     src={activeCourse.bannerUrl}
@@ -438,21 +438,11 @@ export const CoursesView: React.FC = () => {
                         <Logo variant="icon" size="sm" />
                       </div>
                     </div>
-                    <div className="space-y-1 z-10 pb-1">
-                      <h2 className="text-xl sm:text-2xl font-black text-white leading-tight drop-shadow-md">
-                        {activeCourse.title}
-                      </h2>
-                      <p className="text-xs sm:text-sm font-bold text-amber-300 drop-shadow-xs flex items-center space-x-1.5">
-                        <span>৯ম শিক্ষক নিয়োগ</span>
-                        <span>•</span>
-                        <span className="text-emerald-200 font-extrabold">{activeCourse.instructor}</span>
-                      </p>
-                    </div>
                   </div>
                 )}
 
                 {/* Dark Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent pointer-events-none" />
 
                 {/* Top Right Batch Badge if bannerUrl is present */}
                 {activeCourse.bannerUrl && (
@@ -463,18 +453,6 @@ export const CoursesView: React.FC = () => {
 
                 {/* Floating Info Badges INSIDE Banner */}
                 <div className="relative z-10 p-3 sm:p-4 w-full flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  {/* Title inside banner if image banner is used */}
-                  {activeCourse.bannerUrl && (
-                    <div className="w-full mb-0.5">
-                      <h2 className="text-base sm:text-xl font-black text-white drop-shadow-md">
-                        {activeCourse.title}
-                      </h2>
-                      <p className="text-[11px] font-bold text-emerald-300 drop-shadow-xs">
-                        {activeCourse.instructor}
-                      </p>
-                    </div>
-                  )}
-
                   <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-black shadow-xs">
                     <FileText className="w-3.5 h-3.5 text-amber-400" />
                     <span>{activeCourse.sheetsCount || 20} শিট</span>
@@ -496,6 +474,18 @@ export const CoursesView: React.FC = () => {
                   </div>
                 </div>
 
+              </div>
+
+              {/* Title & Instructor Info Header below Banner */}
+              <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 space-y-1">
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 leading-tight">
+                  {activeCourse.title}
+                </h2>
+                <p className="text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-400 flex items-center space-x-1.5">
+                  <span>৯ম শিক্ষক নিয়োগ</span>
+                  <span>•</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">{activeCourse.instructor}</span>
+                </p>
               </div>
 
             </div>
