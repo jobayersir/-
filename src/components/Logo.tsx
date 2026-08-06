@@ -3,7 +3,7 @@ const logoImg = '/src/assets/images/tamreen_academy_logo_1785821158176.jpg';
 
 interface LogoProps {
   variant?: 'horizontal' | 'stacked' | 'icon' | 'image';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   showSubtitle?: boolean;
 }
@@ -16,13 +16,14 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   // Size scaling multipliers carefully balanced so icon height matches text block height
   const sizeMap = {
+    xs: { icon: 'w-5 h-5 sm:w-6 sm:h-6', text: 'text-xs sm:text-sm', subText: 'text-[7px] sm:text-[8px]', gap: 'space-x-1.5' },
     sm: { icon: 'w-7 h-7 sm:w-8 sm:h-8', text: 'text-sm sm:text-base', subText: 'text-[8px] sm:text-[9px]', gap: 'space-x-2' },
     md: { icon: 'w-9 h-9 sm:w-11 sm:h-11', text: 'text-lg sm:text-xl', subText: 'text-[9px] sm:text-[10px]', gap: 'space-x-2.5 sm:space-x-3' },
     lg: { icon: 'w-14 h-14 sm:w-16 sm:h-16', text: 'text-2xl sm:text-3xl', subText: 'text-xs sm:text-sm', gap: 'space-x-3.5 sm:space-x-4' },
     xl: { icon: 'w-20 h-20 sm:w-24 sm:h-24', text: 'text-4xl sm:text-5xl', subText: 'text-sm sm:text-base', gap: 'space-x-4 sm:space-x-5' },
   };
 
-  const { icon: iconSize, text: textSize, subText: subTextSize, gap } = sizeMap[size];
+  const { icon: iconSize, text: textSize, subText: subTextSize, gap } = sizeMap[size] || sizeMap.md;
 
   // Precision Square Kufic (الخط الكوفي المربع) SVG Emblem for Tamreen Academy
   const KuficEmblem = ({ svgClass }: { svgClass: string }) => (
