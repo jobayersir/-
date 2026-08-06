@@ -510,6 +510,70 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     />
                   </div>
 
+                  <div className="col-span-1 sm:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      কোর্স ব্যানার ছবি লিঙ্ক (Banner Image URL)
+                    </label>
+                    <input
+                      type="text"
+                      value={editingCourse.bannerUrl || ''}
+                      onChange={(e) => setEditingCourse({ ...editingCourse, bannerUrl: e.target.value })}
+                      placeholder="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop"
+                      className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">
+                      (ছবি লিঙ্ক দিলে কোর্সের উপরে প্রিমিয়াম ব্যানার দেখা যাবে)
+                    </span>
+                  </div>
+
+                  <div className="col-span-1 sm:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      কোর্স সম্পর্কে বিস্তারিত বিবরণ (Details Text)
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={editingCourse.detailsText || ''}
+                      onChange={(e) => setEditingCourse({ ...editingCourse, detailsText: e.target.value })}
+                      placeholder="কোর্সের পূর্ণাঙ্গ বিবরণ ও নির্দেশিকা এখানে লিখুন..."
+                      className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-medium"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">
+                      ('কোর্স সম্পর্কে বিস্তারিত' ট্যাবে সরাসরি এই লিখাটি দেখানো হবে)
+                    </span>
+                  </div>
+
+                  <div className="col-span-1 sm:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      রুটিন বিবরণ ও সূচি (Routine Text)
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={editingCourse.routineText || ''}
+                      onChange={(e) => setEditingCourse({ ...editingCourse, routineText: e.target.value })}
+                      placeholder="ক্লাস ও পরীক্ষার সময়সূচি বা রুটিন সরাসরি লিখুন..."
+                      className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-medium"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">
+                      ('রুটিন' ট্যাবে সরাসরি এই লিখাটি ও ডাউনলোড বাটন দেখানো হবে)
+                    </span>
+                  </div>
+
+                  <div className="col-span-1 sm:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      সিলেবাস বিবরণ ও বিষয়সূচি (Syllabus Text)
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={editingCourse.syllabusText || ''}
+                      onChange={(e) => setEditingCourse({ ...editingCourse, syllabusText: e.target.value })}
+                      placeholder="সম্পূর্ণ সিলেবাস ও নম্বর বণ্টন এখানে লিখুন..."
+                      className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-medium"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">
+                      ('সিলেবাস' ট্যাবে সরাসরি এই লিখাটি ও ডাউনলোড বাটন দেখানো হবে)
+                    </span>
+                  </div>
+
                   <div>
                     <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                       মূল্য টেক্সট (Price Text e.g. ৳৪৫০ / ফ্রি)

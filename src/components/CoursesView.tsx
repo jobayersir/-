@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CourseItem, PostCadre, CourseContentItem } from '../types';
 import { getStoredCourses, saveCoursesToStorage } from '../data/coursesData';
+import { Logo } from './Logo';
 import { 
   GraduationCap, 
   BookOpen, 
@@ -36,7 +37,12 @@ import {
   Unlock,
   Trophy,
   ShieldCheck,
-  Settings
+  Settings,
+  Medal,
+  Flame,
+  Award,
+  Target,
+  TrendingUp
 } from 'lucide-react';
 
 export const CoursesView: React.FC = () => {
@@ -411,83 +417,85 @@ export const CoursesView: React.FC = () => {
             </div>
 
             {/* Banner Header Card */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm p-3.5 sm:p-5 space-y-4 overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden">
               
-              {/* Graphic Poster Header */}
-              <div className="relative rounded-2xl bg-gradient-to-br from-amber-50 via-amber-100/50 to-emerald-50 dark:from-slate-800 dark:via-slate-850 dark:to-slate-900 border border-amber-300/50 dark:border-slate-700/80 p-6 sm:p-8 text-center flex flex-col items-center justify-center space-y-2.5 overflow-hidden shadow-inner">
-                
-                {/* Top Right Badge */}
-                <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700 px-3 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-2xs">
-                  {activeCourse.badgeType === 'exam' ? 'Exam Batch' : activeCourse.badgeType === 'recorded' ? 'Recorded Batch' : 'Free Batch'}
-                </div>
-
-                {/* Emblem Seal */}
-                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-900 text-amber-400 border-2 border-amber-400/90 flex items-center justify-center font-black text-xl sm:text-2xl shadow-md transform hover:scale-105 transition-transform">
-                  ত
-                </div>
-
-                {/* Sub Banner Ribbon */}
-                <div className="bg-[#182638] text-amber-300 px-4 py-1 rounded-lg text-xs font-extrabold tracking-wide border border-amber-400/40 shadow-2xs">
-                  {activeCourse.badgeType === 'exam' ? 'এক্সাম ব্যাচ-১' : activeCourse.badgeType === 'recorded' ? 'রেকর্ডেড ব্যাচ' : 'ফ্রি এক্সাম ব্যাচ'}
-                </div>
-
-                {/* Course Main Title Banner */}
-                <h1 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-slate-100 max-w-lg leading-tight pt-1">
-                  {activeCourse.title}
-                </h1>
-
-                {/* Instructor */}
-                <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
-                  ৯ম শিক্ষক নিয়োগ • <span className="text-emerald-700 dark:text-emerald-400 font-extrabold">{activeCourse.instructor}</span>
-                </p>
-              </div>
-
-              {/* Statistics Row (3 Pills + Enrolled Pill) */}
-              <div className="space-y-2.5">
-                <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 px-1">
-                  {activeCourse.title}
-                </h2>
-
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                  {/* Sheet Count Pill */}
-                  <div className="bg-amber-100/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 p-2.5 sm:p-3 rounded-2xl flex items-center justify-center space-x-2 text-center sm:text-left">
-                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-amber-800 dark:text-amber-400 shrink-0" />
-                    <div>
-                      <span className="font-black text-sm sm:text-base text-amber-950 dark:text-amber-200 block leading-tight">
-                        {activeCourse.sheetsCount || 36}
+              {/* Premium Compact Graphic/Image Poster Banner */}
+              <div className="relative w-full h-44 sm:h-56 bg-slate-950 rounded-3xl overflow-hidden flex items-end">
+                {activeCourse.bannerUrl ? (
+                  <img
+                    src={activeCourse.bannerUrl}
+                    alt={activeCourse.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-950 p-5 sm:p-6 flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-sm flex items-center space-x-1">
+                        <Sparkles className="w-3 h-3 text-slate-950" />
+                        <span>{activeCourse.badgeType === 'exam' ? 'Exam Batch' : activeCourse.badgeType === 'recorded' ? 'Recorded Batch' : 'Free Batch'}</span>
                       </span>
-                      <span className="text-[10px] sm:text-xs font-bold text-amber-800 dark:text-amber-400">শিট</span>
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-1.5 shadow-lg flex items-center justify-center">
+                        <Logo variant="icon" size="sm" />
+                      </div>
+                    </div>
+                    <div className="space-y-1 z-10 pb-1">
+                      <h2 className="text-xl sm:text-2xl font-black text-white leading-tight drop-shadow-md">
+                        {activeCourse.title}
+                      </h2>
+                      <p className="text-xs sm:text-sm font-bold text-amber-300 drop-shadow-xs flex items-center space-x-1.5">
+                        <span>৯ম শিক্ষক নিয়োগ</span>
+                        <span>•</span>
+                        <span className="text-emerald-200 font-extrabold">{activeCourse.instructor}</span>
+                      </p>
                     </div>
                   </div>
+                )}
 
-                  {/* Exam Count Pill */}
-                  <div className="bg-emerald-100/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 p-2.5 sm:p-3 rounded-2xl flex items-center justify-center space-x-2 text-center sm:text-left">
-                    <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-800 dark:text-emerald-400 shrink-0" />
-                    <div>
-                      <span className="font-black text-sm sm:text-base text-emerald-950 dark:text-emerald-200 block leading-tight">
-                        {activeCourse.examsCount || 34}
-                      </span>
-                      <span className="text-[10px] sm:text-xs font-bold text-emerald-800 dark:text-emerald-400">পরীক্ষা</span>
+                {/* Dark Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-transparent pointer-events-none" />
+
+                {/* Top Right Batch Badge if bannerUrl is present */}
+                {activeCourse.bannerUrl && (
+                  <div className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-amber-300 border border-amber-400/40 px-3 py-1 rounded-full text-[10px] sm:text-xs font-black shadow-md z-10">
+                    {activeCourse.badgeType === 'exam' ? 'এক্সাম ব্যাচ' : activeCourse.badgeType === 'recorded' ? 'রেকর্ডেড ব্যাচ' : 'ফ্রি ব্যাচ'}
+                  </div>
+                )}
+
+                {/* Floating Info Badges INSIDE Banner */}
+                <div className="relative z-10 p-3 sm:p-4 w-full flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  {/* Title inside banner if image banner is used */}
+                  {activeCourse.bannerUrl && (
+                    <div className="w-full mb-0.5">
+                      <h2 className="text-base sm:text-xl font-black text-white drop-shadow-md">
+                        {activeCourse.title}
+                      </h2>
+                      <p className="text-[11px] font-bold text-emerald-300 drop-shadow-xs">
+                        {activeCourse.instructor}
+                      </p>
                     </div>
+                  )}
+
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-black shadow-xs">
+                    <FileText className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{activeCourse.sheetsCount || 20} শিট</span>
                   </div>
 
-                  {/* Model Test Pill */}
-                  <div className="bg-sky-100/70 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-800/60 p-2.5 sm:p-3 rounded-2xl flex items-center justify-center space-x-2 text-center sm:text-left">
-                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-sky-800 dark:text-sky-400 shrink-0" />
-                    <div>
-                      <span className="font-black text-sm sm:text-base text-sky-950 dark:text-sky-200 block leading-tight">
-                        ৭
-                      </span>
-                      <span className="text-[10px] sm:text-xs font-bold text-sky-800 dark:text-sky-400">ফুল মডেল</span>
-                    </div>
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-emerald-400/40 text-emerald-300 text-[10px] sm:text-xs font-black shadow-xs">
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{activeCourse.examsCount || 25} পরীক্ষা</span>
+                  </div>
+
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-sky-400/40 text-sky-300 text-[10px] sm:text-xs font-black shadow-xs">
+                    <GraduationCap className="w-3.5 h-3.5 text-sky-400" />
+                    <span>৭ ফুল মডেল</span>
+                  </div>
+
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md border border-white/20 text-slate-200 text-[10px] sm:text-xs font-bold shadow-xs ml-auto">
+                    <Users className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{activeCourse.studentCount} জন</span>
                   </div>
                 </div>
 
-                {/* Enrolled Students Pill */}
-                <div className="bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/90 py-2.5 px-4 rounded-xl text-center flex items-center justify-center space-x-2 text-slate-800 dark:text-slate-200 font-extrabold text-xs sm:text-sm">
-                  <Users className="w-4 h-4 text-slate-500" />
-                  <span>{activeCourse.studentCount} জন ভর্তি হয়েছেন</span>
-                </div>
               </div>
 
             </div>
@@ -527,160 +535,107 @@ export const CoursesView: React.FC = () => {
             <div className="space-y-2.5">
               
               {/* PLAN / COURSE DETAILS TAB */}
-              {detailTab === 'plan' && (() => {
-                const isPlanUnlocked = activeCourse.isEnrolled || activeCourse.isPlanLocked === false;
-                const plansToRender = (activeCourse.customPlans && activeCourse.customPlans.length > 0)
-                  ? activeCourse.customPlans
-                  : [
-                      { id: 'p1', title: 'কোর্স রূপরেখা ও অরিয়েন্টেশন নির্দেশিকা', code: 'Details- 01', sizeOrTime: '১.২ মেগাবাইট' },
-                      { id: 'p2', title: 'অধ্যায়ভিত্তিক পূর্ণাঙ্গ নম্বর বণ্টন গাইড', code: 'Details- 02', sizeOrTime: '২.৫ মেগাবাইট' },
-                    ];
-
-                return (
-                  <div className="space-y-3">
-                    {/* Course Overview Card */}
-                    <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 shadow-2xs space-y-3">
-                      <div className="flex items-center space-x-2">
-                        <div className="p-2 rounded-xl bg-emerald-600 text-white shrink-0">
-                          <ScrollText className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <h3 className="font-extrabold text-sm sm:text-base text-slate-800 dark:text-slate-100">
-                            {activeCourse.title} - বিস্তারিত তথ্য
-                          </h3>
-                          <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                            {activeCourse.subText || 'মাদ্রাসা শিক্ষক নিবন্ধন প্রস্তুতি'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <p className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                        {activeCourse.description || 'এই কোর্সে এনরোল করার মাধ্যমে আপনি পাবেন সম্পূর্ণ সিলেবাসভিত্তিক অনলাইন ক্লাস, বিষয়ভিত্তিক ও অধ্যায়ভিত্তিক মডেল টেস্ট, এক্সক্লুসিভ PDF নোট এবং ওস্তাদ সাপোর্ট।'}
-                      </p>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
-                        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-slate-700/60 text-center">
-                          <span className="text-[10px] font-bold text-slate-400 block">মোট পরীক্ষা</span>
-                          <span className="text-xs font-black text-slate-800 dark:text-slate-200">{activeCourse.examsCount || 25}+ টি</span>
-                        </div>
-                        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-slate-700/60 text-center">
-                          <span className="text-[10px] font-bold text-slate-400 block">PDF শিট</span>
-                          <span className="text-xs font-black text-slate-800 dark:text-slate-200">{activeCourse.sheetsCount || 40}+ টি</span>
-                        </div>
-                        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-emerald-100 dark:border-slate-700/60 text-center col-span-2 sm:col-span-1">
-                          <span className="text-[10px] font-bold text-slate-400 block">ফ্রি / ফি</span>
-                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{activeCourse.isFreeCourse ? 'সম্পূর্ণ ফ্রি' : `৳${activeCourse.discountPrice}`}</span>
-                        </div>
-                      </div>
+              {detailTab === 'plan' && (
+                <div className="p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-3.5">
+                  <div className="flex items-center space-x-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 shrink-0">
+                      <ScrollText className="w-5 h-5" />
                     </div>
-
-                    {/* Downloadable Plan / Outline Files */}
-                    <div className="space-y-2.5">
-                      <h4 className="text-xs font-extrabold text-slate-500 uppercase tracking-wider px-1">কোর্স ডকুমেন্ট ও নির্দেশিকা</h4>
-                      {plansToRender.map((item) => (
-                        <div
-                          key={item.id}
-                          onClick={() => {
-                            if (!isPlanUnlocked) {
-                              setShowEnrollAlert(true);
-                            }
-                          }}
-                          className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
-                            !isPlanUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3 min-w-0 pr-2">
-                            <div className={`p-2.5 rounded-xl shrink-0 ${
-                              isPlanUnlocked ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                            }`}>
-                              <ScrollText className="w-5 h-5" />
-                            </div>
-                            <div className="min-w-0">
-                              <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
-                                {item.title}
-                              </h4>
-                              <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
-                                {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div>
-                            {!isPlanUnlocked ? (
-                              <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
-                                <Lock className="w-4 h-4 text-amber-600" />
-                                <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
-                              </div>
-                            ) : (
-                              <button className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs flex items-center space-x-1">
-                                <Download className="w-4 h-4" />
-                                <span className="text-xs font-bold hidden sm:inline">ডাউনলোড</span>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                    <div>
+                      <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                        কোর্স সম্পর্কে বিস্তারিত
+                      </h3>
+                      <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 block">
+                        {activeCourse.title}
+                      </span>
                     </div>
                   </div>
-                );
-              })()}
+
+                  <div className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap pt-1">
+                    {activeCourse.detailsText || activeCourse.description || 'এই কোর্স সম্পর্কিত বিস্তারিত কোনো বিবরণ প্রদান করা হয়নি। এডমিন প্যানেল থেকে বিবরণ যুক্ত করুন।'}
+                  </div>
+                </div>
+              )}
 
               {/* ROUTINE TAB */}
               {detailTab === 'routine' && (() => {
                 const isRoutineUnlocked = activeCourse.isEnrolled || activeCourse.isRoutineLocked === false;
-                const routinesToRender = (activeCourse.customRoutines && activeCourse.customRoutines.length > 0)
-                  ? activeCourse.customRoutines
-                  : [
-                      { id: 'r1', title: 'সাপ্তাহিক লাইভ ক্লাস ও পরীক্ষা রুটিন (সংশোধিত সূচি)', code: 'রুটিন- 01', sizeOrTime: 'প্রতিদিন রাত ৮:০০ টা' },
-                      { id: 'r2', title: 'মডেল টেস্ট সূচি ও সলভ সেসন টাইমটেবিল', code: 'রুটিন- 02', sizeOrTime: 'সপ্তাহে ৩ দিন' },
-                      { id: 'r3', title: 'বিষয়ভিত্তিক অধ্যায় রিভিশন ও ওস্তাদ গাইডলাইন সূচি', code: 'রুটিন- 03', sizeOrTime: 'সাপ্তাহিক বিশেষ' },
-                    ];
+                const defaultRoutineText = `📅 ${activeCourse.title} - লাইভ ক্লাস ও পরীক্ষা রুটিন:\n\n• শনি-সোম-বুধ (রাত ৮:০০ টা): বিষয়ভিত্তিক লাইভ ক্লাস\n• রবি-মঙ্গল-বৃহস্পতি (রাত ৮:০০ টা): প্রশ্ন সমাধান ও ওস্তাদ সলভ সেসন\n• প্রতিদিন রাত ৯:৩০ টা: বিষয়ভিত্তিক অনলাইন এক্সাম (২০ নম্বর)\n• শুক্রবার রাত ৮:০০ টা: সাপ্তাহিক পূর্ণাঙ্গ মডেল টেস্ট (১০০ নম্বর)`;
+                const routineTextToDisplay = activeCourse.routineText || defaultRoutineText;
+                const routinesToRender = activeCourse.customRoutines || [];
+
+                const handleRoutineDownload = () => {
+                  if (!isRoutineUnlocked) {
+                    setShowEnrollAlert(true);
+                    return;
+                  }
+                  const element = document.createElement("a");
+                  const file = new Blob([routineTextToDisplay], { type: 'text/plain;charset=utf-8' });
+                  element.href = URL.createObjectURL(file);
+                  element.download = `${activeCourse.title}_Routine.txt`;
+                  document.body.appendChild(element);
+                  element.click();
+                  document.body.removeChild(element);
+                };
 
                 return (
-                  <div className="space-y-2.5">
-                    {routinesToRender.map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => {
-                          if (!isRoutineUnlocked) {
-                            setShowEnrollAlert(true);
-                          }
-                        }}
-                        className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
-                          !isRoutineUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3 min-w-0 pr-2">
-                          <div className={`p-2.5 rounded-xl shrink-0 ${
-                            isRoutineUnlocked ? 'bg-amber-100 dark:bg-amber-950 text-amber-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                          }`}>
+                  <div className="space-y-3">
+                    {/* Routine Main Card with Download Button */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-3.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 shrink-0">
                             <Calendar className="w-5 h-5" />
                           </div>
-                          <div className="min-w-0">
-                            <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
-                              {item.title}
-                            </h4>
-                            <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
-                              {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
+                          <div>
+                            <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                              কোর্স রুটিন ও সময়সূচি
+                            </h3>
+                            <span className="text-xs font-bold text-amber-600 dark:text-amber-400 block">
+                              {activeCourse.title}
                             </span>
                           </div>
                         </div>
 
-                        <div>
-                          {!isRoutineUnlocked ? (
-                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
-                              <Lock className="w-4 h-4 text-amber-600" />
-                              <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
-                            </div>
-                          ) : (
-                            <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
-                              <Download className="w-3.5 h-3.5" />
-                              <span>দেখুন/ডাউনলোড</span>
-                            </button>
-                          )}
-                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRoutineDownload}
+                          className={`px-4 py-2 rounded-xl font-extrabold text-xs flex items-center justify-center space-x-2 shadow-2xs transition-all active:scale-95 ${
+                            !isRoutineUnlocked
+                              ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border border-amber-300'
+                              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          }`}
+                        >
+                          {!isRoutineUnlocked ? <Lock className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
+                          <span>রুটিন ডাউনলোড করুন</span>
+                        </button>
                       </div>
-                    ))}
+
+                      {/* Direct Written Routine Text */}
+                      <div className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap bg-slate-50 dark:bg-slate-850/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                        {routineTextToDisplay}
+                      </div>
+                    </div>
+
+                    {/* Additional Routine Files if any */}
+                    {routinesToRender.length > 0 && (
+                      <div className="space-y-2 pt-1">
+                        <h4 className="text-xs font-extrabold text-slate-500 uppercase tracking-wider px-1">অন্যান্য রুটিন ফাইলসমূহ</h4>
+                        {routinesToRender.map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => {
+                              if (!isRoutineUnlocked) setShowEnrollAlert(true);
+                              else handleRoutineDownload();
+                            }}
+                            className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-300"
+                          >
+                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{item.title}</span>
+                            <Download className="w-4 h-4 text-emerald-600" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -688,59 +643,82 @@ export const CoursesView: React.FC = () => {
               {/* SYLLABUS TAB */}
               {detailTab === 'syllabus' && (() => {
                 const isSyllabusUnlocked = activeCourse.isEnrolled || activeCourse.isSyllabusLocked === false;
-                const syllabusesToRender = (activeCourse.customSyllabuses && activeCourse.customSyllabuses.length > 0)
-                  ? activeCourse.customSyllabuses
-                  : [
-                      { id: 'syl1', title: '৯ম মাদ্রাসা শিক্ষক নিবন্ধন সম্পূর্ণ সিলেবাস (১০০ নম্বর)', code: 'সিলেবাস 01', sizeOrTime: 'PDF (২.০ MB)' },
-                      { id: 'syl2', title: 'বিষয়ভিত্তিক মার্ক ডিস্ট্রিবিউশন ও মানবণ্টন গাইড', code: 'সিলেবাস 02', sizeOrTime: 'PDF (১.৫ MB)' },
-                      { id: 'syl3', title: 'অধ্যায়ভিত্তিক গুরুত্বপূর্ণ টপিক ও প্রশ্ন বিশ্লেষণ সূচি', code: 'সিলেবাস 03', sizeOrTime: 'PDF (১.৮ MB)' },
-                    ];
+                const defaultSyllabusText = `📖 ${activeCourse.title} - সম্পূর্ণ সিলেবাস ও মানবণ্টন:\n\n১. সাধারণ অংশ (৫০ নম্বর):\n   - বাংলা, ইংরেজি, গণিত ও সাধারণ জ্ঞান।\n\n২. বিষয়ভিত্তিক অংশ (৫০ নম্বর):\n   - সংশিষ্ট বিষয়ের অধ্যায়ভিত্তিক গুরুত্ব ও প্রস্তুতি নির্দেশিকা।`;
+                const syllabusTextToDisplay = activeCourse.syllabusText || defaultSyllabusText;
+                const syllabusesToRender = activeCourse.customSyllabuses || [];
+
+                const handleSyllabusDownload = () => {
+                  if (!isSyllabusUnlocked) {
+                    setShowEnrollAlert(true);
+                    return;
+                  }
+                  const element = document.createElement("a");
+                  const file = new Blob([syllabusTextToDisplay], { type: 'text/plain;charset=utf-8' });
+                  element.href = URL.createObjectURL(file);
+                  element.download = `${activeCourse.title}_Syllabus.txt`;
+                  document.body.appendChild(element);
+                  element.click();
+                  document.body.removeChild(element);
+                };
 
                 return (
-                  <div className="space-y-2.5">
-                    {syllabusesToRender.map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => {
-                          if (!isSyllabusUnlocked) {
-                            setShowEnrollAlert(true);
-                          }
-                        }}
-                        className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
-                          !isSyllabusUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3 min-w-0 pr-2">
-                          <div className={`p-2.5 rounded-xl shrink-0 ${
-                            isSyllabusUnlocked ? 'bg-purple-100 dark:bg-purple-950 text-purple-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                          }`}>
+                  <div className="space-y-3">
+                    {/* Syllabus Main Card with Download Button */}
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-3.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 shrink-0">
                             <BookmarkCheck className="w-5 h-5" />
                           </div>
-                          <div className="min-w-0">
-                            <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
-                              {item.title}
-                            </h4>
-                            <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
-                              {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
+                          <div>
+                            <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100">
+                              কোর্স সিলেবাস ও নম্বর বণ্টন
+                            </h3>
+                            <span className="text-xs font-bold text-purple-600 dark:text-purple-400 block">
+                              {activeCourse.title}
                             </span>
                           </div>
                         </div>
 
-                        <div>
-                          {!isSyllabusUnlocked ? (
-                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
-                              <Lock className="w-4 h-4 text-amber-600" />
-                              <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
-                            </div>
-                          ) : (
-                            <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
-                              <Download className="w-3.5 h-3.5" />
-                              <span>ডাউনলোড</span>
-                            </button>
-                          )}
-                        </div>
+                        <button
+                          type="button"
+                          onClick={handleSyllabusDownload}
+                          className={`px-4 py-2 rounded-xl font-extrabold text-xs flex items-center justify-center space-x-2 shadow-2xs transition-all active:scale-95 ${
+                            !isSyllabusUnlocked
+                              ? 'bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border border-amber-300'
+                              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          }`}
+                        >
+                          {!isSyllabusUnlocked ? <Lock className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
+                          <span>সিলেবাস ডাউনলোড করুন</span>
+                        </button>
                       </div>
-                    ))}
+
+                      {/* Direct Written Syllabus Text */}
+                      <div className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap bg-slate-50 dark:bg-slate-850/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                        {syllabusTextToDisplay}
+                      </div>
+                    </div>
+
+                    {/* Additional Syllabus Files if any */}
+                    {syllabusesToRender.length > 0 && (
+                      <div className="space-y-2 pt-1">
+                        <h4 className="text-xs font-extrabold text-slate-500 uppercase tracking-wider px-1">অন্যান্য সিলেবাস ফাইলসমূহ</h4>
+                        {syllabusesToRender.map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => {
+                              if (!isSyllabusUnlocked) setShowEnrollAlert(true);
+                              else handleSyllabusDownload();
+                            }}
+                            className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer hover:border-emerald-300"
+                          >
+                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{item.title}</span>
+                            <Download className="w-4 h-4 text-emerald-600" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -870,71 +848,256 @@ export const CoursesView: React.FC = () => {
 
               {/* LEADERBOARD TAB (ENROLLED ONLY) */}
               {detailTab === 'leaderboard' && activeCourse.isEnrolled && (
-                <div className="space-y-3 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <div>
-                      <h3 className="font-black text-base text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-                        <Trophy className="w-5 h-5 text-amber-500" />
-                        <span>ব্যাচ মেধা তালিকা (Leaderboard)</span>
-                      </h3>
-                      <p className="text-xs text-slate-500">সকল মডেল টেস্টের গড় স্কোরের ভিত্তিতে র‍্যাংকিং</p>
-                    </div>
-                    <span className="px-3 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 font-extrabold text-xs rounded-full border border-amber-300">
-                      শীর্ষ ১০
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {[
-                      { rank: 1, name: 'মোঃ আব্দুল্লাহ মারুফ', score: '৯৮%', badge: '🥇 ১ম স্থান', avatarBg: 'bg-amber-500 text-white' },
-                      { rank: 2, name: 'ফারহানা ইয়াসমিন', score: '৯৫%', badge: '🥈 ২য় স্থান', avatarBg: 'bg-slate-400 text-white' },
-                      { rank: 3, name: 'সাইফুল ইসলাম রাফি', score: '৯২%', badge: '🥉 ৩য় স্থান', avatarBg: 'bg-amber-700 text-white' },
-                      { rank: 4, name: 'মুফতি আব্দুর রহমান', score: '৯০%', badge: '৪র্থ স্থান', avatarBg: 'bg-emerald-600 text-white' },
-                      { rank: 5, name: 'তানজিলা তাসনিম', score: '৮৯%', badge: '৫ম স্থান', avatarBg: 'bg-emerald-600 text-white' },
-                    ].map((student) => (
-                      <div key={student.rank} className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className={`w-8 h-8 rounded-full font-black text-xs flex items-center justify-center ${student.avatarBg}`}>
-                            {student.rank}
-                          </div>
-                          <div>
-                            <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-slate-100 block">
-                              {student.name}
-                            </span>
-                            <span className="text-[10px] text-emerald-600 font-bold">{student.badge}</span>
-                          </div>
+                <div className="space-y-4">
+                  {/* Overall Leaderboard Header & User Card */}
+                  <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white shadow-lg space-y-3.5 border border-emerald-700/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2.5">
+                        <div className="p-2 rounded-2xl bg-amber-400/20 border border-amber-400/40 text-amber-300">
+                          <Trophy className="w-6 h-6 text-amber-400" />
                         </div>
-                        <span className="font-black text-sm text-slate-800 dark:text-slate-200">
-                          {student.score}
+                        <div>
+                          <h3 className="font-black text-base sm:text-lg text-white">
+                            ব্যাচ মেধা তালিকা (Leaderboard)
+                          </h3>
+                          <p className="text-[11px] sm:text-xs text-emerald-200/90 font-medium">
+                            {activeCourse.title} • সকল মডেল টেস্টের মেধা স্কোরের তালিকা
+                          </p>
+                        </div>
+                      </div>
+                      <span className="px-3 py-1 bg-amber-400/20 text-amber-300 border border-amber-400/40 font-black text-xs rounded-full shadow-2xs">
+                        লাইভ র্যাঙ্কিং
+                      </span>
+                    </div>
+
+                    {/* Current User Rank Card */}
+                    <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+                      <div className="p-2 rounded-xl bg-slate-900/40">
+                        <span className="text-[10px] font-bold text-emerald-300 block">আপনার অবস্থান</span>
+                        <span className="text-sm sm:text-base font-black text-amber-300 flex items-center justify-center space-x-1">
+                          <Crown className="w-4 h-4 text-amber-400" />
+                          <span>#১২ (টপ ৩%)</span>
                         </span>
                       </div>
-                    ))}
+                      <div className="p-2 rounded-xl bg-slate-900/40">
+                        <span className="text-[10px] font-bold text-emerald-300 block">গড় স্কোর (%)</span>
+                        <span className="text-sm sm:text-base font-black text-white">
+                          ৯২.৫%
+                        </span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-900/40">
+                        <span className="text-[10px] font-bold text-emerald-300 block">মোট অর্জিত পয়েন্ট</span>
+                        <span className="text-sm sm:text-base font-black text-amber-300">
+                          ৯২৫ পয়েন্ট
+                        </span>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-900/40 col-span-2 sm:col-span-1">
+                        <span className="text-[10px] font-bold text-emerald-300 block">সঠিকতার হার (এক্যুরেসি)</span>
+                        <span className="text-sm sm:text-base font-black text-emerald-200">
+                          ৯৫.০%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top 3 Podium Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    {/* 1st Place - Gold */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-b from-amber-500/15 via-white to-amber-500/5 dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-400/80 shadow-md relative overflow-hidden flex flex-col items-center text-center space-y-2">
+                      <div className="absolute top-0 right-0 bg-amber-400 text-slate-950 font-black text-[10px] px-3 py-1 rounded-bl-xl shadow-xs">
+                        🥇 ১ম স্থান
+                      </div>
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 text-slate-950 font-black text-xl flex items-center justify-center border-2 border-amber-200 shadow-md mt-1">
+                        ১
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                          মাওলানা হাফেজ আব্দুল মালেক
+                        </h4>
+                        <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 block">
+                          প্রভাষক (আরবি)
+                        </span>
+                      </div>
+                      <div className="w-full grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-extrabold">
+                        <div className="p-1.5 rounded-xl bg-amber-100/80 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200">
+                          <span className="block text-[9px] font-bold text-amber-700 dark:text-amber-400">পার্সেন্টেজ</span>
+                          <span>৯৮.৫%</span>
+                        </div>
+                        <div className="p-1.5 rounded-xl bg-amber-100/80 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200">
+                          <span className="block text-[9px] font-bold text-amber-700 dark:text-amber-400">পয়েন্ট</span>
+                          <span>৯৮৫ pts</span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-bold text-slate-500 flex items-center space-x-2">
+                        <span>এক্যুরেসি: ৯৮%</span>
+                        <span>•</span>
+                        <span className="text-amber-600 font-extrabold flex items-center">
+                          <Flame className="w-3 h-3 text-amber-500 mr-0.5 fill-amber-500" />
+                          ২৪ দিন
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 2nd Place - Silver */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-b from-slate-200/50 via-white to-slate-100/20 dark:from-slate-800/60 dark:via-slate-900 dark:to-slate-900 border-2 border-slate-300 dark:border-slate-700 shadow-sm relative overflow-hidden flex flex-col items-center text-center space-y-2">
+                      <div className="absolute top-0 right-0 bg-slate-300 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-black text-[10px] px-3 py-1 rounded-bl-xl shadow-xs">
+                        🥈 ২য় স্থান
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-slate-300 to-slate-500 text-white font-black text-lg flex items-center justify-center border-2 border-slate-200 shadow-sm mt-1">
+                        ২
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                          মুফতি তানভীর আহমেদ
+                        </h4>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">
+                          সহকারী শিক্ষক (আরবি)
+                        </span>
+                      </div>
+                      <div className="w-full grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-extrabold">
+                        <div className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                          <span className="block text-[9px] font-bold text-slate-500">পার্সেন্টেজ</span>
+                          <span>৯৬.০%</span>
+                        </div>
+                        <div className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                          <span className="block text-[9px] font-bold text-slate-500">পয়েন্ট</span>
+                          <span>৯৬০ pts</span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-bold text-slate-500 flex items-center space-x-2">
+                        <span>এক্যুরেসি: ৯৫%</span>
+                        <span>•</span>
+                        <span className="text-amber-600 font-extrabold flex items-center">
+                          <Flame className="w-3 h-3 text-amber-500 mr-0.5 fill-amber-500" />
+                          ২০ দিন
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 3rd Place - Bronze */}
+                    <div className="p-4 rounded-3xl bg-gradient-to-b from-amber-700/10 via-white to-amber-900/5 dark:from-amber-950/20 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-700/50 shadow-sm relative overflow-hidden flex flex-col items-center text-center space-y-2">
+                      <div className="absolute top-0 right-0 bg-amber-700 text-white font-black text-[10px] px-3 py-1 rounded-bl-xl shadow-xs">
+                        🥉 ৩য় স্থান
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 text-white font-black text-lg flex items-center justify-center border-2 border-amber-400 shadow-sm mt-1">
+                        ৩
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">
+                          কারি মোশতাক মাহমুদ
+                        </h4>
+                        <span className="text-[10px] font-bold text-amber-800 dark:text-amber-500 block">
+                          সহকারী মৌলভী
+                        </span>
+                      </div>
+                      <div className="w-full grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-extrabold">
+                        <div className="p-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200">
+                          <span className="block text-[9px] font-bold text-amber-700">পার্সেন্টেজ</span>
+                          <span>৯৩.৫%</span>
+                        </div>
+                        <div className="p-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200">
+                          <span className="block text-[9px] font-bold text-amber-700">পয়েন্ট</span>
+                          <span>৯৩৫ pts</span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-bold text-slate-500 flex items-center space-x-2">
+                        <span>এক্যুরেসি: ৯৩%</span>
+                        <span>•</span>
+                        <span className="text-amber-600 font-extrabold flex items-center">
+                          <Flame className="w-3 h-3 text-amber-500 mr-0.5 fill-amber-500" />
+                          ১৮ দিন
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rest of Leaderboard Table (Ranks 4-10) */}
+                  <div className="p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                      <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 flex items-center space-x-1.5">
+                        <Award className="w-4 h-4 text-emerald-600" />
+                        <span>পরবর্তী সেরা মেধা তালিকা (৪র্থ - ১০ম স্থান)</span>
+                      </h4>
+                      <span className="text-[11px] font-bold text-slate-400">মোট পরীক্ষার্থী: ১,২৪০ জন</span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {[
+                        { rank: 4, name: 'মুফতি আব্দুর রহমান', cadre: 'লেকচারার (হাদিস)', percentage: '৯২.০%', points: '৯২০ pts', accuracy: '৯৪%', exams: '২২টি', badge: '🏅 টপ ৫' },
+                        { rank: 5, name: 'তানজিলা তাসনিম', cadre: 'সহকারী শিক্ষিকা (বাংলা)', percentage: '৯০.৫%', points: '৯০৫ pts', accuracy: '৯২%', exams: '২০টি', badge: '🏅 টপ ৫' },
+                        { rank: 6, name: 'আরিফুল ইসলাম শাহিন', cadre: 'প্রভাষক (ফেকাহ)', percentage: '৮৯.০%', points: '৮৯০ pts', accuracy: '৯০%', exams: '১৯টি', badge: '🌟 টপ ১০' },
+                        { rank: 7, name: 'ফারহানা ইয়াসমিন', cadre: 'সহকারী শিক্ষক (ইংরেজি)', percentage: '৮৮.৫%', points: '৮৮৫ pts', accuracy: '৮৯%', exams: '১৮টি', badge: '🌟 টপ ১০' },
+                        { rank: 8, name: 'মোঃ জাহিদ হাসান', cadre: 'সহকারী মৌলভী', percentage: '৮৭.০%', points: '৮৭০ pts', accuracy: '৮৮%', exams: '১৭টি', badge: '🌟 টপ ১০' },
+                        { rank: 9, name: 'সামিয়া আকতার', cadre: 'প্রভাষক (আরবি)', percentage: '৮৫.৫%', points: '৮৫৫ pts', accuracy: '৮৬%', exams: '১৬টি', badge: '🌟 টপ ১০' },
+                        { rank: 10, name: 'হাফেজ রাশেদুল ইসলাম', cadre: 'সহকারী শিক্ষক (গণিত)', percentage: '৮৪.০%', points: '৮৪০ pts', accuracy: '৮৫%', exams: '১৫টি', badge: '🌟 টপ ১০' },
+                      ].map((student) => (
+                        <div
+                          key={student.rank}
+                          className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all hover:bg-emerald-50/40 dark:hover:bg-slate-800/80"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-black text-xs flex items-center justify-center shrink-0">
+                              #{student.rank}
+                            </div>
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-slate-100">
+                                  {student.name}
+                                </span>
+                                <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                  {student.badge}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 block">
+                                {student.cadre} • {student.exams}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between sm:justify-end space-x-3 sm:space-x-4 pl-11 sm:pl-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-200/50 dark:border-slate-800">
+                            <div className="text-left sm:text-right">
+                              <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block leading-tight">
+                                {student.percentage}
+                              </span>
+                              <span className="text-[9px] font-bold text-slate-400">স্কোর</span>
+                            </div>
+
+                            <div className="text-left sm:text-right">
+                              <span className="text-xs font-black text-amber-600 dark:text-amber-400 block leading-tight">
+                                {student.points}
+                              </span>
+                              <span className="text-[9px] font-bold text-slate-400">পয়েন্ট</span>
+                            </div>
+
+                            <div className="text-left sm:text-right">
+                              <span className="text-xs font-black text-slate-700 dark:text-slate-300 block leading-tight">
+                                {student.accuracy}
+                              </span>
+                              <span className="text-[9px] font-bold text-slate-400">এক্যুরেসি</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
 
             </div>
 
-            {/* Sticky Bottom Bar */}
-            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-4 shadow-2xl">
-              <div className="max-w-3xl mx-auto flex items-center justify-between">
-                
-                <div>
-                  <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
-                    {activeCourse.priceText || '৳৪৫০'}
-                  </span>
-                  <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 ml-1.5 font-bold">
-                    শিটসহ
-                  </span>
-                </div>
-
-                {activeCourse.isEnrolled ? (
-                  <div className="flex items-center space-x-2">
-                    <span className="px-4 py-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-black text-xs sm:text-sm border border-emerald-300/80">
-                      ✓ ভর্তি সম্পন্ন
+            {/* Sticky Bottom Bar - Shown ONLY if not enrolled */}
+            {!activeCourse.isEnrolled && (
+              <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-4 shadow-2xl">
+                <div className="max-w-3xl mx-auto flex items-center justify-between">
+                  <div>
+                    <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
+                      {activeCourse.priceText || '৳৪৫০'}
+                    </span>
+                    <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 ml-1.5 font-bold">
+                      শিটসহ
                     </span>
                   </div>
-                ) : (
+
                   <button
                     onClick={() => handleEnrollCourse(activeCourse.id)}
                     className="px-6 py-2.5 sm:py-3 rounded-xl bg-[#132238] hover:bg-[#0a1322] text-white font-extrabold text-xs sm:text-sm shadow-lg flex items-center space-x-2 active:scale-95 transition-all"
@@ -942,10 +1105,9 @@ export const CoursesView: React.FC = () => {
                     <span>ভর্তি হন</span>
                     <ChevronRight className="w-4 h-4 stroke-[3]" />
                   </button>
-                )}
-
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Locked Modal Prompt */}
             {showEnrollAlert && (

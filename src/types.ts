@@ -147,6 +147,12 @@ export interface CourseItem {
   thumbnailBg: string;
   description: string;
   badgeType?: 'live' | 'exam' | 'recorded' | 'free';
+  bannerUrl?: string;
+  detailsText?: string;
+  routineText?: string;
+  routineFileUrl?: string;
+  syllabusText?: string;
+  syllabusFileUrl?: string;
   sheetsCount?: number;
   examsCount?: number;
   classesCount?: number;
