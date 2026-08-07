@@ -2,6 +2,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --font-bengali: 'Noto Serif Bengali', 'Hind Siliguri', serif;
+  --font-arabic: 'Noto Naskh Arabic', 'Amiri', serif;
+}
+
 @layer base {
   *, ::before, ::after {
     -webkit-font-smoothing: antialiased;
@@ -10,7 +15,7 @@
   }
 
   body {
-    font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif;
+    font-family: var(--font-bengali), 'Noto Serif Bengali', 'Hind Siliguri', serif;
     line-height: 1.9;
     letter-spacing: 0;
     word-spacing: normal;
@@ -19,7 +24,7 @@
 
   /* Universal Headings & Paragraph Alignment Rules */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif;
+    font-family: var(--font-bengali), 'Noto Serif Bengali', 'Hind Siliguri', serif;
     text-align: left;
     letter-spacing: 0;
   }
@@ -33,14 +38,14 @@
 .font-bengali,
 .font-bengali-display,
 .font-bengali-serif {
-  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
+  font-family: var(--font-bengali), 'Noto Serif Bengali', 'Hind Siliguri', serif !important;
   line-height: 1.9;
 }
 
 .font-arabic,
 .font-amiri,
 .font-naskh {
-  font-family: 'Noto Naskh Arabic', 'Traditional Arabic', serif !important;
+  font-family: var(--font-arabic), 'Noto Naskh Arabic', 'Amiri', serif !important;
   line-height: 2.1 !important;
 }
 
@@ -51,14 +56,14 @@
 
 /* Specific Typography Presets */
 .text-body-bengali {
-  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
+  font-family: var(--font-bengali), 'Noto Serif Bengali', 'Hind Siliguri', serif !important;
   font-size: 18px;
   line-height: 1.9;
   text-align: justify;
 }
 
 .text-heading-bengali {
-  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
+  font-family: var(--font-bengali), 'Noto Serif Bengali', 'Hind Siliguri', serif !important;
   font-size: 24px;
   font-weight: 700;
   line-height: 1.9;
@@ -66,7 +71,7 @@
 }
 
 .text-subheading-bengali {
-  font-family: 'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif !important;
+  font-family: var(--font-bengali), 'Noto Serif Bengali', 'Hind Siliguri', serif !important;
   font-size: 20px;
   font-weight: 600;
   line-height: 1.9;
@@ -74,7 +79,7 @@
 }
 
 .text-arabic-para {
-  font-family: 'Noto Naskh Arabic', 'Traditional Arabic', serif !important;
+  font-family: var(--font-arabic), 'Noto Naskh Arabic', 'Amiri', serif !important;
   font-size: 24px;
   font-weight: 500;
   line-height: 2.1;

@@ -24,6 +24,7 @@ import {
 } from './components/SecondaryViews';
 import { QUESTION_BANK } from './data/questionBank';
 import { Logo } from './components/Logo';
+import { getBengaliFontFamily, getArabicFontFamily } from './utils/arabic';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');

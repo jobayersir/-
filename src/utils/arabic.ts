@@ -20,13 +20,33 @@ export function formatArabicText(text: string, showHarakat: boolean = true): str
 /**
  * Maps selected Arabic font name to CSS font-family string
  */
-export function getArabicFontFamily(_fontName?: string): string {
-  return "'Noto Naskh Arabic', 'Traditional Arabic', serif";
+export function getArabicFontFamily(fontName?: string): string {
+  switch (fontName) {
+    case 'Amiri':
+      return "'Amiri', 'Noto Naskh Arabic', serif";
+    case 'Scheherazade New':
+      return "'Scheherazade New', 'Noto Naskh Arabic', serif";
+    case 'Cairo':
+      return "'Cairo', 'Noto Naskh Arabic', sans-serif";
+    case 'Noto Naskh Arabic':
+    default:
+      return "'Noto Naskh Arabic', 'Amiri', serif";
+  }
 }
 
 /**
  * Maps selected Bengali font name to CSS font-family string
  */
-export function getBengaliFontFamily(_fontName?: string): string {
-  return "'Noto Serif Bengali', 'SolaimanLipi', 'Kalpurush', serif";
+export function getBengaliFontFamily(fontName?: string): string {
+  switch (fontName) {
+    case 'Hind Siliguri':
+      return "'Hind Siliguri', 'Noto Serif Bengali', sans-serif";
+    case 'Anek Bangla':
+      return "'Anek Bangla', 'Hind Siliguri', sans-serif";
+    case 'Tiro Bangla':
+      return "'Tiro Bangla', 'Noto Serif Bengali', serif";
+    case 'Noto Serif Bengali':
+    default:
+      return "'Noto Serif Bengali', 'Hind Siliguri', serif";
+  }
 }

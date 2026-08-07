@@ -180,8 +180,10 @@ export const Header: React.FC<HeaderProps> = ({
                       onChange={(e) => onChangeBengaliFont(e.target.value)}
                       className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-800 dark:text-slate-200 font-medium focus:outline-none"
                     >
-                      <option value="Hind Siliguri">হিন্দ শিলিগুড়ি</option>
-                      <option value="Noto Serif Bengali">নোটো শরিফ</option>
+                      <option value="Hind Siliguri">হিন্দ শিলিগুড়ি (Hind Siliguri)</option>
+                      <option value="Noto Serif Bengali">নোটো শরিফ (Noto Serif)</option>
+                      <option value="Anek Bangla">অনেক বাংলা (Anek Bangla)</option>
+                      <option value="Tiro Bangla">তিরো বাংলা (Tiro Bangla)</option>
                     </select>
                   </div>
 
@@ -192,9 +194,10 @@ export const Header: React.FC<HeaderProps> = ({
                       onChange={(e) => onChangeArabicFont(e.target.value)}
                       className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-800 dark:text-slate-200 font-medium focus:outline-none font-arabic"
                     >
-                      <option value="Amiri">আমিরি</option>
-                      <option value="Noto Naskh Arabic">নাসখ</option>
-                      <option value="Scheherazade New">শাহরাজাদ</option>
+                      <option value="Noto Naskh Arabic">নাসখ (Noto Naskh)</option>
+                      <option value="Amiri">আমিরি (Amiri)</option>
+                      <option value="Scheherazade New">শাহরাজাদ (Scheherazade)</option>
+                      <option value="Cairo">কায়রো (Cairo)</option>
                     </select>
                   </div>
 
