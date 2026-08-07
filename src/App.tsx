@@ -334,7 +334,7 @@ export default function App() {
         )}
 
         {activeTab === 'leaderboard' && (
-          <LeaderboardView />
+          <LeaderboardView user={userProfile} onTabChange={handleNavigateTab} />
         )}
 
         {activeTab === 'admin' && (

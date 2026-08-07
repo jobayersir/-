@@ -46,14 +46,6 @@ export interface LeaderboardUser {
   isCurrentUser?: boolean;
 }
 
-const PRESET_MOCK_AVATARS = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
-];
-
 const MOCK_CANDIDATE_NAMES = [
   'মাওলানা হাফেজ আব্দুল মালেক',
   'মুফতি তানভীর আহমেদ',
@@ -208,7 +200,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: correct,
         maxScore: examQuestions,
         accuracyPercentage: acc,
@@ -250,7 +241,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: sc,
         maxScore: 500,
         accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),
@@ -290,7 +280,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: sc,
         maxScore: 2000,
         accuracyPercentage: Math.min(100, Math.max(60, 97 - i)),
@@ -331,7 +320,6 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: sc,
         maxScore: 5600,
         accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),
@@ -654,102 +642,78 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       </div>
 
       {/* CURRENT USER HIGHLIGHTED CARD */}
-      <div className="relative p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-600/10 via-emerald-500/15 to-teal-500/10 dark:from-emerald-950/90 dark:to-teal-950/90 border border-emerald-500/80 shadow-md backdrop-blur-md transition-all space-y-2">
-        
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center space-x-3">
-            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs border border-emerald-400">
-              {currentUser.rank}
+      <div className="relative p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-600/10 via-emerald-500/15 to-teal-500/10 dark:from-emerald-950/90 dark:to-teal-950/90 border-2 border-emerald-500/80 shadow-md backdrop-blur-md transition-all">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
+            <span className="text-sm sm:text-base font-black text-emerald-600 dark:text-emerald-400 w-6 text-right shrink-0">
+              {currentUser.rank}.
             </span>
             
-            {renderAvatarCircle(currentUser, 'w-10 h-10')}
+            {renderAvatarCircle(currentUser, 'w-10 h-10 sm:w-11 sm:h-11')}
 
-            <div>
+            <div className="min-w-0 space-y-1">
               <div className="flex items-center space-x-2">
-                <h3 className="font-black text-xs sm:text-sm text-slate-900 dark:text-slate-100">
+                <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 truncate">
                   {currentUser.name}
                 </h3>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-extrabold shrink-0">
                   আপনি
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
-                আপনার মেধা অবস্থান • {currentUser.totalExamsTaken || 18}টি পরীক্ষা • গড় {currentUser.avgPoints || 28.5} পয়েন্ট
-              </p>
+
+              {!showThisExamStats ? (
+                <div className="flex items-center flex-wrap gap-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 font-extrabold text-[11px] border border-sky-200 dark:border-sky-800/80">
+                    টেস্ট: {currentUser.totalExamsTaken || 18}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-extrabold text-[11px] border border-emerald-200 dark:border-emerald-800/80">
+                    গড়: {currentUser.avgPoints || 28.5}%
+                  </span>
+                </div>
+              ) : (
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                  আপনার মেধা অবস্থান • এক্যুরেসি {currentUser.accuracyPercentage}%
+                </p>
+              )}
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 sm:space-x-4 text-right">
-            {isCourseContext ? (
-              <>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা সংখ্যা</span>
-                  <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                    {currentUser.totalExamsTaken || 18}টি
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">গড় পয়েন্ট</span>
-                  <span className="font-black text-xs text-emerald-600 dark:text-emerald-400">
-                    {currentUser.avgPoints || 28.5}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">মোট পয়েন্ট</span>
-                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
-                    {currentUser.score}
-                  </span>
-                </div>
-              </>
-            ) : showThisExamStats ? (
-              <>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">সঠিক উত্তর</span>
-                  <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400">
-                    {currentUser.score}টি
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">ভুল উত্তর</span>
-                  <span className="font-bold text-xs text-rose-500">
-                    {currentUser.maxScore - currentUser.score}টি
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">নম্বর / পয়েন্ট</span>
-                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
-                    {currentUser.score} পয়েন্ট
-                  </span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা সংখ্যা</span>
-                  <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                    {currentUser.totalExamsTaken || 16}টি
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">গড় পয়েন্ট</span>
-                  <span className="font-black text-xs text-emerald-600 dark:text-emerald-400">
-                    {currentUser.avgPoints || 28.0}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">পয়েন্ট</span>
-                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
-                    {currentUser.score}
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
+          {showThisExamStats ? (
+            <div className="flex items-center space-x-2.5 sm:space-x-5 shrink-0 text-right">
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 block font-semibold">সঠিক</span>
+                <span className="font-bold text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
+                  {currentUser.score}টি
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 block font-semibold">ভুল</span>
+                <span className="font-bold text-xs sm:text-sm text-rose-500">
+                  {currentUser.maxScore - currentUser.score}টি
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 block font-semibold">নাম্বার</span>
+                <span className="font-black text-sm sm:text-lg text-amber-600 dark:text-amber-400">
+                  {currentUser.score}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="text-right shrink-0 pl-2">
+              <span className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 font-bold block uppercase tracking-wider">
+                পয়েন্ট
+              </span>
+              <span className="text-lg sm:text-2xl font-black text-amber-600 dark:text-amber-400">
+                {currentUser.score}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* REMAINING USERS LIST WITH PAGINATION (MAX 20 CANDIDATES PER PAGE) */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 flex items-center space-x-2">
             <span>অন্যান্য পরীক্ষার্থীদের র‍্যাঙ্কিং</span>
@@ -759,134 +723,85 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </span>
         </div>
 
-        {/* Compact Table / List Header */}
-        <div className="hidden sm:flex items-center justify-between px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-          <div className="flex items-center space-x-3">
-            <span className="w-8 text-center">ক্রম</span>
-            <span>পরীক্ষার্থীর নাম</span>
-          </div>
-          {isCourseContext ? (
-            <div className="flex items-center space-x-6 pr-2">
-              <span>পরীক্ষা সংখ্যা</span>
-              <span>গড় পয়েন্ট</span>
-              <span>মোট পয়েন্ট</span>
-            </div>
-          ) : showThisExamStats ? (
-            <div className="flex items-center space-x-8 pr-2">
-              <span>সঠিক উত্তর</span>
-              <span>ভুল উত্তর</span>
-              <span>নম্বর / পয়েন্ট</span>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-6 pr-2">
-              <span>পরীক্ষা সংখ্যা</span>
-              <span>গড় পয়েন্ট</span>
-              <span>পয়েন্ট</span>
-            </div>
-          )}
-        </div>
-
         {/* List of Candidates */}
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {paginatedRemaining.map((u) => (
             <div
               key={u.rank}
-              className={`py-2.5 px-3.5 rounded-2xl border transition-colors flex items-center justify-between ${
+              className={`p-3 sm:p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                 u.isCurrentUser 
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-400/80' 
-                  : 'bg-slate-50/80 dark:bg-slate-800/50 border-slate-200/60 dark:border-slate-700/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800'
+                  ? 'bg-emerald-50/90 dark:bg-emerald-950/40 border-emerald-500/80 shadow-sm' 
+                  : 'bg-slate-50/80 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/70 hover:border-emerald-300 dark:hover:border-emerald-700 shadow-2xs'
               }`}
             >
-              {/* 1. Serial Number, Avatar Image & Name */}
-              <div className="flex items-center space-x-3 min-w-0">
-                <span className="w-7 h-7 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
-                  {u.rank}
+              {/* 1. Rank, Avatar Image & Name */}
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <span className="text-sm sm:text-base font-black text-slate-600 dark:text-slate-400 w-6 text-right shrink-0">
+                  {u.rank}.
                 </span>
 
                 {/* Profile Picture */}
-                {renderAvatarCircle(u, 'w-8 h-8')}
+                {renderAvatarCircle(u, 'w-10 h-10 sm:w-11 sm:h-11')}
 
-                <div className="min-w-0 space-y-0.5">
-                  <div className="flex items-center space-x-1.5">
-                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
+                <div className="min-w-0 space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100 truncate">
                       {u.name}
                     </h4>
                     {u.isCurrentUser && (
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-extrabold">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold shrink-0">
                         আপনি
                       </span>
                     )}
                   </div>
-                  {/* Under the name: Total exams and avg points / accuracy */}
-                  <p className="text-[11px] text-slate-500 font-medium truncate">
-                    {u.totalExamsTaken || 15}টি পরীক্ষা • {showThisExamStats ? `এক্যুরেসি ${u.accuracyPercentage}%` : `গড় পয়েন্ট ${u.avgPoints || 28.0}`}
-                  </p>
+
+                  {!showThisExamStats ? (
+                    <div className="flex items-center flex-wrap gap-1.5">
+                      <span className="px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 font-extrabold text-[11px] border border-sky-200 dark:border-sky-800/80">
+                        টেস্ট: {u.totalExamsTaken || 3}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 font-extrabold text-[11px] border border-emerald-200 dark:border-emerald-800/80">
+                        গড়: {u.avgPoints || 28.0}%
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-500 font-medium truncate">
+                      এক্যুরেসি {u.accuracyPercentage}%
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* 2. Stats Column */}
-              {isCourseContext ? (
-                <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
-                    <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                      {u.totalExamsTaken || 18}টি
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
-                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
-                      {u.avgPoints || 28.0}
-                    </span>
-                  </div>
-                  <div className="text-right min-w-[55px]">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
-                    <span className="font-black text-sm sm:text-base text-amber-600 dark:text-amber-400">
-                      {u.score}
-                    </span>
-                  </div>
-                </div>
-              ) : showThisExamStats ? (
-                <div className="flex items-center space-x-4 sm:space-x-8 shrink-0 text-right">
-                  <div className="text-right min-w-[50px]">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">সঠিক:</span>
-                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
+              {showThisExamStats ? (
+                <div className="flex items-center space-x-2.5 sm:space-x-5 shrink-0 text-right">
+                  <div className="text-right min-w-[36px] sm:min-w-[45px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block">সঠিক</span>
+                    <span className="font-bold text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
                       {u.correctCount ?? u.score}টি
                     </span>
                   </div>
-                  <div className="text-right min-w-[50px]">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">ভুল:</span>
-                    <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded-md border border-rose-200/60 dark:border-rose-800/60">
+                  <div className="text-right min-w-[36px] sm:min-w-[45px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block">ভুল</span>
+                    <span className="font-bold text-xs sm:text-sm text-rose-500">
                       {u.wrongCount ?? Math.max(0, u.maxScore - u.score)}টি
                     </span>
                   </div>
-                  <div className="text-right min-w-[65px]">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
+                  <div className="text-right min-w-[45px] sm:min-w-[55px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block">নাম্বার</span>
                     <span className="font-black text-sm sm:text-base text-amber-600 dark:text-amber-400">
                       {u.score}
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
-                    <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                      {u.totalExamsTaken || 16}টি
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
-                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
-                      {u.avgPoints || 28.0}
-                    </span>
-                  </div>
-                  <div className="text-right min-w-[55px]">
-                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
-                    <span className="font-black text-sm sm:text-base text-amber-600 dark:text-amber-400">
-                      {u.score}
-                    </span>
-                  </div>
+                <div className="text-right shrink-0 pl-2">
+                  <span className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 font-bold block uppercase tracking-wider">
+                    পয়েন্ট
+                  </span>
+                  <span className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100">
+                    {u.score}
+                  </span>
                 </div>
               )}
             </div>

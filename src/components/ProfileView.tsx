@@ -38,14 +38,6 @@ const CADRE_OPTIONS: { id: PostCadre; label: string }[] = [
   { id: 'general_subject', label: 'সাধারণ বিষয় (বাংলা, ইংরেজি, গণিত)' },
 ];
 
-const PRESET_AVATARS = [
-  { id: 'avatar1', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80', label: 'টিচার ১' },
-  { id: 'avatar2', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80', label: 'স্কলার ১' },
-  { id: 'avatar3', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80', label: 'শিক্ষক ২' },
-  { id: 'avatar4', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80', label: 'টিচার ২' },
-  { id: 'avatar5', url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80', label: 'উস্তাদ' },
-];
-
 export const ProfileView: React.FC<ProfileViewProps> = ({ user, onTabChange, onUpdateProfile }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -92,10 +84,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, onTabChange, onU
 
   const handleRemovePhoto = () => {
     setFormData(prev => ({ ...prev, avatarUrl: '' }));
-  };
-
-  const handleSelectPresetAvatar = (url: string) => {
-    setFormData(prev => ({ ...prev, avatarUrl: url }));
   };
 
   const currentCadreLabel = CADRE_OPTIONS.find(c => c.id === user.cadre)?.label || 'সহকারী শিক্ষক (আরবি)';
@@ -417,29 +405,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ user, onTabChange, onU
                     <p className="text-[11px] text-slate-400">
                       JPG, PNG বা WEBP ফাইল সিলেক্ট করুন (সর্বোচ্চ ৫ মেগাবাইট)
                     </p>
-                  </div>
-                </div>
-
-                {/* Preset Avatars Gallery */}
-                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 space-y-2">
-                  <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
-                    অথবা রেডিমেড অবতার সিলেক্ট করুন:
-                  </span>
-                  <div className="flex items-center space-x-3 overflow-x-auto pb-1">
-                    {PRESET_AVATARS.map((avatar) => (
-                      <button
-                        key={avatar.id}
-                        type="button"
-                        onClick={() => handleSelectPresetAvatar(avatar.url)}
-                        className={`w-11 h-11 rounded-xl overflow-hidden shrink-0 ring-2 transition-all ${
-                          formData.avatarUrl === avatar.url 
-                            ? 'ring-emerald-500 scale-105 shadow-md' 
-                            : 'ring-transparent opacity-70 hover:opacity-100'
-                        }`}
-                      >
-                        <img src={avatar.url} alt={avatar.label} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
                   </div>
                 </div>
               </div>
