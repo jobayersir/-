@@ -214,7 +214,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-base sm:text-lg font-extrabold text-white">
-                তামরীন AI (Tamreen AI)
+                তামরীন এআই
               </h2>
               <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/30">
                 PRO 3.6

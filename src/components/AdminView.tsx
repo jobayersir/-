@@ -647,7 +647,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   <div className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                     <div>
                       <span className="font-extrabold text-xs text-slate-800 dark:text-slate-200 block">
-                        কোর্স সম্পর্কে বিস্তারিত বাটন (Details)
+                        কোর্স সম্পর্কে বিস্তারিত বাটন
                       </span>
                       <span className="text-[10px] text-slate-400">
                         {editingCourse.isPlanLocked ? 'শুধুমাত্র এনরোলড ইউজার দেখতে পারবে (লকড)' : 'সকল ইউজার দেখতে পারবে (উন্মুক্ত)'}
@@ -669,7 +669,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   <div className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                     <div>
                       <span className="font-extrabold text-xs text-slate-800 dark:text-slate-200 block">
-                        রুটিন বাটন (Routine)
+                        রুটিন বাটন
                       </span>
                       <span className="text-[10px] text-slate-400">
                         {editingCourse.isRoutineLocked ? 'শুধুমাত্র এনরোলড ইউজার দেখতে পারবে (লকড)' : 'সকল ইউজার দেখতে পারবে (উন্মুক্ত)'}
@@ -691,7 +691,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   <div className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
                     <div>
                       <span className="font-extrabold text-xs text-slate-800 dark:text-slate-200 block">
-                        সিলেবাস বাটন (Syllabus)
+                        সিলেবাস বাটন
                       </span>
                       <span className="text-[10px] text-slate-400">
                         {editingCourse.isSyllabusLocked ? 'শুধুমাত্র এনরোলড ইউজার দেখতে পারবে (লকড)' : 'সকল ইউজার দেখতে পারবে (উন্মুক্ত)'}
@@ -825,11 +825,11 @@ export const AdminView: React.FC<AdminViewProps> = ({
                     onChange={(e) => setNewItemType(e.target.value as any)}
                     className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold"
                   >
-                    <option value="plan">কোর্স সম্পর্কে বিস্তারিত (Details)</option>
-                    <option value="routine">রুটিন (Routine)</option>
-                    <option value="syllabus">সিলেবাস (Syllabus)</option>
-                    <option value="sheet">PDF শিট (Sheet)</option>
-                    <option value="exam">পরীক্ষা (Exam)</option>
+                    <option value="plan">কোর্স সম্পর্কে বিস্তারিত</option>
+                    <option value="routine">রুটিন</option>
+                    <option value="syllabus">সিলেবাস</option>
+                    <option value="sheet">লেকচার শিট</option>
+                    <option value="exam">পরীক্ষা</option>
                   </select>
 
                   <input

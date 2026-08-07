@@ -331,12 +331,12 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
 
   // Subject Performance Mock Breakdown
   const subjectPerformance = [
-    { name: 'আরবি ভাষা ও বালাগাত (Arabic Language)', percentage: 92, color: 'bg-emerald-600' },
-    { name: 'হাদিস ও উসূলে হাদিস (Hadith & Usul)', percentage: 86, color: 'bg-teal-600' },
-    { name: 'ফিকহ ও ফরায়েজ (Fiqh & Farayezi)', percentage: 81, color: 'bg-emerald-500' },
-    { name: 'বাংলা সাহিত্য ও ব্যাকরণ (Bangla)', percentage: 76, color: 'bg-amber-500' },
-    { name: 'English Grammar & Literature', percentage: 73, color: 'bg-indigo-500' },
-    { name: 'সাধারণ গণিত ও মানসিক দক্ষতা (Math)', percentage: 68, color: 'bg-rose-500' },
+    { name: 'আরবি ভাষা ও বালাগাত', percentage: 92, color: 'bg-emerald-600' },
+    { name: 'হাদিস ও উসূলে হাদিস', percentage: 86, color: 'bg-teal-600' },
+    { name: 'ফিকহ ও ফরায়েজ', percentage: 81, color: 'bg-emerald-500' },
+    { name: 'বাংলা সাহিত্য ও ব্যাকরণ', percentage: 76, color: 'bg-amber-500' },
+    { name: 'ইংরেজি ব্যাকরণ ও সাহিত্য', percentage: 73, color: 'bg-indigo-500' },
+    { name: 'সাধারণ গণিত ও মানসিক দক্ষতা', percentage: 68, color: 'bg-rose-500' },
   ];
 
   return (
@@ -588,12 +588,12 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               
               <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg">
                 <Sparkles className="w-4 h-4 text-slate-950" />
-                <span>🎉 Congratulations! (অভিনন্দন)</span>
+                <span>🎉 অভিনন্দন!</span>
               </div>
 
               <div>
                 <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                  {scorePercentage >= 80 ? 'Excellent Performance!' : scorePercentage >= 60 ? 'Good Job!' : 'keep Practicing!'}
+                  {scorePercentage >= 80 ? 'চমৎকার পারফরম্যান্স!' : scorePercentage >= 60 ? 'বেশ ভালো!' : 'আরও অনুশীলন প্রয়োজন!'}
                 </h2>
                 <p className="text-emerald-200 text-xs sm:text-sm font-medium mt-1">
                   তামরীন একাডেমি জাতীয় মেধা তালিকায় আপনার ফলাফল সংযুক্ত হয়েছে।
@@ -666,25 +666,25 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
             {/* Statistics Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-                <span className="text-xs text-slate-400 font-semibold block">সঠিক (Correct)</span>
+                <span className="text-xs text-slate-400 font-semibold block">সঠিক</span>
                 <strong className="text-emerald-600 dark:text-emerald-400 text-xl font-black">{correctCount}</strong>
               </div>
               <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-                <span className="text-xs text-slate-400 font-semibold block">ভুল (Wrong)</span>
+                <span className="text-xs text-slate-400 font-semibold block">ভুল</span>
                 <strong className="text-rose-500 text-xl font-black">{wrongCount}</strong>
               </div>
               <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-                <span className="text-xs text-slate-400 font-semibold block">অনুত্তরিত (Skipped)</span>
+                <span className="text-xs text-slate-400 font-semibold block">অনুত্তরিত</span>
                 <strong className="text-slate-500 text-xl font-black">{skippedCount}</strong>
               </div>
               <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-                <span className="text-xs text-slate-400 font-semibold block">সময় (Time Used)</span>
+                <span className="text-xs text-slate-400 font-semibold block">সময়</span>
                 <strong className="text-slate-900 dark:text-slate-100 text-sm font-black mt-1 block">
                   {Math.floor(timeUsedSeconds / 60)} মি. {timeUsedSeconds % 60} সে.
                 </strong>
               </div>
               <div className="col-span-2 sm:col-span-1 bg-amber-500/10 border border-amber-400/40 p-4 rounded-2xl text-center shadow-sm">
-                <span className="text-xs text-amber-700 dark:text-amber-300 font-semibold block">জাতীয় মেধা Rank</span>
+                <span className="text-xs text-amber-700 dark:text-amber-300 font-semibold block">জাতীয় মেধা র‍্যাংক</span>
                 <strong className="text-amber-600 dark:text-amber-400 text-xl font-black">{toBnNumeral(userRank)}তম</strong>
               </div>
             </div>
@@ -940,7 +940,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
 
             <div className="space-y-1">
               <h3 className="text-xl font-black text-slate-950 dark:text-slate-100">
-                Submit Exam? (পরীক্ষা সাবমিট করবেন?)
+                পরীক্ষা সাবমিট করবেন?
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                 সাবমিট করার পর উত্তর পরিবর্তন করা সম্ভব হবে না।
@@ -949,7 +949,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
 
             {/* Unanswered count badge */}
             <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs font-extrabold text-slate-800 dark:text-slate-200">
-              Remaining unanswered (উত্তর না দেওয়া প্রশ্ন):{' '}
+              উত্তর না দেওয়া প্রশ্ন:{' '}
               <strong className="text-amber-600 dark:text-amber-400 font-black text-sm">{unansweredCount}টি</strong>
             </div>
 
@@ -958,13 +958,13 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                 onClick={() => setShowSubmitModal(false)}
                 className="py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800"
               >
-                Cancel (বাতিল)
+                বাতিল
               </button>
               <button
                 onClick={handleFinalSubmit}
                 className="py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md"
               >
-                Submit (সাবমিট)
+                সাবমিট
               </button>
             </div>
 
@@ -1017,7 +1017,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
           <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-5 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100">
-                প্রশ্ন নেভিগেশন গ্রিড (Question Map)
+                প্রশ্ন নেভিগেশন গ্রিড
               </h3>
               <button
                 onClick={() => setShowQuestionGridDrawer(false)}

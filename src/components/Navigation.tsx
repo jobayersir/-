@@ -14,7 +14,7 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }
     { id: 'home', label: 'হোম', icon: Home },
     { id: 'exams', label: 'পরীক্ষা দিন', icon: FileCheck2 },
     { id: 'courses', label: 'কোর্স', icon: GraduationCap },
-    { id: 'ustad_ai', label: 'তামরীন AI', icon: null, isSpecial: true },
+    { id: 'ustad_ai', label: 'তামরীন এআই', icon: null, isSpecial: true },
   ];
 
   return (

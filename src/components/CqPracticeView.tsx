@@ -124,22 +124,13 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
               <h3 className="text-xl sm:text-2xl font-bold text-slate-950 dark:text-slate-50 leading-relaxed">
                 {selectedQuestion.title}
               </h3>
-
-              {selectedQuestion.titleArabic && (
-                <p
-                  style={{ fontFamily: arabicFont }}
-                  className="font-arabic text-2xl sm:text-3xl font-bold text-emerald-950 dark:text-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/40 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 leading-[2.2]"
-                >
-                  {selectedQuestion.titleArabic}
-                </p>
-              )}
             </div>
 
             {/* Key Scoring Points */}
             <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2">
               <h5 className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center">
                 <CheckCircle className="w-4 h-4 mr-1.5 text-emerald-600" />
-                উচ্চ নম্বর অর্জনের মূল পয়েন্টসমূহ (Key Scoring Topics):
+                উচ্চ নম্বর অর্জনের মূল পয়েন্টসমূহ:
               </h5>
               <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 pl-5 list-disc">
                 {selectedQuestion.keyPoints.map((pt, idx) => (
@@ -156,7 +147,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
                 }
                 className="w-full py-3 px-4 rounded-xl bg-emerald-50 dark:bg-slate-900 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 font-bold text-sm flex items-center justify-between border border-emerald-200 dark:border-slate-700 transition-colors"
               >
-                <span>আদর্শ নমুনা উত্তর দেখুন (Model Answer)</span>
+                <span>আদর্শ নমুনা উত্তর দেখুন</span>
                 {showModelAnswer[selectedQuestion.id] ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (

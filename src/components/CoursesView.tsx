@@ -433,7 +433,7 @@ export const CoursesView: React.FC = () => {
                     <div className="flex justify-between items-start">
                       <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider shadow-sm flex items-center space-x-1">
                         <Sparkles className="w-3 h-3 text-slate-950" />
-                        <span>{activeCourse.badgeType === 'exam' ? 'Exam Batch' : activeCourse.badgeType === 'recorded' ? 'Recorded Batch' : 'Free Batch'}</span>
+                        <span>{activeCourse.badgeType === 'exam' ? 'পরীক্ষা ব্যাচ' : activeCourse.badgeType === 'recorded' ? 'রেকর্ডেড ব্যাচ' : 'ফ্রি ব্যাচ'}</span>
                       </span>
                       <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-1.5 shadow-lg flex items-center justify-center">
                         <Logo variant="icon" size="sm" />
@@ -499,7 +499,7 @@ export const CoursesView: React.FC = () => {
                 { id: 'plan', label: 'কোর্স সম্পর্কে বিস্তারিত', icon: ScrollText },
                 { id: 'routine', label: 'রুটিন', icon: Calendar },
                 { id: 'syllabus', label: 'সিলেবাস', icon: BookmarkCheck },
-                { id: 'sheets', label: 'PDF শিট', icon: FileText },
+                { id: 'sheets', label: 'লেকচার শিট', icon: FileText },
                 { id: 'exams', label: 'পরীক্ষা', icon: PenTool },
                 ...(activeCourse.isEnrolled ? [{ id: 'leaderboard', label: 'লিডারবোর্ড', icon: Trophy }] : [])
               ].map((tab) => {
@@ -720,11 +720,11 @@ export const CoursesView: React.FC = () => {
                 const sheetsToRender = (activeCourse.customSheets && activeCourse.customSheets.length > 0)
                   ? activeCourse.customSheets
                   : [
-                      { id: 's1', title: 'Exam- 01 মাকামাতু কুফিয়্যাহ.pdf', code: 'PDF Sheet 01', sizeOrTime: '১.৮ মেগাবাইট' },
-                      { id: 's2', title: 'Exam- 02-সূরা বাকারা.pdf', code: 'PDF Sheet 02', sizeOrTime: '২.১ মেগাবাইট' },
-                      { id: 's3', title: 'Exam- 03 কিতাবুল ঈমান.pdf', code: 'PDF Sheet 03', sizeOrTime: '১.৪ মেগাবাইট' },
-                      { id: 's4', title: 'Exam- 04 আল-হাদিস ও সানাদ হ্যান্ডআউট.pdf', code: 'PDF Sheet 04', sizeOrTime: '২.৯ মেগাবাইট' },
-                      { id: 's5', title: 'Exam- 05 নাহু ও সরফ তারকীব রুলস.pdf', code: 'PDF Sheet 05', sizeOrTime: '১.৬ মেগাবাইট' },
+                      { id: 's1', title: 'লেকচার ১: মাকামাতু কুফিয়্যাহ', code: 'শিট ০১', sizeOrTime: '১.৮ মেগাবাইট' },
+                      { id: 's2', title: 'লেকচার ২: সূরা বাকারা বিশেষ টীকা', code: 'শিট ০২', sizeOrTime: '২.১ মেগাবাইট' },
+                      { id: 's3', title: 'লেকচার ৩: কিতাবুল ঈমান ব্যাখ্যামূলক শিট', code: 'শিট ০৩', sizeOrTime: '১.৪ মেগাবাইট' },
+                      { id: 's4', title: 'লেকচার ৪: আল-হাদিস ও সানাদ হ্যান্ডআউট', code: 'শিট ০৪', sizeOrTime: '২.৯ মেগাবাইট' },
+                      { id: 's5', title: 'লেকচার ৫: নাহু ও সরফ তারকীব রুলস', code: 'শিট ০৫', sizeOrTime: '১.৬ মেগাবাইট' },
                     ];
 
                 return (

@@ -414,7 +414,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
             {/* Title & Subtitle */}
             <div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
-                পরীক্ষা দিন <span className="text-amber-400 font-extrabold text-xl sm:text-2xl font-arabic">(اختبارات)</span>
+                পরীক্ষা দিন
               </h1>
               <p className="text-xs sm:text-sm text-emerald-100/90 font-medium mt-0.5 leading-relaxed">
                 নিজেকে যাচাই করুন, সাফল্যের পথে এগিয়ে যান
@@ -516,12 +516,12 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
               onChange={(e) => setSelectedSubjectFilter(e.target.value)}
               className="w-full bg-transparent text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 focus:outline-none cursor-pointer"
             >
-              <option value="all">সকল বিষয় (All Subjects)</option>
+              <option value="all">সকল বিষয়</option>
               <option value="আরবি ব্যাকরণ">আরবি ব্যাকরণ (নাহু ও সরফ)</option>
               <option value="আল-কুরআন">আল-কুরআন ও হাদিস</option>
               <option value="ফিকহ">ফিকহ ও উসূলে ফিকহ</option>
               <option value="বাংলা">বাংলা সাহিত্য ও ভাষা</option>
-              <option value="ইংরেজি">English Language</option>
+              <option value="ইংরেজি">ইংরেজি ভাষা</option>
               <option value="সাধারণ জ্ঞান">সাধারণ জ্ঞান ও গণিত</option>
               <option value="ইসলামী ইতিহাস">ইসলামী ইতিহাস</option>
             </select>
@@ -688,16 +688,11 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                     )}
                   </div>
 
-                  {/* Title & Arabic Subtitle */}
+                  {/* Title */}
                   <div>
                     <h3 className="font-extrabold text-base sm:text-lg text-slate-950 dark:text-slate-100 leading-snug group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                       {exam.title}
                     </h3>
-                    {exam.titleArabic && (
-                      <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 font-arabic font-semibold mt-1" style={{ fontFamily: "'Amiri', serif" }}>
-                        {exam.titleArabic}
-                      </p>
-                    )}
                   </div>
 
                   {/* Subject Name */}
@@ -728,7 +723,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         <Timer className="w-4 h-4 animate-spin text-rose-500" />
                         <span>{exam.scheduledTime}</span>
                       </div>
-                      <span className="text-[11px] bg-rose-500 text-white px-2 py-0.5 rounded-lg animate-pulse">LIVE NOW</span>
+                      <span className="text-[11px] bg-rose-500 text-white px-2 py-0.5 rounded-lg animate-pulse">লাইভ চলছে</span>
                     </div>
                   ) : isCompleted ? (
                     <div className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 font-bold">
@@ -1005,7 +1000,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 space-y-1 mt-2">
                           <div className="flex items-center space-x-1.5 text-amber-900 dark:text-amber-300 font-black text-xs">
                             <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                            <span>💡 বিস্তারিত ব্যাখ্যা (Explanation):</span>
+                            <span>💡 বিস্তারিত ব্যাখ্যা:</span>
                           </div>
                           <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
                             {q.explanation || 'এই প্রশ্নের উত্তর সরাসরি তামরীন একাডেমির প্রমিত পাঠ্যবই ও বিগত বছরের বোর্ড প্রশ্ন রেফারেন্স অনুযায়ী সবিস্তারে ব্যাখ্যাকৃত।'}
@@ -1033,7 +1028,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                   className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
                 >
                   <Trophy className="w-4 h-4 text-slate-950" />
-                  <span>জাতীয় মেধা তালিকা দেখুন (Exam Leaderboard)</span>
+                  <span>জাতীয় মেধা তালিকা দেখুন</span>
                 </button>
                 <button
                   onClick={() => setViewingReportExam(null)}

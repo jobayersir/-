@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'home', label: 'Home', labelBn: 'হোম', icon: Home },
     { id: 'exams', label: 'Exams', labelBn: 'পরীক্ষা দিন', icon: FileCheck2 },
     { id: 'courses', label: 'Courses', labelBn: 'কোর্স', icon: GraduationCap },
-    { id: 'ustad_ai', label: 'AI Assistant', labelBn: 'তামরীন AI', icon: null, isSpecial: true },
+    { id: 'ustad_ai', label: 'AI Assistant', labelBn: 'তামরীন এআই', icon: null, isSpecial: true },
   ];
 
   return (
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
                 মাদ্রাসা মডেল টেস্ট প্ল্যাটফর্ম
               </span>
               <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-                Madrasa Subject Prep
+                মাদ্রাসা বিষয়ভিত্তিক প্রস্তুতি
               </span>
             </div>
           </div>
@@ -180,26 +180,26 @@ export const Header: React.FC<HeaderProps> = ({
                       onChange={(e) => onChangeBengaliFont(e.target.value)}
                       className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-800 dark:text-slate-200 font-medium focus:outline-none"
                     >
-                      <option value="Hind Siliguri">হিন্দ শিলিগুড়ি (Sans)</option>
-                      <option value="Noto Serif Bengali">নোটো শরিফ (Serif)</option>
+                      <option value="Hind Siliguri">হিন্দ শিলিগুড়ি</option>
+                      <option value="Noto Serif Bengali">নোটো শরিফ</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-slate-500 dark:text-slate-400 text-[11px] mb-1 font-medium">আরবি ফন্ট (Arabic)</label>
+                    <label className="block text-slate-500 dark:text-slate-400 text-[11px] mb-1 font-medium">আরবি ফন্ট</label>
                     <select
                       value={arabicFont}
                       onChange={(e) => onChangeArabicFont(e.target.value)}
                       className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-slate-800 dark:text-slate-200 font-medium focus:outline-none font-arabic"
                     >
-                      <option value="Amiri">الأميري (Amiri)</option>
-                      <option value="Noto Naskh Arabic">নাসখ (Noto Naskh)</option>
-                      <option value="Scheherazade New">شهرزاد (Scheherazade)</option>
+                      <option value="Amiri">আমিরি</option>
+                      <option value="Noto Naskh Arabic">নাসখ</option>
+                      <option value="Scheherazade New">শাহরাজাদ</option>
                     </select>
                   </div>
 
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                    <span className="text-slate-600 dark:text-slate-300 font-medium">হরকত (حركات) প্রদর্শন</span>
+                    <span className="text-slate-600 dark:text-slate-300 font-medium">হরকত প্রদর্শন</span>
                     <button
                       onClick={onToggleHarakat}
                       className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-colors ${

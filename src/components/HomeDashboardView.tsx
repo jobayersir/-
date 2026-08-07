@@ -53,7 +53,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
           <div className="max-w-2xl space-y-4">
             <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>তামরীন একাডেমি (TAMREEN ACADEMY) • মাদ্রাসা স্পেশাল ব্যাচ</span>
+              <span>তামরীন একাডেমি • মাদ্রাসা স্পেশাল ব্যাচ</span>
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
@@ -64,7 +64,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             </h2>
 
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী ক্যাডারের জন্য তামরীন একাডেমির বিশ্বস্ত আরবি-বাংলা-ইংরেজি সিলেবাস, উস্তাদ এআই (Ustad AI), এমসিকিউ ও সিকিউ প্রস্তুতির সেরা ডিজিটাল প্ল্যাটফর্ম।
+              সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী ক্যাডারের জন্য তামরীন একাডেমির বিশ্বস্ত আরবি-বাংলা-ইংরেজি সিলেবাস, উস্তাদ এআই, এমসিকিউ ও সিকিউ প্রস্তুতির সেরা ডিজিটাল প্ল্যাটফর্ম।
             </p>
 
             <div className="pt-2 flex flex-wrap gap-3">
@@ -128,7 +128,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">গড় অর্জন (Accuracy)</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">গড় অর্জন</p>
             <h4 className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-0.5">
               {averageScore > 0 ? `${averageScore.toFixed(0)}%` : 'নতুন শুরু'}
             </h4>
@@ -141,7 +141,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             <Flame className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">স্টাডি স্ট্রিক (Daily)</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">স্টাডি স্ট্রিক</p>
             <h4 className="text-xl font-bold text-slate-800 dark:text-slate-100 mt-0.5">
               ৭ দিন 🔥
             </h4>
@@ -171,7 +171,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 <CheckSquare className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                এমসিকিউ ও মডেল টেস্ট (MCQ)
+                এমসিকিউ ও মডেল টেস্ট
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                 বিষয়ভিত্তিক ও পদভিত্তিক টাইমড মডেল টেস্ট। নেগেটিভ মার্কিং (০.২৫), তাৎক্ষণিক স্কোর, সঠিক উত্তর ও বিস্তারিত ব্যাখ্যাসহ সমাধান।
@@ -193,7 +193,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 <Edit3 className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                সিকিউ ও লিখিত প্রস্তুতি (CQ)
+                সিকিউ ও লিখিত প্রস্তুতি
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                 রচনামূলক ও সংক্ষিপ্ত প্রশ্ন, আরবি-বাংলা নমুনা উত্তর এবং আপনার হাতে লেখা বা টাইপ করা উত্তর উস্তাদ এআই দিয়ে মার্কিং করান।
@@ -215,7 +215,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 <Bot className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                উস্তাদ এআই (Ustad AI Tutor)
+                উস্তাদ এআই
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
                 আরবি ব্যাকরণ, ফিকহ জটিলতা, হাদিসের সনদ বা নিবন্ধন সিলেবাস সম্পর্কিত যেকোনো প্রশ্ন উস্তাদ এআই-কে জিজ্ঞেস করুন।
@@ -262,7 +262,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 আরবি পরিভাষা ও ডিকশনারি
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                বালাগাত, নাহু, সরফ, ফিকহ ও হাদীসের জটিল ইসলামিক পরিভাষার ত্রিভাষিক (আরবি, বাংলা, ইংরেজি) অভিধান।
+                বালাগাত, নাহু, সরফ, ফিকহ ও হাদীসের জটিল ইসলামিক পরিভাষার আরবি-বাংলা অভিধান।
               </p>
             </div>
             <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold text-cyan-600 dark:text-cyan-400">
@@ -301,7 +301,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center">
             <Brain className="w-4 h-4 mr-1.5 text-emerald-600" />
-            আজকের বিশেষ সাধারণ প্রশ্ন (Question of the Day)
+            আজকের বিশেষ সাধারণ প্রশ্ন
           </span>
           <span className="text-[11px] bg-emerald-200 dark:bg-emerald-900/60 text-emerald-900 dark:text-emerald-200 px-2.5 py-0.5 rounded-full font-semibold">
             ফিকহ ও উসূলে ফিকহ
@@ -311,13 +311,10 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
         <h4 className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">
           ইসলামী শরীয়তের ৪র্থ মৌলিক উৎস কোনটি এবং কিয়াসের প্রধান রুকন কয়টি?
         </h4>
-        <p className="font-arabic text-lg text-emerald-800 dark:text-emerald-300 mt-1">
-          ما هو المصدر الرابع من مصادر التشريع الإسلامي وما هي أركان القياس؟
-        </p>
 
         <div className="mt-4 pt-3 border-t border-emerald-200/60 dark:border-slate-700 flex flex-wrap items-center justify-between text-xs">
           <span className="text-slate-600 dark:text-slate-300">
-            উত্তর: <strong className="text-emerald-700 dark:text-emerald-400">কিয়াস (القياس)</strong>, রুকন: ৪টি (আসল, ফারঅ, ইল্লত, হুকুম)।
+            উত্তর: <strong className="text-emerald-700 dark:text-emerald-400">কিয়াস</strong>, রুকন: ৪টি (আসল, ফারঅ, ইল্লত, হুকুম)।
           </span>
           <button
             onClick={() => onTabChange('mcq')}

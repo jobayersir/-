@@ -151,7 +151,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="max-w-2xl space-y-4">
             <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-800/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
               <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>তামরীন একাডেমি (TAMREEN ACADEMY) • বিশেষ বিষয়ভিত্তিক প্রস্তুতি</span>
+              <span>তামরীন একাডেমি • বিশেষ বিষয়ভিত্তিক প্রস্তুতি</span>
             </div>
 
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
@@ -162,7 +162,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </h1>
 
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী পদের জন্য তামরীন একাডেমির বিশ্বস্ত আরবি-বাংলা-ইংরেজি সিলেবাস, উস্তাদ এআই (Ustad AI), মডেল টেস্ট ও প্র্যাকটিস প্ল্যাটফর্ম।
+              সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী পদের জন্য তামরীন একাডেমির বিশ্বস্ত আরবি-বাংলা-ইংরেজি সিলেবাস, উস্তাদ এআই, মডেল টেস্ট ও প্র্যাকটিস প্ল্যাটফর্ম।
             </p>
 
             <div className="pt-2 flex flex-wrap gap-3">
@@ -203,7 +203,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100">
-                পড়া চালিয়ে যান (Continue Learning)
+                পড়া চালিয়ে যান
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 আপনার সর্বশেষ অধ্যায় ও লেকচার নোট
@@ -230,7 +230,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-slate-100">
-              নাহু ও সরফ: ফেএল-এর প্রকারভেদ (الفعل وأقسامه) এবং ব্যাকরণিক প্রয়োগ
+              নাহু ও সরফ: ফেএল-এর প্রকারভেদ এবং ব্যাকরণিক প্রয়োগ
             </h3>
 
             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 mt-2">
@@ -257,7 +257,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-slate-100">
-              পছন্দসই কোর্সসমূহ (Featured Courses)
+              পছন্দসই কোর্সসমূহ
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               মাদ্রাসা ক্যাডারভিত্তিক বিশেষায়িত কোর্স মডিউল
@@ -302,9 +302,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <h3 className="font-extrabold text-base sm:text-lg text-white group-hover:text-amber-200 transition-colors">
                     {course.title}
                   </h3>
-                  <p className="text-xs text-emerald-200/80 font-arabic mt-1" style={{ fontFamily: "'Amiri', serif" }}>
-                    {course.titleArabic}
-                  </p>
                 </div>
 
                 {/* Course Body */}
@@ -345,7 +342,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-slate-100">
-              পরীক্ষা ও মক টেস্ট (Exams Center)
+              পরীক্ষা ও মক টেস্ট
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               ডেইলি টেস্ট, ফ্রি পরীক্ষা এবং ভিআইপি প্রিমিয়াম লাইভ পরীক্ষা
@@ -423,11 +420,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="space-y-3 max-w-xl">
             <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-teal-800/80 text-teal-300 text-xs font-bold border border-teal-500/30">
               <Bot className="w-4 h-4 text-amber-300" />
-              <span>২৪/৭ আপনার এআই টিউটর (Tamreen AI)</span>
+              <span>২৪/৭ আপনার এআই টিউটর</span>
             </div>
 
             <h3 className="text-xl sm:text-2xl font-extrabold text-white">
-              নাহু, সরফ বা ফিকহ বিষয়ে যেকোনো প্রশ্ন করুন তামরীন AI-কে!
+              নাহু, সরফ বা ফিকহ বিষয়ে যেকোনো প্রশ্ন করুন তামরীন এআই-কে!
             </h3>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
@@ -440,7 +437,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             className="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow-xl flex items-center space-x-2 whitespace-nowrap transition-all hover:scale-105"
           >
             <Sparkles className="w-4 h-4 fill-slate-950" />
-            <span>তামরীন AI প্রশ্ন করুন</span>
+            <span>তামরীন এআই প্রশ্ন করুন</span>
           </button>
         </div>
       </section>
@@ -454,7 +451,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex items-center space-x-2">
               <Trophy className="w-5 h-5 text-amber-500" />
               <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
-                সপ্তাহের সেরা মেধাবী (Leaderboard)
+                সপ্তাহের সেরা মেধাবী
               </h3>
             </div>
             <button
@@ -501,7 +498,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex items-center space-x-2">
             <Bell className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
-              সর্বশেষ সার্কুলার ও নোটিশ (Updates)
+              সর্বশেষ সার্কুলার ও নোটিশ
             </h3>
           </div>
 
@@ -544,7 +541,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           className="px-6 py-3.5 rounded-2xl bg-slate-950 hover:bg-slate-900 text-amber-300 font-extrabold text-xs sm:text-sm shadow-xl flex items-center space-x-2 whitespace-nowrap transition-transform hover:scale-105"
         >
           <Crown className="w-4 h-4 text-amber-400" />
-          <span>প্রিমিয়াম হন (Upgrade)</span>
+          <span>প্রিমিয়াম হন</span>
         </button>
       </section>
 
