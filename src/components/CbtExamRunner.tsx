@@ -30,6 +30,8 @@ import { ExtendedExamItem } from './ExamsView';
 import { MCQQuestion } from '../types';
 import { formatArabicText } from '../utils/arabic';
 
+import { saveExamResult } from '../utils/examStorage';
+
 interface CbtExamRunnerProps {
   exam: ExtendedExamItem;
   questions: MCQQuestion[];
@@ -68,6 +70,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
   // Exam Result Mode State
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [timeUsedSeconds, setTimeUsedSeconds] = useState<number>(0);
+  const [userRank, setUserRank] = useState<number>(15);
 
   // Auto scroll smoothly to top when exam is submitted so summary stats & Q1 are visible
   useEffect(() => {
@@ -185,9 +188,40 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
   const handleFinalSubmit = () => {
     setIsTimerActive(false);
     setShowSubmitModal(false);
-    setTimeUsedSeconds(totalExamSeconds - timeRemainingSeconds);
+    const usedSecs = totalExamSeconds - timeRemainingSeconds;
+    setTimeUsedSeconds(usedSecs);
     setIsSubmitted(true);
     
+    // Calculate final correct and wrong counts
+    let cCount = 0;
+    let wCount = 0;
+    questions.forEach((q, idx) => {
+      const uChoice = userAnswers[idx];
+      if (uChoice !== undefined) {
+        if (uChoice === q.correctAnswer) {
+          cCount++;
+        } else {
+          wCount++;
+        }
+      }
+    });
+
+    const pct = questions.length > 0 ? Math.round((cCount / questions.length) * 100) : 0;
+
+    // Save exam result to persistence store & add points to user's dashboard total
+    const saved = saveExamResult({
+      examId: exam.id,
+      examTitle: exam.title,
+      score: cCount, // 1 point per correct answer
+      correctCount: cCount,
+      wrongCount: wCount,
+      totalQuestions: questions.length,
+      percentage: pct,
+      timestamp: Date.now()
+    });
+
+    setUserRank(saved.rank);
+
     // Default open first 3 explanations
     const initialExps: Record<number, boolean> = {};
     questions.forEach((_, idx) => {
@@ -651,7 +685,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               </div>
               <div className="col-span-2 sm:col-span-1 bg-amber-500/10 border border-amber-400/40 p-4 rounded-2xl text-center shadow-sm">
                 <span className="text-xs text-amber-700 dark:text-amber-300 font-semibold block">জাতীয় মেধা Rank</span>
-                <strong className="text-amber-600 dark:text-amber-400 text-xl font-black">১৫তম</strong>
+                <strong className="text-amber-600 dark:text-amber-400 text-xl font-black">{toBnNumeral(userRank)}তম</strong>
               </div>
             </div>
 

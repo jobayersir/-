@@ -472,8 +472,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-700/50"
               >
                 <div className="flex items-center space-x-3">
-                  <span className={`w-7 h-7 rounded-full bg-gradient-to-tr ${leader.bg} text-slate-950 font-black text-xs flex items-center justify-center shadow-xs`}>
-                    #{leader.rank}
+                  <span className="w-7 h-7 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    {leader.rank}
                   </span>
                   <div>
                     <h4 className="font-bold text-xs text-slate-900 dark:text-slate-100">

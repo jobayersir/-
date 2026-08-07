@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
 import { 
   Trophy, 
   Crown, 
@@ -236,16 +237,38 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     ]
   };
 
+  // Fetch stored exam results and user accumulated points
+  const latestResult = getLatestExamResult();
+  const storedTotalPoints = getStoredUserTotalPoints();
+
+  const currentUserScore = filterPeriod === 'thisExam'
+    ? (latestResult ? latestResult.score : 20)
+    : storedTotalPoints;
+
+  const currentUserMaxScore = filterPeriod === 'thisExam'
+    ? (latestResult ? latestResult.totalQuestions : 25)
+    : 1000;
+
+  const currentUserAccuracy = filterPeriod === 'thisExam'
+    ? (latestResult ? latestResult.percentage : 80)
+    : 88;
+
+  const currentUserRank = filterPeriod === 'thisExam'
+    ? (latestResult ? latestResult.rank : 5)
+    : 15;
+
   // Current User Card Info
   const currentUser: LeaderboardUser = {
-    rank: 15,
-    name: user?.name || 'মাওলানা মোঃ আব্দুল্লাহ (আপনি)',
+    rank: currentUserRank,
+    name: user?.name || 'আরিফুল ইসলাম (আপনি)',
     cadre: 'সহকারী শিক্ষক (আরবি)',
-    score: 84,
-    maxScore: 100,
-    accuracyPercentage: 84,
-    timeSpentMinutes: 52,
-    avgTimePerQuestionSec: 31,
+    score: currentUserScore,
+    maxScore: currentUserMaxScore,
+    accuracyPercentage: currentUserAccuracy,
+    correctCount: latestResult ? latestResult.correctCount : 20,
+    wrongCount: latestResult ? latestResult.wrongCount : 5,
+    timeSpentMinutes: 25,
+    avgTimePerQuestionSec: 28,
     totalExamsTaken: 16,
     streakDays: user?.streakDays || 14,
     location: 'ময়মনসিংহ',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
+import { getStoredExamResult, getLatestExamResult } from '../utils/examStorage';
 import { 
   FileCheck2, 
   Clock, 
@@ -1175,38 +1176,51 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                   <span>পয়েন্ট</span>
                 </div>
               </div>
-              {[
-                { rank: 4, name: 'তানভীর আহমেদ', correct: '৮৬টি', wrong: '১৪টি', score: '৮৬ পয়েন্ট' },
-                { rank: 5, name: 'আরিফুল ইসলাম (আপনি)', correct: '৮৪টি', wrong: '১৬টি', score: '৮৪ পয়েন্ট', isUser: true },
-                { rank: 6, name: 'সাবিহা আক্তার', correct: '৮৩টি', wrong: '১৭টি', score: '৮৩ পয়েন্ট' },
-                { rank: 7, name: 'নাজমুল হাসান', correct: '৮১টি', wrong: '১৯টি', score: '৮১ পয়েন্ট' },
-                { rank: 8, name: 'ইসরাত জাহান', correct: '৭৯টি', wrong: '২১টি', score: '৭৯ পয়েন্ট' },
-              ].map((row, idx) => (
-                <div
-                  key={idx}
-                  className={`px-3 py-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${
-                    row.isUser
-                      ? 'bg-emerald-100/90 dark:bg-emerald-950/80 border-emerald-400 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-2xs'
-                      : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/70 text-slate-900 dark:text-slate-100 font-bold'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2.5 min-w-0">
-                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                      {row.rank}
-                    </span>
-                    <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-xs shrink-0">
-                      {row.name.charAt(0)}
-                    </div>
-                    <span className="truncate max-w-[110px] sm:max-w-[150px]">{row.name}</span>
-                  </div>
+              {(() => {
+                const activeResult = viewingLeaderboardExam ? (getStoredExamResult(viewingLeaderboardExam.id) || getLatestExamResult()) : null;
+                const dynamicCorrect = activeResult ? activeResult.correctCount : 20;
+                const dynamicWrong = activeResult ? activeResult.wrongCount : 5;
+                const dynamicScore = activeResult ? activeResult.score : 20;
+                const dynamicRank = activeResult ? activeResult.rank : 5;
 
-                  <div className="flex items-center space-x-3 text-right shrink-0">
-                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/60">{row.correct}</span>
-                    <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60">{row.wrong}</span>
-                    <span className="font-black text-amber-600 dark:text-amber-400 text-xs min-w-[55px]">{row.score}</span>
+                const candidates = [
+                  { rank: 1, name: 'মুশফিকুর রহমান', correct: '২৪টি', wrong: '১টি', score: '২৪ পয়েন্ট' },
+                  { rank: 2, name: 'আহমাদ রাফি', correct: '২৩টি', wrong: '২টি', score: '২৩ পয়েন্ট' },
+                  { rank: 3, name: 'ফারিহা নূর', correct: '২২টি', wrong: '৩টি', score: '২২ পয়েন্ট' },
+                  { rank: 4, name: 'তানভীর আহমেদ', correct: `${Math.max(dynamicCorrect + 1, 21)}টি`, wrong: '৪টি', score: `${Math.max(dynamicCorrect + 1, 21)} পয়েন্ট` },
+                  { rank: dynamicRank, name: 'আরিফুল ইসলাম (আপনি)', correct: `${dynamicCorrect}টি`, wrong: `${dynamicWrong}টি`, score: `${dynamicScore} পয়েন্ট`, isUser: true },
+                  { rank: Math.max(dynamicRank + 1, 6), name: 'সাবিহা আক্তার', correct: `${Math.max(0, dynamicCorrect - 1)}টি`, wrong: `${dynamicWrong + 1}টি`, score: `${Math.max(0, dynamicScore - 1)} পয়েন্ট` },
+                  { rank: Math.max(dynamicRank + 2, 7), name: 'নাজমুল হাসান', correct: `${Math.max(0, dynamicCorrect - 2)}টি`, wrong: `${dynamicWrong + 2}টি`, score: `${Math.max(0, dynamicScore - 2)} পয়েন্ট` },
+                  { rank: Math.max(dynamicRank + 3, 8), name: 'ইসরাত জাহান', correct: `${Math.max(0, dynamicCorrect - 3)}টি`, wrong: `${dynamicWrong + 3}টি`, score: `${Math.max(0, dynamicScore - 3)} পয়েন্ট` },
+                ];
+
+                return candidates.map((row, idx) => (
+                  <div
+                    key={idx}
+                    className={`px-3 py-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${
+                      row.isUser
+                        ? 'bg-emerald-100/90 dark:bg-emerald-950/80 border-emerald-400 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-2xs'
+                        : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/70 text-slate-900 dark:text-slate-100 font-bold'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2.5 min-w-0">
+                      <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                        {row.rank}
+                      </span>
+                      <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-xs shrink-0">
+                        {row.name.charAt(0)}
+                      </div>
+                      <span className="truncate max-w-[110px] sm:max-w-[150px]">{row.name}</span>
+                    </div>
+
+                    <div className="flex items-center space-x-3 text-right shrink-0">
+                      <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/60">{row.correct}</span>
+                      <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60">{row.wrong}</span>
+                      <span className="font-black text-amber-600 dark:text-amber-400 text-xs min-w-[55px]">{row.score}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ));
+              })()}
             </div>
 
             {/* Bottom Modal Actions */}
