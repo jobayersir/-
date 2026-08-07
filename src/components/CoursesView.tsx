@@ -848,7 +848,7 @@ export const CoursesView: React.FC = () => {
                         </div>
                         <div>
                           <h3 className="font-black text-base sm:text-lg text-white">
-                            ব্যাচ মেধা তালিকা (Leaderboard)
+                            ব্যাচ মেধা তালিকা
                           </h3>
                           <p className="text-[11px] sm:text-xs text-emerald-200/90 font-medium">
                             {activeCourse.title} • সকল মডেল টেস্টের মেধা স্কোরের তালিকা
@@ -856,36 +856,60 @@ export const CoursesView: React.FC = () => {
                         </div>
                       </div>
                       <span className="px-3 py-1 bg-amber-400/20 text-amber-300 border border-amber-400/40 font-black text-xs rounded-full shadow-2xs">
-                        লাইভ র্যাঙ্কিং
+                        লাইভ র‍্যাঙ্কিং
                       </span>
                     </div>
 
-                    {/* Current User Rank Card */}
-                    <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
-                      <div className="p-2 rounded-xl bg-slate-900/40">
-                        <span className="text-[10px] font-bold text-emerald-300 block">আপনার অবস্থান</span>
-                        <span className="text-sm sm:text-base font-black text-amber-300 flex items-center justify-center space-x-1">
-                          <Crown className="w-4 h-4 text-amber-400" />
-                          <span>#১২ (টপ ৩%)</span>
-                        </span>
+                    {/* Current User Highlighted Card (Slim Bar) */}
+                    <div className="relative p-3.5 sm:p-4 rounded-2xl bg-slate-900/70 border border-emerald-500/80 shadow-md backdrop-blur-md transition-all space-y-2 text-white">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center space-x-2.5">
+                          <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs border border-emerald-300">
+                            #১২
+                          </span>
+                          <div>
+                            <div className="flex items-center space-x-1.5">
+                              <h3 className="font-black text-xs sm:text-sm text-white">
+                                মাওলানা জোবায়ের আহমদ
+                              </h3>
+                              <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-bold">
+                                আপনি
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-emerald-200/80 font-medium">
+                              আপনার মেধা অবস্থান • প্রভাষক (আরবি)
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 sm:space-x-4 text-right">
+                          <div className="text-right">
+                            <span className="text-[9px] text-emerald-300/70 block font-medium">পরীক্ষা</span>
+                            <span className="font-bold text-xs text-white">
+                              ২৫টি
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[9px] text-emerald-300/70 block font-medium">গড় এক্যুরেসি</span>
+                            <span className="font-black text-xs text-emerald-300">
+                              ৯৫.০%
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[9px] text-emerald-300/70 block font-medium">পয়েন্ট</span>
+                            <span className="font-black text-xs sm:text-sm text-amber-300">
+                              ৯২৫
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="p-2 rounded-xl bg-slate-900/40">
-                        <span className="text-[10px] font-bold text-emerald-300 block">গড় স্কোর (%)</span>
-                        <span className="text-sm sm:text-base font-black text-white">
-                          ৯২.৫%
-                        </span>
-                      </div>
-                      <div className="p-2 rounded-xl bg-slate-900/40">
-                        <span className="text-[10px] font-bold text-emerald-300 block">মোট অর্জিত পয়েন্ট</span>
-                        <span className="text-sm sm:text-base font-black text-amber-300">
-                          ৯২৫ পয়েন্ট
-                        </span>
-                      </div>
-                      <div className="p-2 rounded-xl bg-slate-900/40 col-span-2 sm:col-span-1">
-                        <span className="text-[10px] font-bold text-emerald-300 block">সঠিকতার হার (এক্যুরেসি)</span>
-                        <span className="text-sm sm:text-base font-black text-emerald-200">
-                          ৯৫.০%
-                        </span>
+
+                      {/* Thin Progress Line */}
+                      <div className="w-full h-1.5 rounded-full bg-emerald-950/60 overflow-hidden">
+                        <div 
+                          className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 transition-all duration-500"
+                          style={{ width: '95%' }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -895,7 +919,7 @@ export const CoursesView: React.FC = () => {
                     {/* 1st Place - Gold */}
                     <div className="p-4 rounded-3xl bg-gradient-to-b from-amber-500/15 via-white to-amber-500/5 dark:from-amber-950/40 dark:via-slate-900 dark:to-slate-900 border-2 border-amber-400/80 shadow-md relative overflow-hidden flex flex-col items-center text-center space-y-2">
                       <div className="absolute top-0 right-0 bg-amber-400 text-slate-950 font-black text-[10px] px-3 py-1 rounded-bl-xl shadow-xs">
-                        🥇 ১ম স্থান
+                        🥇 চ্যাম্পিয়ন
                       </div>
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 text-slate-950 font-black text-xl flex items-center justify-center border-2 border-amber-200 shadow-md mt-1">
                         ১
@@ -908,23 +932,19 @@ export const CoursesView: React.FC = () => {
                           প্রভাষক (আরবি)
                         </span>
                       </div>
-                      <div className="w-full grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-extrabold">
-                        <div className="p-1.5 rounded-xl bg-amber-100/80 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200">
-                          <span className="block text-[9px] font-bold text-amber-700 dark:text-amber-400">পার্সেন্টেজ</span>
-                          <span>৯৮.৫%</span>
+                      <div className="w-full grid grid-cols-3 gap-1 pt-1 text-center">
+                        <div className="p-1 rounded-lg bg-amber-100/80 dark:bg-amber-950/60">
+                          <span className="block text-[9px] font-bold text-amber-700 dark:text-amber-400">পরীক্ষা</span>
+                          <span className="text-xs font-black text-slate-900 dark:text-amber-200">২৪টি</span>
                         </div>
-                        <div className="p-1.5 rounded-xl bg-amber-100/80 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200">
-                          <span className="block text-[9px] font-bold text-amber-700 dark:text-amber-400">পয়েন্ট</span>
-                          <span>৯৮৫ pts</span>
+                        <div className="p-1 rounded-lg bg-amber-100/80 dark:bg-amber-950/60">
+                          <span className="block text-[9px] font-bold text-amber-700 dark:text-amber-400">গড়</span>
+                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">৯৮.৫%</span>
                         </div>
-                      </div>
-                      <div className="text-[10px] font-bold text-slate-500 flex items-center space-x-2">
-                        <span>এক্যুরেসি: ৯৮%</span>
-                        <span>•</span>
-                        <span className="text-amber-600 font-extrabold flex items-center">
-                          <Flame className="w-3 h-3 text-amber-500 mr-0.5 fill-amber-500" />
-                          ২৪ দিন
-                        </span>
+                        <div className="p-1 rounded-lg bg-amber-100/80 dark:bg-amber-950/60">
+                          <span className="block text-[9px] font-bold text-amber-700 dark:text-amber-400">পয়েন্ট</span>
+                          <span className="text-xs font-black text-amber-600 dark:text-amber-300">৯৮৫</span>
+                        </div>
                       </div>
                     </div>
 
@@ -944,23 +964,19 @@ export const CoursesView: React.FC = () => {
                           সহকারী শিক্ষক (আরবি)
                         </span>
                       </div>
-                      <div className="w-full grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-extrabold">
-                        <div className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
-                          <span className="block text-[9px] font-bold text-slate-500">পার্সেন্টেজ</span>
-                          <span>৯৬.০%</span>
+                      <div className="w-full grid grid-cols-3 gap-1 pt-1 text-center">
+                        <div className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800">
+                          <span className="block text-[9px] font-bold text-slate-500">পরীক্ষা</span>
+                          <span className="text-xs font-black text-slate-900 dark:text-slate-200">২০টি</span>
                         </div>
-                        <div className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
-                          <span className="block text-[9px] font-bold text-slate-500">পয়েন্ট</span>
-                          <span>৯৬০ pts</span>
+                        <div className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800">
+                          <span className="block text-[9px] font-bold text-slate-500">গড়</span>
+                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">৯৬.০%</span>
                         </div>
-                      </div>
-                      <div className="text-[10px] font-bold text-slate-500 flex items-center space-x-2">
-                        <span>এক্যুরেসি: ৯৫%</span>
-                        <span>•</span>
-                        <span className="text-amber-600 font-extrabold flex items-center">
-                          <Flame className="w-3 h-3 text-amber-500 mr-0.5 fill-amber-500" />
-                          ২০ দিন
-                        </span>
+                        <div className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800">
+                          <span className="block text-[9px] font-bold text-slate-500">পয়েন্ট</span>
+                          <span className="text-xs font-black text-amber-600 dark:text-amber-400">৯৬০</span>
+                        </div>
                       </div>
                     </div>
 
@@ -980,23 +996,19 @@ export const CoursesView: React.FC = () => {
                           সহকারী মৌলভী
                         </span>
                       </div>
-                      <div className="w-full grid grid-cols-2 gap-1.5 pt-1 text-[11px] font-extrabold">
-                        <div className="p-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200">
-                          <span className="block text-[9px] font-bold text-amber-700">পার্সেন্টেজ</span>
-                          <span>৯৩.৫%</span>
+                      <div className="w-full grid grid-cols-3 gap-1 pt-1 text-center">
+                        <div className="p-1 rounded-lg bg-amber-50 dark:bg-amber-950/40">
+                          <span className="block text-[9px] font-bold text-amber-700">পরীক্ষা</span>
+                          <span className="text-xs font-black text-slate-900 dark:text-amber-200">১৮টি</span>
                         </div>
-                        <div className="p-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200">
-                          <span className="block text-[9px] font-bold text-amber-700">পয়েন্ট</span>
-                          <span>৯৩৫ pts</span>
+                        <div className="p-1 rounded-lg bg-amber-50 dark:bg-amber-950/40">
+                          <span className="block text-[9px] font-bold text-amber-700">গড়</span>
+                          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">৯৩.৫%</span>
                         </div>
-                      </div>
-                      <div className="text-[10px] font-bold text-slate-500 flex items-center space-x-2">
-                        <span>এক্যুরেসি: ৯৩%</span>
-                        <span>•</span>
-                        <span className="text-amber-600 font-extrabold flex items-center">
-                          <Flame className="w-3 h-3 text-amber-500 mr-0.5 fill-amber-500" />
-                          ১৮ দিন
-                        </span>
+                        <div className="p-1 rounded-lg bg-amber-50 dark:bg-amber-950/40">
+                          <span className="block text-[9px] font-bold text-amber-700">পয়েন্ট</span>
+                          <span className="text-xs font-black text-amber-600 dark:text-amber-400">৯৩৫</span>
+                        </div>
                       </div>
                     </div>
                   </div>
