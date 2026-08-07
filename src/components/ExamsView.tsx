@@ -1167,12 +1167,20 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
             {/* Ranked Users List (Matches Image) */}
             <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 pb-1 border-b border-slate-200 dark:border-slate-800">
+                <span>ক্রম ও পরীক্ষার্থীর নাম</span>
+                <div className="flex items-center space-x-4 pr-1">
+                  <span>সঠিক</span>
+                  <span>ভুল</span>
+                  <span>পয়েন্ট</span>
+                </div>
+              </div>
               {[
-                { rank: 4, name: 'তানভীর আহমেদ', accuracy: '৮৬%', score: '৮৬ নম্বর' },
-                { rank: 5, name: 'আরিফুল ইসলাম (আপনি)', accuracy: '৮৪%', score: '৮৪ নম্বর', isUser: true },
-                { rank: 6, name: 'সাবিহা আক্তার', accuracy: '৮৩%', score: '৮৩ নম্বর' },
-                { rank: 7, name: 'নাজমুল হাসান', accuracy: '৮১%', score: '৮১ নম্বর' },
-                { rank: 8, name: 'ইসরাত জাহান', accuracy: '৭৯%', score: '৭৯ নম্বর' },
+                { rank: 4, name: 'তানভীর আহমেদ', correct: '৮৬টি', wrong: '১৪টি', score: '৮৬ পয়েন্ট' },
+                { rank: 5, name: 'আরিফুল ইসলাম (আপনি)', correct: '৮৪টি', wrong: '১৬টি', score: '৮৪ পয়েন্ট', isUser: true },
+                { rank: 6, name: 'সাবিহা আক্তার', correct: '৮৩টি', wrong: '১৭টি', score: '৮৩ পয়েন্ট' },
+                { rank: 7, name: 'নাজমুল হাসান', correct: '৮১টি', wrong: '১৯টি', score: '৮১ পয়েন্ট' },
+                { rank: 8, name: 'ইসরাত জাহান', correct: '৭৯টি', wrong: '২১টি', score: '৭৯ পয়েন্ট' },
               ].map((row, idx) => (
                 <div
                   key={idx}
@@ -1182,19 +1190,20 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                       : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/70 text-slate-900 dark:text-slate-100 font-bold'
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <span className="w-5 font-black text-center text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center space-x-2.5 min-w-0">
+                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
                       {row.rank}
                     </span>
                     <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-xs shrink-0">
                       {row.name.charAt(0)}
                     </div>
-                    <span className="truncate max-w-[130px] sm:max-w-[180px]">{row.name}</span>
+                    <span className="truncate max-w-[110px] sm:max-w-[150px]">{row.name}</span>
                   </div>
 
-                  <div className="flex items-center space-x-3 text-right">
-                    <span className="font-extrabold text-slate-700 dark:text-slate-300">{row.accuracy}</span>
-                    <span className="font-black text-emerald-700 dark:text-emerald-400 min-w-[55px]">{row.score}</span>
+                  <div className="flex items-center space-x-3 text-right shrink-0">
+                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/60">{row.correct}</span>
+                    <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60">{row.wrong}</span>
+                    <span className="font-black text-amber-600 dark:text-amber-400 text-xs min-w-[55px]">{row.score}</span>
                   </div>
                 </div>
               ))}

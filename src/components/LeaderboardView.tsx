@@ -39,6 +39,8 @@ export interface LeaderboardUser {
   score: number;
   maxScore: number;
   accuracyPercentage: number;
+  correctCount?: number;
+  wrongCount?: number;
   timeSpentMinutes: number;
   avgTimePerQuestionSec?: number;
   totalExamsTaken?: number;
@@ -588,8 +590,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center space-x-2.5">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-sm border border-emerald-300">
-              #{currentUser.rank}
+            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs border border-emerald-400">
+              {currentUser.rank}
             </span>
             <div>
               <div className="flex items-center space-x-1.5">
@@ -607,30 +609,49 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </div>
 
           <div className="flex items-center space-x-3 sm:space-x-4 text-right">
-            <div className="text-right">
-              <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা</span>
-              <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                {currentUser.totalExamsTaken || 16}টি
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="text-[9px] text-slate-400 block font-medium">প্রাপ্ত নম্বর</span>
-              <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
-                {currentUser.score}/{currentUser.maxScore}
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="text-[9px] text-slate-400 block font-medium">প্রশ্নপ্রতি সময়</span>
-              <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                {currentUser.avgTimePerQuestionSec || 31} সে.
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="text-[9px] text-slate-400 block font-medium">এক্যুরেসি</span>
-              <span className="font-black text-xs text-amber-600 dark:text-amber-400">
-                {currentUser.accuracyPercentage}%
-              </span>
-            </div>
+            {filterPeriod === 'thisExam' ? (
+              <>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">সঠিক উত্তর</span>
+                  <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400">
+                    {currentUser.score}টি
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">ভুল উত্তর</span>
+                  <span className="font-bold text-xs text-rose-500">
+                    {currentUser.maxScore - currentUser.score}টি
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">নম্বর / পয়েন্ট</span>
+                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                    {currentUser.score} পয়েন্ট
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা</span>
+                  <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                    {currentUser.totalExamsTaken || 16}টি
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">প্রাপ্ত নম্বর</span>
+                  <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
+                    {currentUser.score}/{currentUser.maxScore}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">এক্যুরেসি</span>
+                  <span className="font-black text-xs text-amber-600 dark:text-amber-400">
+                    {currentUser.accuracyPercentage}%
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -658,11 +679,19 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             <span className="w-8 text-center">ক্রম</span>
             <span>পরীক্ষার্থীর নাম</span>
           </div>
-          <div className="flex items-center space-x-6 pr-2">
-            <span>পরীক্ষা সংখ্যা</span>
-            <span>গড় এক্যুরেসি</span>
-            <span>লাস্ট পয়েন্ট</span>
-          </div>
+          {filterPeriod === 'thisExam' ? (
+            <div className="flex items-center space-x-8 pr-2">
+              <span>সঠিক উত্তর</span>
+              <span>ভুল উত্তর</span>
+              <span>নম্বর / পয়েন্ট</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-6 pr-2">
+              <span>পরীক্ষা সংখ্যা</span>
+              <span>গড় এক্যুরেসি</span>
+              <span>পয়েন্ট</span>
+            </div>
+          )}
         </div>
 
         <div className="space-y-1.5">
@@ -673,8 +702,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             >
               {/* 1. Serial Number & 2. Name */}
               <div className="flex items-center space-x-3 min-w-0">
-                <span className="w-7 h-7 rounded-lg bg-slate-200/80 dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                  #{u.rank}
+                <span className="w-7 h-7 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+                  {u.rank}
                 </span>
                 <div className="min-w-0 space-y-0.5">
                   <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
@@ -686,27 +715,50 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 </div>
               </div>
 
-              {/* 3. Stats: Exams Count, Average Accuracy, Last Points */}
-              <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
-                <div className="text-right">
-                  <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
-                  <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                    {u.totalExamsTaken || (12 + (10 - u.rank))}টি
-                  </span>
+              {/* 3. Stats Column */}
+              {filterPeriod === 'thisExam' ? (
+                <div className="flex items-center space-x-4 sm:space-x-8 shrink-0 text-right">
+                  <div className="text-right min-w-[50px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">সঠিক:</span>
+                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
+                      {u.correctCount || u.score}টি
+                    </span>
+                  </div>
+                  <div className="text-right min-w-[50px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">ভুল:</span>
+                    <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded-md border border-rose-200/60 dark:border-rose-800/60">
+                      {u.wrongCount || Math.max(0, (u.maxScore || 100) - u.score)}টি
+                    </span>
+                  </div>
+                  <div className="text-right min-w-[65px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
+                    <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                      {u.score}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
-                  <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
-                    {u.accuracyPercentage}%
-                  </span>
+              ) : (
+                <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
+                    <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                      {u.totalExamsTaken || (12 + (10 - u.rank))}টি
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
+                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
+                      {u.accuracyPercentage}%
+                    </span>
+                  </div>
+                  <div className="text-right min-w-[55px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
+                    <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                      {u.score}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right min-w-[55px]">
-                  <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
-                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
-                    {u.score}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
           ))}
         </div>
