@@ -38,17 +38,39 @@ export default function App() {
   const [examResults, setExamResults] = useState<ExamResult[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
 
-  // User Profile Object
-  const userProfile: UserProfileData = {
-    name: 'মাওলানা মোঃ আব্দুল্লাহ',
-    email: 'abdullah.tamreen@gmail.com',
-    cadre: selectedCadre,
-    isPremium: true,
-    joinedDate: 'জানুয়ারি ২০২৬',
-    totalSolvedQuestions: 1420,
-    accuracyRate: 84,
-    streakDays: 14,
-    targetYear: 'মাদ্রাসা পরীক্ষা',
+  // User Profile persistent state
+  const [userProfile, setUserProfile] = useState<UserProfileData>(() => {
+    try {
+      const saved = localStorage.getItem('tamreen_user_profile');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('Failed to parse user profile', e);
+    }
+    return {
+      name: 'মাওলানা মোঃ আব্দুল্লাহ',
+      email: 'abdullah.tamreen@gmail.com',
+      phone: '০১৭১২-৩৪৫৬৭৮',
+      institution: 'গফরগাঁও ইসলামিয়া কামিল মাদ্রাসা',
+      location: 'ময়মনসিংহ',
+      cadre: selectedCadre,
+      isPremium: true,
+      joinedDate: 'জানুয়ারি ২০২৬',
+      totalSolvedQuestions: 1420,
+      accuracyRate: 84,
+      streakDays: 14,
+      targetYear: '১৮তম এনটিআরসিএ (মাদ্রাসা শিক্ষক নিবন্ধন ২০২৬)',
+      avatarUrl: '',
+    };
+  });
+
+  const handleUpdateProfile = (updatedProfile: UserProfileData) => {
+    setUserProfile(updatedProfile);
+    if (updatedProfile.cadre && updatedProfile.cadre !== selectedCadre) {
+      setSelectedCadre(updatedProfile.cadre);
+    }
+    localStorage.setItem('tamreen_user_profile', JSON.stringify(updatedProfile));
   };
 
   // Navigation handler synchronized with browser history for mobile back button support
@@ -288,7 +310,11 @@ export default function App() {
         )}
 
         {activeTab === 'profile' && (
-          <ProfileView user={userProfile} onTabChange={handleNavigateTab} />
+          <ProfileView 
+            user={userProfile} 
+            onTabChange={handleNavigateTab} 
+            onUpdateProfile={handleUpdateProfile} 
+          />
         )}
 
         {activeTab === 'my_courses' && (

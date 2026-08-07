@@ -764,7 +764,28 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </div>
 
           <div className="flex items-center space-x-3 sm:space-x-4 text-right">
-            {showThisExamStats ? (
+            {isCourseContext ? (
+              <>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা সংখ্যা</span>
+                  <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                    {currentUser.totalExamsTaken || 18}টি
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">গড় পয়েন্ট</span>
+                  <span className="font-black text-xs text-emerald-600 dark:text-emerald-400">
+                    {currentUser.avgPoints || 28.5}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-slate-400 block font-medium">মোট পয়েন্ট</span>
+                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                    {currentUser.score}
+                  </span>
+                </div>
+              </>
+            ) : showThisExamStats ? (
               <>
                 <div className="text-right">
                   <span className="text-[9px] text-slate-400 block font-medium">সঠিক উত্তর</span>
@@ -788,7 +809,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             ) : (
               <>
                 <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা</span>
+                  <span className="text-[9px] text-slate-400 block font-medium">পরীক্ষা সংখ্যা</span>
                   <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
                     {currentUser.totalExamsTaken || 16}টি
                   </span>
@@ -834,7 +855,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             <span className="w-8 text-center">ক্রম</span>
             <span>পরীক্ষার্থীর নাম</span>
           </div>
-          {showThisExamStats ? (
+          {isCourseContext ? (
+            <div className="flex items-center space-x-6 pr-2">
+              <span>পরীক্ষা সংখ্যা</span>
+              <span>গড় পয়েন্ট</span>
+              <span>মোট পয়েন্ট</span>
+            </div>
+          ) : showThisExamStats ? (
             <div className="flex items-center space-x-8 pr-2">
               <span>সঠিক উত্তর</span>
               <span>ভুল উত্তর</span>
@@ -871,18 +898,39 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               </div>
 
               {/* 3. Stats Column */}
-              {showThisExamStats ? (
+              {isCourseContext ? (
+                <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
+                    <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
+                      {u.totalExamsTaken || 18}টি
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
+                    <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
+                      {u.avgPoints || 28.0}
+                    </span>
+                  </div>
+                  <div className="text-right min-w-[55px]">
+                    <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
+                    <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                      {u.score}
+                    </span>
+                  </div>
+                </div>
+              ) : showThisExamStats ? (
                 <div className="flex items-center space-x-4 sm:space-x-8 shrink-0 text-right">
                   <div className="text-right min-w-[50px]">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">সঠিক:</span>
                     <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
-                      {u.correctCount || u.score}টি
+                      {u.correctCount ?? u.score}টি
                     </span>
                   </div>
                   <div className="text-right min-w-[50px]">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">ভুল:</span>
                     <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded-md border border-rose-200/60 dark:border-rose-800/60">
-                      {u.wrongCount || Math.max(0, (u.maxScore || 100) - u.score)}টি
+                      {u.wrongCount ?? Math.max(0, u.maxScore - u.score)}টি
                     </span>
                   </div>
                   <div className="text-right min-w-[65px]">
@@ -897,7 +945,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   <div className="text-right">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পরীক্ষা:</span>
                     <span className="font-bold text-xs text-slate-700 dark:text-slate-300">
-                      {u.totalExamsTaken || (12 + (10 - u.rank))}টি
+                      {u.totalExamsTaken || 16}টি
                     </span>
                   </div>
                   <div className="text-right">

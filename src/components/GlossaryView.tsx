@@ -33,7 +33,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({ arabicFont, onBookma
         <div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center">
             <BookMarked className="w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400" />
-            আরবি পরিভাষা ও ইসলামিক অভিধান (Madrasa Exam Glossary)
+            আরবি পরিভাষা ও ইসলামিক অভিধান
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             বালাগাত, ফিকহ, উসূল, নাহু ও হাদিস শাস্ত্রের প্রামাণ্য ইসলামিক পরিভাষাসমূহ
@@ -48,7 +48,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({ arabicFont, onBookma
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="পরিভাষা খুঁজুন (আরবি, বাংলা বা ইংরেজিতে)..."
+              placeholder="পরিভাষা খুঁজুন..."
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
@@ -81,9 +81,6 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({ arabicFont, onBookma
                 <h4 className="text-base sm:text-lg font-bold text-slate-950 dark:text-slate-50 mt-1">
                   {term.termBangla}
                 </h4>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">
-                  {term.termEnglish}
-                </p>
               </div>
 
               <button

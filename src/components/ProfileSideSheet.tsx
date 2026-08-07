@@ -94,8 +94,12 @@ export const ProfileSideSheet: React.FC<ProfileSideSheetProps> = ({
                 <div className="flex items-center space-x-3.5">
                   <div className="relative">
                     <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-amber-400 p-0.5 shadow-md">
-                      <div className="w-full h-full rounded-[14px] bg-slate-900 flex items-center justify-center font-bold text-lg text-emerald-300">
-                        {user.name.charAt(0)}
+                      <div className="w-full h-full rounded-[14px] bg-slate-900 flex items-center justify-center font-bold text-lg text-emerald-300 overflow-hidden">
+                        {user.avatarUrl ? (
+                          <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          user.name.charAt(0)
+                        )}
                       </div>
                     </div>
                     {user.isPremium && (
@@ -170,9 +174,6 @@ export const ProfileSideSheet: React.FC<ProfileSideSheetProps> = ({
                         <span className="block text-xs font-semibold text-slate-900 dark:text-slate-100">
                           {item.labelBn}
                         </span>
-                        <span className="block text-[10px] text-slate-400">
-                          {item.label}
-                        </span>
                       </div>
                     </div>
 
@@ -201,7 +202,7 @@ export const ProfileSideSheet: React.FC<ProfileSideSheetProps> = ({
               className="w-full flex items-center justify-center space-x-2 p-3 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors border border-rose-200/60 dark:border-rose-900/40"
             >
               <LogOut className="w-4 h-4" />
-              <span>লগআউট (Logout)</span>
+              <span>লগআউট</span>
             </button>
           </div>
 

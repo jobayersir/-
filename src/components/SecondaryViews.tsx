@@ -1,7 +1,8 @@
 import React from 'react';
 import { UserProfileData, NavTab, PostCadre } from '../types';
 import { LeaderboardView } from './LeaderboardView';
-export { LeaderboardView };
+import { ProfileView } from './ProfileView';
+export { LeaderboardView, ProfileView };
 import { 
   User, 
   Bookmark, 
@@ -29,50 +30,7 @@ interface ViewProps {
   onToggleDarkMode?: () => void;
 }
 
-// 1. My Profile View
-export const ProfileView: React.FC<ViewProps> = ({ user, onTabChange }) => (
-  <div className="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-6">
-    <div className="flex items-center space-x-4 pb-6 border-b border-slate-100 dark:border-slate-800">
-      <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-400 p-1 shadow-md">
-        <div className="w-full h-full rounded-[20px] bg-slate-900 flex items-center justify-center font-bold text-2xl text-emerald-300">
-          {user.name.charAt(0)}
-        </div>
-      </div>
-      <div className="space-y-1">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-          <span>{user.name}</span>
-          {user.isPremium && (
-            <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black uppercase">
-              VIP PREM
-            </span>
-          )}
-        </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-          সহকারী শিক্ষক (আরবি) • মাদ্রাসা পরীক্ষা প্রস্তুতি
-        </span>
-      </div>
-    </div>
-
-    <div className="grid grid-cols-2 gap-4">
-      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700">
-        <span className="text-xs text-slate-400 font-medium block">সদস্যপদ যোগদানের তারিখ</span>
-        <span className="font-bold text-sm text-slate-800 dark:text-slate-200">{user.joinedDate}</span>
-      </div>
-      <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700">
-        <span className="text-xs text-slate-400 font-medium block">চলতি স্ট্রিক</span>
-        <span className="font-bold text-sm text-amber-500">{user.streakDays} দিন টানা অধ্যয়ন</span>
-      </div>
-    </div>
-
-    <button
-      onClick={() => onTabChange('dashboard')}
-      className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md"
-    >
-      পারফরম্যান্স ড্যাশবোর্ড দেখুন
-    </button>
-  </div>
-);
+// 1. My Profile View is exported from ./ProfileView.tsx
 
 // 2. Bookmarks View
 export const BookmarksView: React.FC<ViewProps> = ({ onTabChange }) => (
@@ -80,7 +38,7 @@ export const BookmarksView: React.FC<ViewProps> = ({ onTabChange }) => (
     <div className="flex items-center space-x-2">
       <Bookmark className="w-5 h-5 text-amber-500 fill-amber-500" />
       <h2 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
-        বুকমার্ককৃত প্রশ্ন ও নোটস (Bookmarks)
+        বুকমার্ককৃত প্রশ্ন ও নোটস
       </h2>
     </div>
 
@@ -115,7 +73,7 @@ export const WrongQuestionsView: React.FC<ViewProps> = ({ onTabChange }) => (
     <div className="flex items-center space-x-2">
       <AlertTriangle className="w-5 h-5 text-rose-500" />
       <h2 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
-        ভুল উত্তরের ব্যাংক (Wrong Questions Review)
+        ভুল উত্তরের ব্যাংক
       </h2>
     </div>
 
@@ -216,7 +174,7 @@ export const SettingsView: React.FC<ViewProps> = ({
     <div className="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800 pb-4">
       <Settings className="w-5 h-5 text-emerald-600" />
       <h2 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
-        অ্যাপ সেটিংস ও পছন্দসমূহ (Settings)
+        অ্যাপ সেটিংস ও পছন্দসমূহ
       </h2>
     </div>
 
@@ -242,7 +200,7 @@ export const SettingsView: React.FC<ViewProps> = ({
           onClick={onToggleDarkMode}
           className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold"
         >
-          {darkMode ? 'সক্রিয় (Dark)' : 'বন্ধ (Light)'}
+          {darkMode ? 'সক্রিয়' : 'বন্ধ'}
         </button>
       </div>
     </div>

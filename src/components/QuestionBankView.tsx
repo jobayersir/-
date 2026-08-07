@@ -38,7 +38,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
         <div>
           <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center">
             <BookOpen className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" />
-            বিগত বছরের প্রশ্ন ব্যাংক (Past Madrasa Question Bank)
+            বিগত বছরের প্রশ্ন ব্যাংক
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             মাদ্রাসা বিষয়ভিত্তিক সকল পরীক্ষার শতভাগ সঠিক সমাধান ও তথ্যবহুল ব্যাখ্যা

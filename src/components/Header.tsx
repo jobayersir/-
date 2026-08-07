@@ -313,8 +313,12 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <div className="relative">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-400 p-0.5 shadow-sm group-hover:scale-105 transition-transform duration-200">
-                  <div className="w-full h-full rounded-[14px] bg-slate-900 flex items-center justify-center font-bold text-sm text-emerald-300">
-                    {user.name.charAt(0)}
+                  <div className="w-full h-full rounded-[14px] bg-slate-900 flex items-center justify-center font-bold text-sm text-emerald-300 overflow-hidden">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      user.name.charAt(0)
+                    )}
                   </div>
                 </div>
                 {user.isPremium && (

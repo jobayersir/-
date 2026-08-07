@@ -178,6 +178,9 @@ export interface CourseItem {
 export interface UserProfileData {
   name: string;
   email: string;
+  phone?: string;
+  institution?: string;
+  location?: string;
   avatarUrl?: string;
   cadre: PostCadre;
   isPremium: boolean;

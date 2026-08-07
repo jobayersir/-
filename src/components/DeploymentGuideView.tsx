@@ -25,7 +25,7 @@ export const DeploymentGuideView: React.FC = () => {
       <div className="bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-emerald-800/40 space-y-4">
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-800/60 text-emerald-300 text-xs font-semibold border border-emerald-500/30">
           <Rocket className="w-3.5 h-3.5 text-amber-400" />
-          <span>ডিপ্লয়মেন্ট ও আর্কিটেকচার গাইড (GitHub • Supabase • Vercel • .com)</span>
+          <span>ডিপ্লয়মেন্ট ও আর্কিটেকচার গাইড</span>
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -43,7 +43,7 @@ export const DeploymentGuideView: React.FC = () => {
           <div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center">
               <Database className="w-5 h-5 mr-2 text-emerald-600 dark:text-emerald-400" />
-              সুপাবেস ডাটাবেইজ স্কিমা (Supabase SQL Script)
+              সুপাবেস ডাটাবেইজ স্কিমা
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Supabase এর SQL Editor এ পেস্ট করে চালান। ইউজার, পরীক্ষা ও বুকমার্ক টেবিল স্বয়ংক্রিয় তৈরি হবে।
