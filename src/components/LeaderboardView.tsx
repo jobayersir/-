@@ -27,6 +27,8 @@ interface LeaderboardViewProps {
   onBackToExam?: () => void;
   examTitle?: string;
   isPremiumExam?: boolean;
+  isCourseContext?: boolean;
+  hideFilters?: boolean;
 }
 
 export interface LeaderboardUser {
@@ -50,7 +52,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   onTabChange,
   onBackToExam,
   examTitle,
-  isPremiumExam = false
+  isPremiumExam = false,
+  isCourseContext = false,
+  hideFilters = false
 }) => {
   const [filterPeriod, setFilterPeriod] = useState<'thisExam' | 'weekly' | 'monthly' | 'allTime'>('thisExam');
   const [leaderboardType, setLeaderboardType] = useState<'free' | 'premium'>(isPremiumExam ? 'premium' : 'free');
@@ -351,12 +355,14 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               <span>লাইভ মেধা তালিকা</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              {leaderboardType === 'premium' 
-                ? 'প্রিমিয়াম পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা' 
-                : 'ফ্রি পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা'}
+              {isCourseContext 
+                ? 'কোর্সে অংশগ্রহণকারীদের মেধা তালিকা' 
+                : leaderboardType === 'premium' 
+                  ? 'প্রিমিয়াম পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা' 
+                  : 'ফ্রি পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা'}
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100/90 font-medium">
-              {examTitle ? `বিষয়: ${examTitle}` : 'বিষয়ভিত্তিক ও মডেল টেস্ট পরীক্ষার সেরা পরীক্ষার্থীদের তালিকা'}
+              {examTitle ? `${isCourseContext ? 'কোর্স: ' : 'বিষয়: '}${examTitle}` : 'বিষয়ভিত্তিক ও মডেল টেস্ট পরীক্ষার সেরা পরীক্ষার্থীদের তালিকা'}
             </p>
           </div>
 
@@ -371,7 +377,14 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         </div>
 
         {/* Free vs Premium Leaderboard Switcher */}
-        {isPremiumExam === undefined ? (
+        {isCourseContext ? (
+          <div className="relative z-10 flex items-center justify-center mt-4">
+            <div className="px-4 py-2 rounded-xl text-xs font-black text-slate-950 bg-amber-400 shadow-md flex items-center space-x-1.5">
+              <Trophy className="w-4 h-4" />
+              <span>কোর্স ব্যাচ মেধা তালিকা</span>
+            </div>
+          </div>
+        ) : isPremiumExam === undefined ? (
           <div className="relative z-10 flex items-center justify-center gap-2 mt-5 p-1 bg-black/20 rounded-2xl border border-white/10">
             <button
               onClick={() => setLeaderboardType('free')}
@@ -405,30 +418,32 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </div>
         )}
 
-        {/* Filter Tabs */}
-        <div className="relative z-10 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-4 p-1.5 bg-emerald-900/60 backdrop-blur-md rounded-2xl border border-emerald-700/50 w-full overflow-x-auto">
-          {[
-            { id: 'thisExam', label: 'এই পরীক্ষা' },
-            { id: 'weekly', label: 'এই সপ্তাহে' },
-            { id: 'monthly', label: 'এই মাসে' },
-            { id: 'allTime', label: 'সর্বকালের' }
-          ].map((tab) => {
-            const isActive = filterPeriod === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setFilterPeriod(tab.id as any)}
-                className={`flex-1 min-w-[70px] sm:min-w-[90px] py-2 rounded-xl text-xs font-extrabold transition-all text-center ${
-                  isActive 
-                    ? 'bg-amber-400 text-slate-950 shadow-md scale-105' 
-                    : 'text-emerald-100 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+        {/* Filter Tabs (Hidden in Course Context) */}
+        {!hideFilters && !isCourseContext && (
+          <div className="relative z-10 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-4 p-1.5 bg-emerald-900/60 backdrop-blur-md rounded-2xl border border-emerald-700/50 w-full overflow-x-auto">
+            {[
+              { id: 'thisExam', label: 'এই পরীক্ষা' },
+              { id: 'weekly', label: 'এই সপ্তাহে' },
+              { id: 'monthly', label: 'এই মাসে' },
+              { id: 'allTime', label: 'সর্বকালের' }
+            ].map((tab) => {
+              const isActive = filterPeriod === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setFilterPeriod(tab.id as any)}
+                  className={`flex-1 min-w-[70px] sm:min-w-[90px] py-2 rounded-xl text-xs font-extrabold transition-all text-center ${
+                    isActive 
+                      ? 'bg-amber-400 text-slate-950 shadow-md scale-105' 
+                      : 'text-emerald-100 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* ========================================================= */}
