@@ -59,8 +59,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   isCourseContext = false,
   hideFilters = false
 }) => {
-  const [filterPeriod, setFilterPeriod] = useState<'thisExam' | 'weekly' | 'monthly' | 'allTime'>('thisExam');
+  const [filterPeriod, setFilterPeriod] = useState<'thisExam' | 'weekly' | 'monthly' | 'allTime'>(
+    isCourseContext ? 'allTime' : 'thisExam'
+  );
   const [leaderboardType, setLeaderboardType] = useState<'free' | 'premium'>(isPremiumExam ? 'premium' : 'free');
+
+  const showThisExamStats = filterPeriod === 'thisExam' && !isCourseContext;
 
   // Keep leaderboardType in sync if isPremiumExam prop changes
   React.useEffect(() => {
@@ -241,54 +245,160 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const latestResult = getLatestExamResult();
   const storedTotalPoints = getStoredUserTotalPoints();
 
-  const currentUserScore = filterPeriod === 'thisExam'
-    ? (latestResult ? latestResult.score : 20)
-    : storedTotalPoints;
+  // Dynamic candidate list & score/rank calculation per filter tab
+  let rawCandidates: LeaderboardUser[] = [];
 
-  const currentUserMaxScore = filterPeriod === 'thisExam'
-    ? (latestResult ? latestResult.totalQuestions : 25)
-    : 1000;
+  if (filterPeriod === 'thisExam' && !isCourseContext) {
+    const examQuestions = latestResult ? latestResult.totalQuestions : 16;
+    const uScore = latestResult ? latestResult.score : Math.min(14, examQuestions);
+    const uCorrect = latestResult ? latestResult.correctCount : uScore;
+    const uWrong = latestResult ? latestResult.wrongCount : Math.max(0, examQuestions - uScore);
+    const uAcc = latestResult ? latestResult.percentage : (examQuestions > 0 ? Math.round((uScore / examQuestions) * 100) : 88);
 
-  const currentUserAccuracy = filterPeriod === 'thisExam'
-    ? (latestResult ? latestResult.percentage : 80)
-    : 88;
+    const userObj: LeaderboardUser = {
+      rank: 1,
+      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
+      cadre: 'সহকারী শিক্ষক (আরবি)',
+      score: uScore,
+      maxScore: examQuestions,
+      accuracyPercentage: uAcc,
+      correctCount: uCorrect,
+      wrongCount: uWrong,
+      timeSpentMinutes: 25,
+      avgTimePerQuestionSec: 24,
+      totalExamsTaken: 16,
+      streakDays: user?.streakDays || 14,
+      location: 'ময়মনসিংহ',
+      isCurrentUser: true
+    };
 
-  const currentUserRank = filterPeriod === 'thisExam'
-    ? (latestResult ? latestResult.rank : 5)
-    : 15;
+    const mockOthers: LeaderboardUser[] = [
+      { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: examQuestions, maxScore: examQuestions, accuracyPercentage: 100, correctCount: examQuestions, wrongCount: 0, timeSpentMinutes: 38, avgTimePerQuestionSec: 22, totalExamsTaken: 28, streakDays: 24, location: 'ঢাকা' },
+      { rank: 2, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: Math.max(1, examQuestions - 1), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 1) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 1), wrongCount: 1, timeSpentMinutes: 41, avgTimePerQuestionSec: 24, totalExamsTaken: 25, streakDays: 18, location: 'চট্টগ্রাম' },
+      { rank: 3, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: Math.max(1, examQuestions - 1), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 1) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 1), wrongCount: 1, timeSpentMinutes: 44, avgTimePerQuestionSec: 26, totalExamsTaken: 22, streakDays: 15, location: 'সিলেট' },
+      { rank: 4, name: 'হাফেজ মাওলানা সিফাত উল্লাহ', cadre: 'লেকচারার ফিকহ', score: Math.max(1, examQuestions - 2), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 2) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 2), wrongCount: 2, timeSpentMinutes: 45, avgTimePerQuestionSec: 27, totalExamsTaken: 20, streakDays: 12, location: 'কুমিল্লা' },
+      { rank: 5, name: 'মাওলানা উবায়দুল ইসলাম', cadre: 'সহকারী মৌলভী', score: Math.max(1, examQuestions - 2), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 2) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 2), wrongCount: 2, timeSpentMinutes: 46, avgTimePerQuestionSec: 28, totalExamsTaken: 19, streakDays: 14, location: 'রাজশাহী' },
+      { rank: 6, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: Math.max(1, examQuestions - 3), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 3) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 3), wrongCount: 3, timeSpentMinutes: 48, avgTimePerQuestionSec: 29, totalExamsTaken: 18, streakDays: 11, location: 'রংপুর' },
+      { rank: 7, name: 'কারী কামরুল হাসান', cadre: 'ইবতেদায়ী প্রধান', score: Math.max(1, examQuestions - 3), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 3) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 3), wrongCount: 3, timeSpentMinutes: 49, avgTimePerQuestionSec: 29, totalExamsTaken: 17, streakDays: 10, location: 'বরিশাল' },
+      { rank: 8, name: 'হাফেজ তরিকুল ইসলাম', cadre: 'সহকারী শিক্ষক (আরবি)', score: Math.max(1, examQuestions - 4), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 4) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 4), wrongCount: 4, timeSpentMinutes: 50, avgTimePerQuestionSec: 30, totalExamsTaken: 16, streakDays: 9, location: 'খুলনা' },
+      { rank: 9, name: 'মাওলানা মাহমুদুল হাসান', cadre: 'সহকারী মৌলভী', score: Math.max(1, examQuestions - 5), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 5) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 5), wrongCount: 5, timeSpentMinutes: 51, avgTimePerQuestionSec: 30, totalExamsTaken: 15, streakDays: 8, location: 'গাজীপুর' },
+      { rank: 10, name: 'মুফতি শফিকুল ইসলাম', cadre: 'প্রভাষক হাদিস', score: Math.max(1, examQuestions - 5), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 5) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 5), wrongCount: 5, timeSpentMinutes: 51, avgTimePerQuestionSec: 31, totalExamsTaken: 15, streakDays: 15, location: 'ময়মনসিংহ' },
+    ];
 
-  // Current User Card Info
-  const currentUser: LeaderboardUser = {
-    rank: currentUserRank,
-    name: user?.name || 'আরিফুল ইসলাম (আপনি)',
-    cadre: 'সহকারী শিক্ষক (আরবি)',
-    score: currentUserScore,
-    maxScore: currentUserMaxScore,
-    accuracyPercentage: currentUserAccuracy,
-    correctCount: latestResult ? latestResult.correctCount : 20,
-    wrongCount: latestResult ? latestResult.wrongCount : 5,
-    timeSpentMinutes: 25,
-    avgTimePerQuestionSec: 28,
-    totalExamsTaken: 16,
-    streakDays: user?.streakDays || 14,
-    location: 'ময়মনসিংহ',
-    isCurrentUser: true
-  };
+    rawCandidates = [...mockOthers, userObj];
+  } else if (filterPeriod === 'weekly') {
+    const userWeeklyPoints = Math.min(500, 360 + (storedTotalPoints - 840));
+    const userObj: LeaderboardUser = {
+      rank: 1,
+      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
+      cadre: 'সহকারী শিক্ষক (আরবি)',
+      score: userWeeklyPoints,
+      maxScore: 500,
+      accuracyPercentage: 92,
+      correctCount: userWeeklyPoints,
+      wrongCount: 15,
+      timeSpentMinutes: 180,
+      avgTimePerQuestionSec: 25,
+      totalExamsTaken: 12 + Math.floor((storedTotalPoints - 840) / 10),
+      streakDays: user?.streakDays || 14,
+      location: 'ময়মনসিংহ',
+      isCurrentUser: true
+    };
 
-  // List of other ranked users (4th to 12th)
-  const remainingUsers: LeaderboardUser[] = [
-    { rank: 4, name: 'হাফেজ মাওলানা সিফাত উল্লাহ', cadre: 'লেকচারার ফিকহ', score: 90, maxScore: 100, accuracyPercentage: 90, timeSpentMinutes: 45, avgTimePerQuestionSec: 27, totalExamsTaken: 20, streakDays: 12, location: 'কুমিল্লা' },
-    { rank: 5, name: 'মাওলানা উবায়দুল ইসলাম', cadre: 'সহকারী মৌলভী', score: 89, maxScore: 100, accuracyPercentage: 89, timeSpentMinutes: 46, avgTimePerQuestionSec: 28, totalExamsTaken: 19, streakDays: 14, location: 'রাজশাহী' },
-    { rank: 6, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: 88, maxScore: 100, accuracyPercentage: 88, timeSpentMinutes: 48, avgTimePerQuestionSec: 29, totalExamsTaken: 18, streakDays: 11, location: 'রংপুর' },
-    { rank: 7, name: 'কারী কামরুল হাসান', cadre: 'ইবতেদায়ী প্রধান', score: 87, maxScore: 100, accuracyPercentage: 87, timeSpentMinutes: 49, avgTimePerQuestionSec: 29, totalExamsTaken: 17, streakDays: 10, location: 'বরিশাল' },
-    { rank: 8, name: 'হাফেজ তরিকুল ইসলাম', cadre: 'সহকারী শিক্ষক (আরবি)', score: 86, maxScore: 100, accuracyPercentage: 86, timeSpentMinutes: 50, avgTimePerQuestionSec: 30, totalExamsTaken: 16, streakDays: 9, location: 'খুলনা' },
-    { rank: 9, name: 'মাওলানা মাহমুদুল হাসান', cadre: 'সহকারী মৌলভী', score: 85, maxScore: 100, accuracyPercentage: 85, timeSpentMinutes: 51, avgTimePerQuestionSec: 30, totalExamsTaken: 15, streakDays: 8, location: 'গাজীপুর' },
-    { rank: 10, name: 'মুফতি শফিকুল ইসলাম', cadre: 'প্রভাষক হাদিস', score: 85, maxScore: 100, accuracyPercentage: 85, timeSpentMinutes: 51, avgTimePerQuestionSec: 31, totalExamsTaken: 15, streakDays: 15, location: 'ময়মনসিংহ' },
-    { rank: 11, name: 'হাফেজ জহিরুল ইসলাম', cadre: 'সহকারী শিক্ষক', score: 84, maxScore: 100, accuracyPercentage: 84, timeSpentMinutes: 53, avgTimePerQuestionSec: 32, totalExamsTaken: 14, streakDays: 7, location: 'বগুড়া' },
-    { rank: 12, name: 'কারি নোমান আহমেদ', cadre: 'ইবতেদায়ী কারী', score: 83, maxScore: 100, accuracyPercentage: 83, timeSpentMinutes: 54, avgTimePerQuestionSec: 33, totalExamsTaken: 13, streakDays: 6, location: 'নোয়াখালী' },
-  ];
+    const mockOthers: LeaderboardUser[] = [
+      { rank: 1, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: 485, maxScore: 500, accuracyPercentage: 97, timeSpentMinutes: 210, avgTimePerQuestionSec: 23, totalExamsTaken: 14, streakDays: 30, location: 'চট্টগ্রাম' },
+      { rank: 2, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: 478, maxScore: 500, accuracyPercentage: 95, timeSpentMinutes: 205, avgTimePerQuestionSec: 24, totalExamsTaken: 12, streakDays: 24, location: 'ঢাকা' },
+      { rank: 3, name: 'হাফেজ ওবায়দুল ইসলাম', cadre: 'ইবতেদায়ী প্রধান', score: 462, maxScore: 500, accuracyPercentage: 92, timeSpentMinutes: 225, avgTimePerQuestionSec: 27, totalExamsTaken: 11, streakDays: 19, location: 'রাজশাহী' },
+      { rank: 4, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: 440, maxScore: 500, accuracyPercentage: 88, timeSpentMinutes: 230, avgTimePerQuestionSec: 28, totalExamsTaken: 10, streakDays: 15, location: 'সিলেট' },
+      { rank: 5, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: 410, maxScore: 500, accuracyPercentage: 82, timeSpentMinutes: 240, avgTimePerQuestionSec: 29, totalExamsTaken: 9, streakDays: 11, location: 'রংপুর' },
+      { rank: 6, name: 'মাওলানা মাহমুদুল হাসান', cadre: 'সহকারী মৌলভী', score: 380, maxScore: 500, accuracyPercentage: 76, timeSpentMinutes: 250, avgTimePerQuestionSec: 30, totalExamsTaken: 8, streakDays: 8, location: 'গাজীপুর' },
+      { rank: 7, name: 'হাফেজ তরিকুল ইসলাম', cadre: 'সহকারী শিক্ষক', score: 340, maxScore: 500, accuracyPercentage: 68, timeSpentMinutes: 260, avgTimePerQuestionSec: 31, totalExamsTaken: 7, streakDays: 7, location: 'খুলনা' },
+      { rank: 8, name: 'মুফতি শফিকুল ইসলাম', cadre: 'প্রভাষক হাদিস', score: 300, maxScore: 500, accuracyPercentage: 60, timeSpentMinutes: 270, avgTimePerQuestionSec: 32, totalExamsTaken: 6, streakDays: 5, location: 'ময়মনসিংহ' },
+    ];
 
-  const currentPodium = topWinners[filterPeriod] || topWinners.thisExam;
+    rawCandidates = [...mockOthers, userObj];
+  } else if (filterPeriod === 'monthly') {
+    const userMonthlyPoints = Math.min(2000, 1480 + (storedTotalPoints - 840));
+    const userObj: LeaderboardUser = {
+      rank: 1,
+      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
+      cadre: 'সহকারী শিক্ষক (আরবি)',
+      score: userMonthlyPoints,
+      maxScore: 2000,
+      accuracyPercentage: 93,
+      correctCount: userMonthlyPoints,
+      wrongCount: 40,
+      timeSpentMinutes: 720,
+      avgTimePerQuestionSec: 25,
+      totalExamsTaken: 38 + Math.floor((storedTotalPoints - 840) / 10),
+      streakDays: user?.streakDays || 14,
+      location: 'ময়মনসিংহ',
+      isCurrentUser: true
+    };
+
+    const mockOthers: LeaderboardUser[] = [
+      { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: 1920, maxScore: 2000, accuracyPercentage: 96, timeSpentMinutes: 840, avgTimePerQuestionSec: 23, totalExamsTaken: 45, streakDays: 45, location: 'ঢাকা' },
+      { rank: 2, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: 1880, maxScore: 2000, accuracyPercentage: 94, timeSpentMinutes: 890, avgTimePerQuestionSec: 25, totalExamsTaken: 42, streakDays: 38, location: 'সিলেট' },
+      { rank: 3, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: 1845, maxScore: 2000, accuracyPercentage: 92, timeSpentMinutes: 860, avgTimePerQuestionSec: 26, totalExamsTaken: 40, streakDays: 30, location: 'চট্টগ্রাম' },
+      { rank: 4, name: 'হাফেজ ওবায়দুল ইসলাম', cadre: 'ইবতেদায়ী প্রধান', score: 1720, maxScore: 2000, accuracyPercentage: 86, timeSpentMinutes: 900, avgTimePerQuestionSec: 28, totalExamsTaken: 36, streakDays: 25, location: 'রাজশাহী' },
+      { rank: 5, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: 1600, maxScore: 2000, accuracyPercentage: 80, timeSpentMinutes: 920, avgTimePerQuestionSec: 29, totalExamsTaken: 32, streakDays: 20, location: 'রংপুর' },
+      { rank: 6, name: 'মাওলানা মাহমুদুল হাসান', cadre: 'সহকারী মৌলভী', score: 1450, maxScore: 2000, accuracyPercentage: 72, timeSpentMinutes: 950, avgTimePerQuestionSec: 30, totalExamsTaken: 28, streakDays: 15, location: 'গাজীপুর' },
+      { rank: 7, name: 'হাফেজ তরিকুল ইসলাম', cadre: 'সহকারী শিক্ষক', score: 1300, maxScore: 2000, accuracyPercentage: 65, timeSpentMinutes: 980, avgTimePerQuestionSec: 31, totalExamsTaken: 24, streakDays: 12, location: 'খুলনা' },
+    ];
+
+    rawCandidates = [...mockOthers, userObj];
+  } else {
+    // allTime
+    const userAllTimePoints = Math.min(5600, 3800 + (storedTotalPoints - 840) * 3);
+    const userObj: LeaderboardUser = {
+      rank: 1,
+      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
+      cadre: 'সহকারী শিক্ষক (আরবি)',
+      score: userAllTimePoints,
+      maxScore: 5600,
+      accuracyPercentage: 94,
+      correctCount: userAllTimePoints,
+      wrongCount: 120,
+      timeSpentMinutes: 2100,
+      avgTimePerQuestionSec: 24,
+      totalExamsTaken: 85 + Math.floor((storedTotalPoints - 840) / 5),
+      streakDays: user?.streakDays || 14,
+      location: 'ময়মনসিংহ',
+      isCurrentUser: true
+    };
+
+    const mockOthers: LeaderboardUser[] = [
+      { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: 5420, maxScore: 5600, accuracyPercentage: 97, timeSpentMinutes: 2400, avgTimePerQuestionSec: 22, totalExamsTaken: 120, streakDays: 120, location: 'ঢাকা' },
+      { rank: 2, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: 5180, maxScore: 5600, accuracyPercentage: 95, timeSpentMinutes: 2510, avgTimePerQuestionSec: 24, totalExamsTaken: 110, streakDays: 95, location: 'চট্টগ্রাম' },
+      { rank: 3, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: 4950, maxScore: 5600, accuracyPercentage: 93, timeSpentMinutes: 2480, avgTimePerQuestionSec: 25, totalExamsTaken: 105, streakDays: 88, location: 'সিলেট' },
+      { rank: 4, name: 'হাফেজ ওবায়দুল ইসলাম', cadre: 'ইবতেদায়ী প্রধান', score: 4500, maxScore: 5600, accuracyPercentage: 88, timeSpentMinutes: 2600, avgTimePerQuestionSec: 27, totalExamsTaken: 95, streakDays: 70, location: 'রাজশাহী' },
+      { rank: 5, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: 4100, maxScore: 5600, accuracyPercentage: 82, timeSpentMinutes: 2700, avgTimePerQuestionSec: 29, totalExamsTaken: 85, streakDays: 55, location: 'রংপুর' },
+      { rank: 6, name: 'মাওলানা মাহমুদুল হাসান', cadre: 'সহকারী মৌলভী', score: 3600, maxScore: 5600, accuracyPercentage: 72, timeSpentMinutes: 2800, avgTimePerQuestionSec: 30, totalExamsTaken: 75, streakDays: 40, location: 'গাজীপুর' },
+      { rank: 7, name: 'হাফেজ তরিকুল ইসলাম', cadre: 'সহকারী শিক্ষক', score: 3100, maxScore: 5600, accuracyPercentage: 62, timeSpentMinutes: 2900, avgTimePerQuestionSec: 32, totalExamsTaken: 65, streakDays: 30, location: 'খুলনা' },
+    ];
+
+    rawCandidates = [...mockOthers, userObj];
+  }
+
+  // Sort candidates by score descending, accuracy descending
+  rawCandidates.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return b.accuracyPercentage - a.accuracyPercentage;
+  });
+
+  // Re-index ranks 1..N dynamically
+  rawCandidates.forEach((item, idx) => {
+    item.rank = idx + 1;
+  });
+
+  // Extract current user with exact dynamic rank
+  const currentUser = rawCandidates.find(c => c.isCurrentUser) || rawCandidates[0];
+
+  // Top 3 Podium
+  const currentPodium = rawCandidates.slice(0, 3);
+
+  // Remaining Users
+  const remainingUsers = rawCandidates.slice(3);
 
   // Helper for Rank Badge Styling
   const renderRankBadge = (rank: number) => {
@@ -632,7 +742,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </div>
 
           <div className="flex items-center space-x-3 sm:space-x-4 text-right">
-            {filterPeriod === 'thisExam' ? (
+            {showThisExamStats ? (
               <>
                 <div className="text-right">
                   <span className="text-[9px] text-slate-400 block font-medium">সঠিক উত্তর</span>
@@ -662,15 +772,15 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">প্রাপ্ত নম্বর</span>
-                  <span className="font-black text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
-                    {currentUser.score}/{currentUser.maxScore}
+                  <span className="text-[9px] text-slate-400 block font-medium">গড় এক্যুরেসি</span>
+                  <span className="font-black text-xs text-emerald-600 dark:text-emerald-400">
+                    {currentUser.accuracyPercentage}%
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">এক্যুরেসি</span>
-                  <span className="font-black text-xs text-amber-600 dark:text-amber-400">
-                    {currentUser.accuracyPercentage}%
+                  <span className="text-[9px] text-slate-400 block font-medium">পয়েন্ট</span>
+                  <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                    {currentUser.score}
                   </span>
                 </div>
               </>
@@ -702,7 +812,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             <span className="w-8 text-center">ক্রম</span>
             <span>পরীক্ষার্থীর নাম</span>
           </div>
-          {filterPeriod === 'thisExam' ? (
+          {showThisExamStats ? (
             <div className="flex items-center space-x-8 pr-2">
               <span>সঠিক উত্তর</span>
               <span>ভুল উত্তর</span>
@@ -739,7 +849,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               </div>
 
               {/* 3. Stats Column */}
-              {filterPeriod === 'thisExam' ? (
+              {showThisExamStats ? (
                 <div className="flex items-center space-x-4 sm:space-x-8 shrink-0 text-right">
                   <div className="text-right min-w-[50px]">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">সঠিক:</span>

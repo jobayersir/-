@@ -1083,145 +1083,235 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
             {/* Filter Tabs in Exam Modal (এই পরীক্ষা, এই সপ্তাহে, এই মাসে, সর্বকালের) */}
             <div className="flex items-center gap-1 p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-xl text-[11px] font-bold">
-              <button className="flex-1 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-black shadow-xs">
+              <button
+                onClick={() => setModalFilter('thisExam')}
+                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
+                  modalFilter === 'thisExam'
+                    ? 'bg-amber-400 text-slate-950 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
+                }`}
+              >
                 এই পরীক্ষা
               </button>
-              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50">
+              <button
+                onClick={() => setModalFilter('weekly')}
+                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
+                  modalFilter === 'weekly'
+                    ? 'bg-amber-400 text-slate-950 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
+                }`}
+              >
                 এই সপ্তাহে
               </button>
-              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50">
+              <button
+                onClick={() => setModalFilter('monthly')}
+                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
+                  modalFilter === 'monthly'
+                    ? 'bg-amber-400 text-slate-950 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
+                }`}
+              >
                 এই মাসে
               </button>
-              <button className="flex-1 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50">
+              <button
+                onClick={() => setModalFilter('allTime')}
+                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
+                  modalFilter === 'allTime'
+                    ? 'bg-amber-400 text-slate-950 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
+                }`}
+              >
                 সর্বকালের
               </button>
             </div>
 
-            {/* Top 3 Winners Podium Cards (Exact Image Layout) */}
-            <div className="grid grid-cols-3 gap-2 items-end pt-2">
-              
-              {/* Rank 2 (Left - Ahmad Rafi) */}
-              <div className="bg-slate-100 dark:bg-slate-800/80 rounded-2xl p-3 border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center">
-                <div className="relative mb-1">
-                  <div className="w-12 h-12 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-sm flex items-center justify-center border-2 border-slate-400 overflow-hidden">
-                    আ
-                  </div>
-                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-slate-400 text-white font-black text-[10px] flex items-center justify-center shadow">
-                    2
-                  </span>
-                </div>
-                <span className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate w-full">
-                  আহমাদ রাফি
-                </span>
-                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                  ৯২%
-                </span>
-                <span className="text-[10px] text-slate-500 font-semibold">
-                  ৯২ নম্বর
-                </span>
-              </div>
+            {(() => {
+              const totalQ = viewingLeaderboardExam ? (viewingLeaderboardExam.questionsCount || viewingLeaderboardExam.questions?.length || 16) : 16;
+              const activeRes = viewingLeaderboardExam ? (getStoredExamResult(viewingLeaderboardExam.id) || getLatestExamResult()) : null;
+              const storedPoints = getStoredUserTotalPoints();
 
-              {/* Rank 1 (Center - Gold Highlight - Mushfiqur Rahman) */}
-              <div className="bg-amber-100 dark:bg-amber-950/60 rounded-2xl p-3.5 border-2 border-amber-400 text-center flex flex-col items-center -mt-3 shadow-md">
-                <Crown className="w-4 h-4 text-amber-500 mb-0.5 animate-bounce" />
-                <div className="relative mb-1">
-                  <div className="w-14 h-14 rounded-full bg-amber-200 text-slate-950 font-black text-base flex items-center justify-center border-2 border-amber-500 overflow-hidden shadow">
-                    মু
-                  </div>
-                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] flex items-center justify-center shadow">
-                    1
-                  </span>
-                </div>
-                <span className="font-black text-xs text-slate-950 dark:text-amber-200 truncate w-full">
-                  মুশফিকুর রহমান
-                </span>
-                <span className="text-xs font-black text-amber-700 dark:text-amber-400 mt-0.5">
-                  ৯৬%
-                </span>
-                <span className="text-[10px] text-amber-800 dark:text-amber-300 font-bold">
-                  ৯৬ নম্বর
-                </span>
-              </div>
+              let modalCandidatesList: Array<{
+                name: string;
+                correct: number;
+                wrong: number;
+                score: number;
+                maxScore: number;
+                percentage: number;
+                isUser?: boolean;
+                rank?: number;
+              }> = [];
 
-              {/* Rank 3 (Right - Fariha Nur) */}
-              <div className="bg-amber-50/80 dark:bg-slate-800/80 rounded-2xl p-3 border border-amber-200/80 dark:border-slate-700 text-center flex flex-col items-center">
-                <div className="relative mb-1">
-                  <div className="w-12 h-12 rounded-full bg-amber-200/80 text-amber-900 font-black text-sm flex items-center justify-center border-2 border-amber-600 overflow-hidden">
-                    ফা
-                  </div>
-                  <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-700 text-white font-black text-[10px] flex items-center justify-center shadow">
-                    3
-                  </span>
-                </div>
-                <span className="font-extrabold text-xs text-slate-900 dark:text-slate-100 truncate w-full">
-                  ফারিহা নূর
-                </span>
-                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                  ৮৮%
-                </span>
-                <span className="text-[10px] text-slate-500 font-semibold">
-                  ৮৮ নম্বর
-                </span>
-              </div>
+              if (modalFilter === 'thisExam') {
+                const uScore = activeRes ? activeRes.score : Math.min(14, totalQ);
+                const uCorrect = activeRes ? activeRes.correctCount : uScore;
+                const uWrong = activeRes ? activeRes.wrongCount : Math.max(0, totalQ - uScore);
+                const uPerc = activeRes ? activeRes.percentage : (totalQ > 0 ? Math.round((uScore / totalQ) * 100) : 88);
 
-            </div>
-
-            {/* Ranked Users List (Matches Image) */}
-            <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 pb-1 border-b border-slate-200 dark:border-slate-800">
-                <span>ক্রম ও পরীক্ষার্থীর নাম</span>
-                <div className="flex items-center space-x-4 pr-1">
-                  <span>সঠিক</span>
-                  <span>ভুল</span>
-                  <span>পয়েন্ট</span>
-                </div>
-              </div>
-              {(() => {
-                const activeResult = viewingLeaderboardExam ? (getStoredExamResult(viewingLeaderboardExam.id) || getLatestExamResult()) : null;
-                const dynamicCorrect = activeResult ? activeResult.correctCount : 20;
-                const dynamicWrong = activeResult ? activeResult.wrongCount : 5;
-                const dynamicScore = activeResult ? activeResult.score : 20;
-                const dynamicRank = activeResult ? activeResult.rank : 5;
-
-                const candidates = [
-                  { rank: 1, name: 'মুশফিকুর রহমান', correct: '২৪টি', wrong: '১টি', score: '২৪ পয়েন্ট' },
-                  { rank: 2, name: 'আহমাদ রাফি', correct: '২৩টি', wrong: '২টি', score: '২৩ পয়েন্ট' },
-                  { rank: 3, name: 'ফারিহা নূর', correct: '২২টি', wrong: '৩টি', score: '২২ পয়েন্ট' },
-                  { rank: 4, name: 'তানভীর আহমেদ', correct: `${Math.max(dynamicCorrect + 1, 21)}টি`, wrong: '৪টি', score: `${Math.max(dynamicCorrect + 1, 21)} পয়েন্ট` },
-                  { rank: dynamicRank, name: 'আরিফুল ইসলাম (আপনি)', correct: `${dynamicCorrect}টি`, wrong: `${dynamicWrong}টি`, score: `${dynamicScore} পয়েন্ট`, isUser: true },
-                  { rank: Math.max(dynamicRank + 1, 6), name: 'সাবিহা আক্তার', correct: `${Math.max(0, dynamicCorrect - 1)}টি`, wrong: `${dynamicWrong + 1}টি`, score: `${Math.max(0, dynamicScore - 1)} পয়েন্ট` },
-                  { rank: Math.max(dynamicRank + 2, 7), name: 'নাজমুল হাসান', correct: `${Math.max(0, dynamicCorrect - 2)}টি`, wrong: `${dynamicWrong + 2}টি`, score: `${Math.max(0, dynamicScore - 2)} পয়েন্ট` },
-                  { rank: Math.max(dynamicRank + 3, 8), name: 'ইসরাত জাহান', correct: `${Math.max(0, dynamicCorrect - 3)}টি`, wrong: `${dynamicWrong + 3}টি`, score: `${Math.max(0, dynamicScore - 3)} পয়েন্ট` },
+                modalCandidatesList = [
+                  { name: 'মুশফিকুর রহমান', correct: totalQ, wrong: 0, score: totalQ, maxScore: totalQ, percentage: 100 },
+                  { name: 'আহমাদ রাফি', correct: Math.max(1, totalQ - 1), wrong: 1, score: Math.max(1, totalQ - 1), maxScore: totalQ, percentage: Math.round(((totalQ - 1) / totalQ) * 100) },
+                  { name: 'ফারিহা নূর', correct: Math.max(1, totalQ - 1), wrong: 1, score: Math.max(1, totalQ - 1), maxScore: totalQ, percentage: Math.round(((totalQ - 1) / totalQ) * 100) },
+                  { name: 'তানভীর আহমেদ', correct: Math.max(1, totalQ - 2), wrong: 2, score: Math.max(1, totalQ - 2), maxScore: totalQ, percentage: Math.round(((totalQ - 2) / totalQ) * 100) },
+                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uCorrect, wrong: uWrong, score: uScore, maxScore: totalQ, percentage: uPerc, isUser: true },
+                  { name: 'সাবিহা আক্তার', correct: Math.max(0, totalQ - 3), wrong: 3, score: Math.max(0, totalQ - 3), maxScore: totalQ, percentage: Math.round(((totalQ - 3) / totalQ) * 100) },
+                  { name: 'নাজমুল হাসান', correct: Math.max(0, totalQ - 4), wrong: 4, score: Math.max(0, totalQ - 4), maxScore: totalQ, percentage: Math.round(((totalQ - 4) / totalQ) * 100) },
+                  { name: 'ইসরাত জাহান', correct: Math.max(0, totalQ - 5), wrong: 5, score: Math.max(0, totalQ - 5), maxScore: totalQ, percentage: Math.round(((totalQ - 5) / totalQ) * 100) },
                 ];
+              } else if (modalFilter === 'weekly') {
+                const uWeekly = Math.min(500, 360 + (storedPoints - 840));
+                modalCandidatesList = [
+                  { name: 'মুশফিকুর রহমান', correct: 485, wrong: 5, score: 485, maxScore: 500, percentage: 97 },
+                  { name: 'আহমাদ রাফি', correct: 470, wrong: 10, score: 470, maxScore: 500, percentage: 94 },
+                  { name: 'ফারিহা নূর', correct: 450, wrong: 15, score: 450, maxScore: 500, percentage: 90 },
+                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uWeekly, wrong: 15, score: uWeekly, maxScore: 500, percentage: Math.round((uWeekly / 500) * 100), isUser: true },
+                  { name: 'তানভীর আহমেদ', correct: 410, wrong: 20, score: 410, maxScore: 500, percentage: 82 },
+                  { name: 'সাবিহা আক্তার', correct: 380, wrong: 25, score: 380, maxScore: 500, percentage: 76 },
+                  { name: 'নাজমুল হাসান', correct: 340, wrong: 30, score: 340, maxScore: 500, percentage: 68 },
+                  { name: 'ইসরাত জাহান', correct: 300, wrong: 35, score: 300, maxScore: 500, percentage: 60 },
+                ];
+              } else if (modalFilter === 'monthly') {
+                const uMonthly = Math.min(2000, 1480 + (storedPoints - 840));
+                modalCandidatesList = [
+                  { name: 'মুশফিকুর রহমান', correct: 1920, wrong: 20, score: 1920, maxScore: 2000, percentage: 96 },
+                  { name: 'আহমাদ রাফি', correct: 1880, wrong: 30, score: 1880, maxScore: 2000, percentage: 94 },
+                  { name: 'ফারিহা নূর', correct: 1840, wrong: 40, score: 1840, maxScore: 2000, percentage: 92 },
+                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uMonthly, wrong: 40, score: uMonthly, maxScore: 2000, percentage: Math.round((uMonthly / 2000) * 100), isUser: true },
+                  { name: 'তানভীর আহমেদ', correct: 1600, wrong: 50, score: 1600, maxScore: 2000, percentage: 80 },
+                  { name: 'সাবিহা আক্তার', correct: 1450, wrong: 60, score: 1450, maxScore: 2000, percentage: 72 },
+                  { name: 'নাজমুল হাসান', correct: 1300, wrong: 70, score: 1300, maxScore: 2000, percentage: 65 },
+                ];
+              } else {
+                const uAllTime = Math.min(5600, 3800 + (storedPoints - 840) * 3);
+                modalCandidatesList = [
+                  { name: 'মুশফিকুর রহমান', correct: 5420, wrong: 60, score: 5420, maxScore: 5600, percentage: 97 },
+                  { name: 'আহমাদ রাফি', correct: 5180, wrong: 80, score: 5180, maxScore: 5600, percentage: 92 },
+                  { name: 'ফারিহা নূর', correct: 4950, wrong: 100, score: 4950, maxScore: 5600, percentage: 88 },
+                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uAllTime, wrong: 120, score: uAllTime, maxScore: 5600, percentage: Math.round((uAllTime / 5600) * 100), isUser: true },
+                  { name: 'তানভীর আহমেদ', correct: 4100, wrong: 150, score: 4100, maxScore: 5600, percentage: 73 },
+                  { name: 'সাবিহা আক্তার', correct: 3600, wrong: 180, score: 3600, maxScore: 5600, percentage: 64 },
+                  { name: 'নাজমুল হাসান', correct: 3100, wrong: 200, score: 3100, maxScore: 5600, percentage: 55 },
+                ];
+              }
 
-                return candidates.map((row, idx) => (
-                  <div
-                    key={idx}
-                    className={`px-3 py-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${
-                      row.isUser
-                        ? 'bg-emerald-100/90 dark:bg-emerald-950/80 border-emerald-400 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-2xs'
-                        : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/70 text-slate-900 dark:text-slate-100 font-bold'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2.5 min-w-0">
-                      <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                        {row.rank}
-                      </span>
-                      <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-xs shrink-0">
-                        {row.name.charAt(0)}
+              // Sort descending by score
+              modalCandidatesList.sort((a, b) => b.score - a.score);
+              modalCandidatesList.forEach((c, idx) => { c.rank = idx + 1; });
+
+              const top2 = modalCandidatesList[1] || modalCandidatesList[0];
+              const top1 = modalCandidatesList[0];
+              const top3 = modalCandidatesList[2] || modalCandidatesList[0];
+
+              return (
+                <>
+                  {/* Top 3 Winners Podium Cards */}
+                  <div className="grid grid-cols-3 gap-2 items-end pt-2">
+                    
+                    {/* Rank 2 */}
+                    <div className="bg-slate-100 dark:bg-slate-800/80 rounded-2xl p-2.5 sm:p-3 border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center">
+                      <div className="relative mb-1">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-xs sm:text-sm flex items-center justify-center border-2 border-slate-400 overflow-hidden">
+                          {top2.name.charAt(0)}
+                        </div>
+                        <span className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-slate-400 text-white font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow">
+                          {top2.rank}
+                        </span>
                       </div>
-                      <span className="truncate max-w-[110px] sm:max-w-[150px]">{row.name}</span>
+                      <span className="font-extrabold text-[11px] sm:text-xs text-slate-900 dark:text-slate-100 truncate w-full">
+                        {top2.name}
+                      </span>
+                      <span className="text-[11px] sm:text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                        {top2.percentage}%
+                      </span>
+                      <span className="text-[9px] sm:text-[10px] text-slate-500 font-semibold">
+                        {top2.score} পয়েন্ট
+                      </span>
                     </div>
 
-                    <div className="flex items-center space-x-3 text-right shrink-0">
-                      <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/60">{row.correct}</span>
-                      <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60">{row.wrong}</span>
-                      <span className="font-black text-amber-600 dark:text-amber-400 text-xs min-w-[55px]">{row.score}</span>
+                    {/* Rank 1 */}
+                    <div className="bg-amber-100 dark:bg-amber-950/60 rounded-2xl p-3 sm:p-3.5 border-2 border-amber-400 text-center flex flex-col items-center -mt-3 shadow-md">
+                      <Crown className="w-4 h-4 text-amber-500 mb-0.5 animate-bounce" />
+                      <div className="relative mb-1">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-200 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center border-2 border-amber-500 overflow-hidden shadow">
+                          {top1.name.charAt(0)}
+                        </div>
+                        <span className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-amber-500 text-slate-950 font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow">
+                          {top1.rank}
+                        </span>
+                      </div>
+                      <span className="font-black text-[11px] sm:text-xs text-slate-950 dark:text-amber-200 truncate w-full">
+                        {top1.name}
+                      </span>
+                      <span className="text-[11px] sm:text-xs font-black text-amber-700 dark:text-amber-400 mt-0.5">
+                        {top1.percentage}%
+                      </span>
+                      <span className="text-[9px] sm:text-[10px] text-amber-800 dark:text-amber-300 font-bold">
+                        {top1.score} পয়েন্ট
+                      </span>
                     </div>
+
+                    {/* Rank 3 */}
+                    <div className="bg-amber-50/80 dark:bg-slate-800/80 rounded-2xl p-2.5 sm:p-3 border border-amber-200/80 dark:border-slate-700 text-center flex flex-col items-center">
+                      <div className="relative mb-1">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-200/80 text-amber-900 font-black text-xs sm:text-sm flex items-center justify-center border-2 border-amber-600 overflow-hidden">
+                          {top3.name.charAt(0)}
+                        </div>
+                        <span className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-amber-700 text-white font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow">
+                          {top3.rank}
+                        </span>
+                      </div>
+                      <span className="font-extrabold text-[11px] sm:text-xs text-slate-900 dark:text-slate-100 truncate w-full">
+                        {top3.name}
+                      </span>
+                      <span className="text-[11px] sm:text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                        {top3.percentage}%
+                      </span>
+                      <span className="text-[9px] sm:text-[10px] text-slate-500 font-semibold">
+                        {top3.score} পয়েন্ট
+                      </span>
+                    </div>
+
                   </div>
-                ));
-              })()}
-            </div>
+
+                  {/* Ranked Users List */}
+                  <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 pb-1 border-b border-slate-200 dark:border-slate-800">
+                      <span>ক্রম ও পরীক্ষার্থীর নাম</span>
+                      <div className="flex items-center space-x-4 pr-1">
+                        <span>সঠিক</span>
+                        <span>ভুল</span>
+                        <span>পয়েন্ট</span>
+                      </div>
+                    </div>
+                    {modalCandidatesList.map((row, idx) => (
+                      <div
+                        key={idx}
+                        className={`px-3 py-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${
+                          row.isUser
+                            ? 'bg-emerald-100/90 dark:bg-emerald-950/80 border-emerald-400 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-2xs'
+                            : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/70 text-slate-900 dark:text-slate-100 font-bold'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-2.5 min-w-0">
+                          <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                            {row.rank}
+                          </span>
+                          <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-xs shrink-0">
+                            {row.name.charAt(0)}
+                          </div>
+                          <span className="truncate max-w-[110px] sm:max-w-[150px]">{row.name}</span>
+                        </div>
+
+                        <div className="flex items-center space-x-3 text-right shrink-0">
+                          <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/60">{row.correct}টি</span>
+                          <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60">{row.wrong}টি</span>
+                          <span className="font-black text-amber-600 dark:text-amber-400 text-xs min-w-[55px]">{row.score} পয়েন্ট</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
 
             {/* Bottom Modal Actions */}
             <div className="space-y-2 pt-1">
