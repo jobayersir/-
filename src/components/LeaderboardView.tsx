@@ -1,24 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
 import { 
   Trophy, 
   Crown, 
   Flame, 
-  Clock, 
   Award, 
   Zap, 
-  CheckCircle2, 
   Sparkles,
-  ArrowUp,
   Medal,
-  Calendar,
+  ChevronLeft,
   ChevronRight,
-  UserCheck,
-  Target,
-  TrendingUp,
-  BarChart2,
-  Users,
-  Timer
+  User,
+  CheckCircle2,
+  XCircle,
+  BarChart2
 } from 'lucide-react';
 import { UserProfileData, NavTab } from '../types';
 
@@ -36,7 +31,7 @@ export interface LeaderboardUser {
   rank: number;
   name: string;
   avatar?: string;
-  cadre: string;
+  cadre?: string;
   score: number;
   maxScore: number;
   accuracyPercentage: number;
@@ -47,9 +42,55 @@ export interface LeaderboardUser {
   totalExamsTaken?: number;
   avgPoints?: number;
   streakDays: number;
-  location: string;
+  location?: string;
   isCurrentUser?: boolean;
 }
+
+const PRESET_MOCK_AVATARS = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=120&auto=format&fit=crop&q=80',
+];
+
+const MOCK_CANDIDATE_NAMES = [
+  'মাওলানা হাফেজ আব্দুল মালেক',
+  'মুফতি তানভীর আহমেদ',
+  'কারি মোশতাক মাহমুদ',
+  'হাফেজ মাওলানা সিফাত উল্লাহ',
+  'মাওলানা উবায়দুল ইসলাম',
+  'মুফতি আব্দুর রশীদ',
+  'কারী কামরুল হাসান',
+  'হাফেজ তরিকুল ইসলাম',
+  'মাওলানা জহিরুল ইসলাম',
+  'মুফতি শফিকুল ইসলাম',
+  'হাফেজ জুবায়ের আহমেদ',
+  'মাওলানা আব্দুল কাইয়ুম',
+  'কারী হাবিবুর রহমান',
+  'মুফতি সালাহউদ্দিন',
+  'হাফেজ মিরাজ হোসেন',
+  'মাওলানা মাহমুদ হাসান',
+  'মুফতি ইব্রাহিম খলিল',
+  'মাওলানা আনোয়ার হোসেন',
+  'হাফেজ নাজমুল হুদা',
+  'মাওলানা তাওহীদুল ইসলাম',
+  'মুফতি আমানুল্লাহ',
+  'হাফেজ বিলাল হোসেন',
+  'মাওলানা আশরাফ আলী',
+  'মুফতি রফিকুল ইসলাম',
+  'হাফেজ জাকারিয়া হাসান',
+  'মাওলানা ফরিদুল আলম',
+  'মুফতি শামীম আহমেদ',
+  'হাফেজ উসামা ইবনে যেয়াদ',
+  'মাওলানা আরিফুর রহমান',
+  'মুফতি মুবাশশির আহমেদ',
+  'হাফেজ তালহা জুবায়ের',
+  'মাওলানা সায়েম হোসাইন',
+  'মুফতি হাসানাত মাহমুদ',
+  'হাফেজ কাওসার আহমেদ',
+  'মাওলানা রায়হান পারভেজ'
+];
 
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ 
   user, 
@@ -64,183 +105,24 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     isCourseContext ? 'allTime' : 'thisExam'
   );
   const [leaderboardType, setLeaderboardType] = useState<'free' | 'premium'>(isPremiumExam ? 'premium' : 'free');
+  
+  // Pagination State (Max 20 items per page)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 20;
 
   const showThisExamStats = filterPeriod === 'thisExam' && !isCourseContext;
 
   // Keep leaderboardType in sync if isPremiumExam prop changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (isPremiumExam !== undefined) {
       setLeaderboardType(isPremiumExam ? 'premium' : 'free');
     }
   }, [isPremiumExam]);
 
-  // Top 3 Podium Mock Data for Tamreen Academy
-  const topWinners: Record<string, LeaderboardUser[]> = {
-    thisExam: [
-      {
-        rank: 1,
-        name: 'মাওলানা হাফেজ আব্দুল মালেক',
-        cadre: 'প্রভাষক (আরবি)',
-        score: 98,
-        maxScore: 100,
-        accuracyPercentage: 98,
-        timeSpentMinutes: 38,
-        avgTimePerQuestionSec: 22,
-        totalExamsTaken: 28,
-        streakDays: 24,
-        location: 'ঢাকা'
-      },
-      {
-        rank: 2,
-        name: 'মুফতি তানভীর আহমেদ',
-        cadre: 'সহকারী শিক্ষক (আরবি)',
-        score: 95,
-        maxScore: 100,
-        accuracyPercentage: 95,
-        timeSpentMinutes: 41,
-        avgTimePerQuestionSec: 24,
-        totalExamsTaken: 25,
-        streakDays: 18,
-        location: 'চট্টগ্রাম'
-      },
-      {
-        rank: 3,
-        name: 'কারি মোশতাক মাহমুদ',
-        cadre: 'সহকারী মৌলভী',
-        score: 92,
-        maxScore: 100,
-        accuracyPercentage: 92,
-        timeSpentMinutes: 44,
-        avgTimePerQuestionSec: 26,
-        totalExamsTaken: 22,
-        streakDays: 15,
-        location: 'সিলেট'
-      }
-    ],
-    weekly: [
-      {
-        rank: 1,
-        name: 'মুফতি তানভীর আহমেদ',
-        cadre: 'সহকারী শিক্ষক (আরবি)',
-        score: 485,
-        maxScore: 500,
-        accuracyPercentage: 97,
-        timeSpentMinutes: 210,
-        avgTimePerQuestionSec: 23,
-        totalExamsTaken: 14,
-        streakDays: 30,
-        location: 'চট্টগ্রাম'
-      },
-      {
-        rank: 2,
-        name: 'মাওলানা হাফেজ আব্দুল মালেক',
-        cadre: 'প্রভাষক (আরবি)',
-        score: 478,
-        maxScore: 500,
-        accuracyPercentage: 95,
-        timeSpentMinutes: 205,
-        avgTimePerQuestionSec: 24,
-        totalExamsTaken: 12,
-        streakDays: 24,
-        location: 'ঢাকা'
-      },
-      {
-        rank: 3,
-        name: 'হাফেজ ওবায়দুল ইসলাম',
-        cadre: 'ইবতেদায়ী প্রধান',
-        score: 462,
-        maxScore: 500,
-        accuracyPercentage: 92,
-        timeSpentMinutes: 225,
-        avgTimePerQuestionSec: 27,
-        totalExamsTaken: 11,
-        streakDays: 19,
-        location: 'রাজশাহী'
-      }
-    ],
-    monthly: [
-      {
-        rank: 1,
-        name: 'মাওলানা হাফেজ আব্দুল মালেক',
-        cadre: 'প্রভাষক (আরবি)',
-        score: 1920,
-        maxScore: 2000,
-        accuracyPercentage: 96,
-        timeSpentMinutes: 840,
-        avgTimePerQuestionSec: 23,
-        totalExamsTaken: 45,
-        streakDays: 45,
-        location: 'ঢাকা'
-      },
-      {
-        rank: 2,
-        name: 'কারি মোশতাক মাহমুদ',
-        cadre: 'সহকারী মৌলভী',
-        score: 1880,
-        maxScore: 2000,
-        accuracyPercentage: 94,
-        timeSpentMinutes: 890,
-        avgTimePerQuestionSec: 25,
-        totalExamsTaken: 42,
-        streakDays: 38,
-        location: 'সিলেট'
-      },
-      {
-        rank: 3,
-        name: 'মুফতি তানভীর আহমেদ',
-        cadre: 'সহকারী শিক্ষক (আরবি)',
-        score: 1845,
-        maxScore: 2000,
-        accuracyPercentage: 92,
-        timeSpentMinutes: 860,
-        avgTimePerQuestionSec: 26,
-        totalExamsTaken: 40,
-        streakDays: 30,
-        location: 'চট্টগ্রাম'
-      }
-    ],
-    allTime: [
-      {
-        rank: 1,
-        name: 'মাওলানা হাফেজ আব্দুল মালেক',
-        cadre: 'প্রভাষক (আরবি)',
-        score: 5420,
-        maxScore: 5600,
-        accuracyPercentage: 97,
-        timeSpentMinutes: 2400,
-        avgTimePerQuestionSec: 22,
-        totalExamsTaken: 120,
-        streakDays: 120,
-        location: 'ঢাকা'
-      },
-      {
-        rank: 2,
-        name: 'মুফতি তানভীর আহমেদ',
-        cadre: 'সহকারী শিক্ষক (আরবি)',
-        score: 5180,
-        maxScore: 5600,
-        accuracyPercentage: 95,
-        timeSpentMinutes: 2510,
-        avgTimePerQuestionSec: 24,
-        totalExamsTaken: 110,
-        streakDays: 95,
-        location: 'চট্টগ্রাম'
-      },
-      {
-        rank: 3,
-        name: 'কারি মোশতাক মাহমুদ',
-        cadre: 'সহকারী মৌলভী',
-        score: 4950,
-        maxScore: 5600,
-        accuracyPercentage: 93,
-        timeSpentMinutes: 2480,
-        avgTimePerQuestionSec: 25,
-        totalExamsTaken: 105,
-        streakDays: 88,
-        location: 'সিলেট'
-      }
-    ]
-  };
+  // Reset page to 1 whenever tab/filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterPeriod, leaderboardType, isCourseContext]);
 
   // Fetch stored exam results and user accumulated points
   const latestResult = getLatestExamResult();
@@ -249,16 +131,19 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   // Dynamic candidate list & score/rank calculation per filter tab
   let rawCandidates: LeaderboardUser[] = [];
 
+  const currentUserAvatar = user?.avatarUrl || '';
+  const currentUserName = user?.name || 'মাওলানা মোঃ আব্দুল্লাহ';
+
   if (isCourseContext) {
-    // Course Leaderboard System: exam count, avg points, total points
+    // Course Leaderboard System
     const userExams = 18 + Math.floor((storedTotalPoints - 840) / 20);
     const userAvg = Math.min(30, Number((27.5 + (storedTotalPoints > 840 ? 1.5 : 0)).toFixed(1)));
     const userTotalPoints = Math.round(userExams * userAvg);
 
     const userObj: LeaderboardUser = {
       rank: 1,
-      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
-      cadre: 'সহকারী শিক্ষক (আরবি)',
+      name: currentUserName,
+      avatar: currentUserAvatar,
       score: userTotalPoints,
       maxScore: userExams * 30,
       accuracyPercentage: Math.round((userAvg / 30) * 100),
@@ -267,20 +152,30 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       timeSpentMinutes: userExams * 20,
       avgTimePerQuestionSec: 24,
       streakDays: user?.streakDays || 14,
-      location: 'ময়মনসিংহ',
       isCurrentUser: true
     };
 
-    const mockOthers: LeaderboardUser[] = [
-      { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: 870, maxScore: 900, accuracyPercentage: 97, totalExamsTaken: 30, avgPoints: 29.0, timeSpentMinutes: 600, avgTimePerQuestionSec: 22, streakDays: 24, location: 'ঢাকা' },
-      { rank: 2, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: 806, maxScore: 840, accuracyPercentage: 96, totalExamsTaken: 28, avgPoints: 28.8, timeSpentMinutes: 560, avgTimePerQuestionSec: 24, streakDays: 18, location: 'চট্টগ্রাম' },
-      { rank: 3, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: 713, maxScore: 750, accuracyPercentage: 95, totalExamsTaken: 25, avgPoints: 28.5, timeSpentMinutes: 500, avgTimePerQuestionSec: 26, streakDays: 15, location: 'সিলেট' },
-      { rank: 4, name: 'হাফেজ মাওলানা সিফাত উল্লাহ', cadre: 'লেকচারার ফিকহ', score: 621, maxScore: 660, accuracyPercentage: 94, totalExamsTaken: 22, avgPoints: 28.2, timeSpentMinutes: 440, avgTimePerQuestionSec: 27, streakDays: 12, location: 'কুমিল্লা' },
-      { rank: 5, name: 'মাওলানা উবায়দুল ইসলাম', cadre: 'সহকারী মৌলভী', score: 560, maxScore: 600, accuracyPercentage: 93, totalExamsTaken: 20, avgPoints: 28.0, timeSpentMinutes: 400, avgTimePerQuestionSec: 28, streakDays: 14, location: 'রাজশাহী' },
-      { rank: 6, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: 495, maxScore: 540, accuracyPercentage: 92, totalExamsTaken: 18, avgPoints: 27.5, timeSpentMinutes: 360, avgTimePerQuestionSec: 29, streakDays: 11, location: 'রংপুর' },
-    ];
+    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
+      const exams = Math.max(8, 32 - i);
+      const avgP = Number((29.5 - i * 0.15).toFixed(1));
+      const sc = Math.round(exams * avgP);
+      return {
+        rank: i + 1,
+        name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
+        score: sc,
+        maxScore: exams * 30,
+        accuracyPercentage: Math.min(100, Math.max(70, Math.round((avgP / 30) * 100))),
+        totalExamsTaken: exams,
+        avgPoints: avgP,
+        timeSpentMinutes: exams * 18,
+        avgTimePerQuestionSec: 22 + (i % 6),
+        streakDays: Math.max(3, 30 - i)
+      };
+    });
 
     rawCandidates = [...mockOthers, userObj];
+
   } else if (filterPeriod === 'thisExam') {
     const examQuestions = latestResult ? latestResult.totalQuestions : 16;
     const uScore = latestResult ? latestResult.score : Math.min(15, examQuestions);
@@ -290,8 +185,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
     const userObj: LeaderboardUser = {
       rank: 1,
-      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
-      cadre: 'সহকারী শিক্ষক (আরবি)',
+      name: currentUserName,
+      avatar: currentUserAvatar,
       score: uScore,
       maxScore: examQuestions,
       accuracyPercentage: uAcc,
@@ -300,29 +195,41 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       timeSpentMinutes: 25,
       avgTimePerQuestionSec: 24,
       totalExamsTaken: 16,
+      avgPoints: Number((uScore * 2).toFixed(1)),
       streakDays: user?.streakDays || 14,
-      location: 'ময়মনসিংহ',
       isCurrentUser: true
     };
 
-    const mockOthers: LeaderboardUser[] = [
-      { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: examQuestions, maxScore: examQuestions, accuracyPercentage: 100, correctCount: examQuestions, wrongCount: 0, timeSpentMinutes: 38, avgTimePerQuestionSec: 22, totalExamsTaken: 28, streakDays: 24, location: 'ঢাকা' },
-      { rank: 2, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: Math.max(1, examQuestions - 1), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 1) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 1), wrongCount: 1, timeSpentMinutes: 41, avgTimePerQuestionSec: 24, totalExamsTaken: 25, streakDays: 18, location: 'চট্টগ্রাম' },
-      { rank: 3, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: Math.max(1, examQuestions - 1), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 1) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 1), wrongCount: 1, timeSpentMinutes: 44, avgTimePerQuestionSec: 26, totalExamsTaken: 22, streakDays: 15, location: 'সিলেট' },
-      { rank: 4, name: 'হাফেজ মাওলানা সিফাত উল্লাহ', cadre: 'লেকচারার ফিকহ', score: Math.max(1, examQuestions - 2), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 2) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 2), wrongCount: 2, timeSpentMinutes: 45, avgTimePerQuestionSec: 27, totalExamsTaken: 20, streakDays: 12, location: 'কুমিল্লা' },
-      { rank: 5, name: 'মাওলানা উবায়দুল ইসলাম', cadre: 'সহকারী মৌলভী', score: Math.max(1, examQuestions - 2), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 2) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 2), wrongCount: 2, timeSpentMinutes: 46, avgTimePerQuestionSec: 28, totalExamsTaken: 19, streakDays: 14, location: 'রাজশাহী' },
-      { rank: 6, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: Math.max(1, examQuestions - 3), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 3) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 3), wrongCount: 3, timeSpentMinutes: 48, avgTimePerQuestionSec: 29, totalExamsTaken: 18, streakDays: 11, location: 'রংপুর' },
-      { rank: 7, name: 'কারী কামরুল হাসান', cadre: 'ইবতেদায়ী প্রধান', score: Math.max(1, examQuestions - 3), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 3) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 3), wrongCount: 3, timeSpentMinutes: 49, avgTimePerQuestionSec: 29, totalExamsTaken: 17, streakDays: 10, location: 'বরিশাল' },
-      { rank: 8, name: 'হাফেজ তরিকুল ইসলাম', cadre: 'সহকারী শিক্ষক (আরবি)', score: Math.max(1, examQuestions - 4), maxScore: examQuestions, accuracyPercentage: Math.round(((examQuestions - 4) / examQuestions) * 100), correctCount: Math.max(1, examQuestions - 4), wrongCount: 4, timeSpentMinutes: 50, avgTimePerQuestionSec: 30, totalExamsTaken: 16, streakDays: 9, location: 'খুলনা' },
-    ];
+    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
+      const wrong = Math.min(examQuestions, Math.floor(i / 4));
+      const correct = Math.max(0, examQuestions - wrong);
+      const acc = Math.round((correct / examQuestions) * 100);
+      const exams = Math.max(10, 28 - Math.floor(i / 2));
+      return {
+        rank: i + 1,
+        name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
+        score: correct,
+        maxScore: examQuestions,
+        accuracyPercentage: acc,
+        correctCount: correct,
+        wrongCount: wrong,
+        totalExamsTaken: exams,
+        avgPoints: Number((28.5 - i * 0.2).toFixed(1)),
+        timeSpentMinutes: 30 + i,
+        avgTimePerQuestionSec: 20 + (i % 8),
+        streakDays: Math.max(2, 25 - i)
+      };
+    });
 
     rawCandidates = [...mockOthers, userObj];
+
   } else if (filterPeriod === 'weekly') {
     const userWeeklyPoints = Math.min(500, Math.max(450, 460 + Math.round((storedTotalPoints - 840) / 10)));
     const userObj: LeaderboardUser = {
       rank: 1,
-      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
-      cadre: 'সহকারী শিক্ষক (আরবি)',
+      name: currentUserName,
+      avatar: currentUserAvatar,
       score: userWeeklyPoints,
       maxScore: 500,
       accuracyPercentage: 96,
@@ -331,26 +238,38 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       timeSpentMinutes: 180,
       avgTimePerQuestionSec: 25,
       totalExamsTaken: 14 + Math.floor((storedTotalPoints - 840) / 20),
+      avgPoints: 28.2,
       streakDays: user?.streakDays || 14,
-      location: 'ময়মনসিংহ',
       isCurrentUser: true
     };
 
-    const mockOthers: LeaderboardUser[] = [
-      { rank: 1, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: 485, maxScore: 500, accuracyPercentage: 97, timeSpentMinutes: 210, avgTimePerQuestionSec: 23, totalExamsTaken: 14, streakDays: 30, location: 'চট্টগ্রাম' },
-      { rank: 2, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: 478, maxScore: 500, accuracyPercentage: 95, timeSpentMinutes: 205, avgTimePerQuestionSec: 24, totalExamsTaken: 12, streakDays: 24, location: 'ঢাকা' },
-      { rank: 3, name: 'হাফেজ ওবায়দুল ইসলাম', cadre: 'ইবতেদায়ী প্রধান', score: 462, maxScore: 500, accuracyPercentage: 92, timeSpentMinutes: 225, avgTimePerQuestionSec: 27, totalExamsTaken: 11, streakDays: 19, location: 'রাজশাহী' },
-      { rank: 4, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: 440, maxScore: 500, accuracyPercentage: 88, timeSpentMinutes: 230, avgTimePerQuestionSec: 28, totalExamsTaken: 10, streakDays: 15, location: 'সিলেট' },
-      { rank: 5, name: 'মুফতি আব্দুর রশীদ', cadre: 'প্রভাষক (আরবি)', score: 410, maxScore: 500, accuracyPercentage: 82, timeSpentMinutes: 240, avgTimePerQuestionSec: 29, totalExamsTaken: 9, streakDays: 11, location: 'রংপুর' },
-    ];
+    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
+      const sc = Math.max(120, 490 - i * 11);
+      const exams = Math.max(6, 18 - Math.floor(i / 2));
+      const avgP = Number((29.0 - i * 0.15).toFixed(1));
+      return {
+        rank: i + 1,
+        name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
+        score: sc,
+        maxScore: 500,
+        accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),
+        totalExamsTaken: exams,
+        avgPoints: avgP,
+        timeSpentMinutes: 150 + i * 5,
+        avgTimePerQuestionSec: 22 + (i % 5),
+        streakDays: Math.max(1, 28 - i)
+      };
+    });
 
     rawCandidates = [...mockOthers, userObj];
+
   } else if (filterPeriod === 'monthly') {
     const userMonthlyPoints = Math.min(2000, Math.max(1800, 1860 + Math.round((storedTotalPoints - 840) / 5)));
     const userObj: LeaderboardUser = {
       rank: 1,
-      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
-      cadre: 'সহকারী শিক্ষক (আরবি)',
+      name: currentUserName,
+      avatar: currentUserAvatar,
       score: userMonthlyPoints,
       maxScore: 2000,
       accuracyPercentage: 95,
@@ -359,26 +278,39 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       timeSpentMinutes: 720,
       avgTimePerQuestionSec: 25,
       totalExamsTaken: 42 + Math.floor((storedTotalPoints - 840) / 20),
+      avgPoints: 28.0,
       streakDays: user?.streakDays || 14,
-      location: 'ময়মনসিংহ',
       isCurrentUser: true
     };
 
-    const mockOthers: LeaderboardUser[] = [
-      { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: 1920, maxScore: 2000, accuracyPercentage: 96, timeSpentMinutes: 840, avgTimePerQuestionSec: 23, totalExamsTaken: 45, streakDays: 45, location: 'ঢাকা' },
-      { rank: 2, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: 1880, maxScore: 2000, accuracyPercentage: 94, timeSpentMinutes: 890, avgTimePerQuestionSec: 25, totalExamsTaken: 42, streakDays: 38, location: 'সিলেট' },
-      { rank: 3, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: 1845, maxScore: 2000, accuracyPercentage: 92, timeSpentMinutes: 860, avgTimePerQuestionSec: 26, totalExamsTaken: 40, streakDays: 30, location: 'চট্টগ্রাম' },
-      { rank: 4, name: 'হাফেজ ওবায়দুল ইসলাম', cadre: 'ইবতেদায়ী প্রধান', score: 1720, maxScore: 2000, accuracyPercentage: 86, timeSpentMinutes: 900, avgTimePerQuestionSec: 28, totalExamsTaken: 36, streakDays: 25, location: 'রাজশাহী' },
-    ];
+    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
+      const sc = Math.max(450, 1950 - i * 42);
+      const exams = Math.max(15, 50 - i);
+      const avgP = Number((28.8 - i * 0.12).toFixed(1));
+      return {
+        rank: i + 1,
+        name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
+        score: sc,
+        maxScore: 2000,
+        accuracyPercentage: Math.min(100, Math.max(60, 97 - i)),
+        totalExamsTaken: exams,
+        avgPoints: avgP,
+        timeSpentMinutes: 600 + i * 15,
+        avgTimePerQuestionSec: 21 + (i % 6),
+        streakDays: Math.max(2, 45 - i)
+      };
+    });
 
     rawCandidates = [...mockOthers, userObj];
+
   } else {
     // allTime
     const userAllTimePoints = Math.min(5600, Math.max(5100, 5250 + Math.round((storedTotalPoints - 840) / 2)));
     const userObj: LeaderboardUser = {
       rank: 1,
-      name: user?.name || 'আরিফুল ইসলাম (আপনি)',
-      cadre: 'সহকারী শিক্ষক (আরবি)',
+      name: currentUserName,
+      avatar: currentUserAvatar,
       score: userAllTimePoints,
       maxScore: 5600,
       accuracyPercentage: 96,
@@ -387,17 +319,29 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       timeSpentMinutes: 2100,
       avgTimePerQuestionSec: 24,
       totalExamsTaken: 112 + Math.floor((storedTotalPoints - 840) / 10),
+      avgPoints: 28.5,
       streakDays: user?.streakDays || 14,
-      location: 'ময়মনসিংহ',
       isCurrentUser: true
     };
 
-    const mockOthers: LeaderboardUser[] = [
-      { rank: 1, name: 'মাওলানা হাফেজ আব্দুল মালেক', cadre: 'প্রভাষক (আরবি)', score: 5420, maxScore: 5600, accuracyPercentage: 97, timeSpentMinutes: 2400, avgTimePerQuestionSec: 22, totalExamsTaken: 120, streakDays: 120, location: 'ঢাকা' },
-      { rank: 2, name: 'মুফতি তানভীর আহমেদ', cadre: 'সহকারী শিক্ষক (আরবি)', score: 5180, maxScore: 5600, accuracyPercentage: 95, timeSpentMinutes: 2510, avgTimePerQuestionSec: 24, totalExamsTaken: 110, streakDays: 95, location: 'চট্টগ্রাম' },
-      { rank: 3, name: 'কারি মোশতাক মাহমুদ', cadre: 'সহকারী মৌলভী', score: 4950, maxScore: 5600, accuracyPercentage: 93, timeSpentMinutes: 2480, avgTimePerQuestionSec: 25, totalExamsTaken: 105, streakDays: 88, location: 'সিলেট' },
-      { rank: 4, name: 'হাফেজ ওবায়দুল ইসলাম', cadre: 'ইবতেদায়ী প্রধান', score: 4500, maxScore: 5600, accuracyPercentage: 88, timeSpentMinutes: 2600, avgTimePerQuestionSec: 27, totalExamsTaken: 95, streakDays: 70, location: 'রাজশাহী' },
-    ];
+    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
+      const sc = Math.max(1200, 5500 - i * 120);
+      const exams = Math.max(30, 125 - i * 2);
+      const avgP = Number((29.2 - i * 0.1).toFixed(1));
+      return {
+        rank: i + 1,
+        name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
+        score: sc,
+        maxScore: 5600,
+        accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),
+        totalExamsTaken: exams,
+        avgPoints: avgP,
+        timeSpentMinutes: 2000 + i * 30,
+        avgTimePerQuestionSec: 20 + (i % 7),
+        streakDays: Math.max(5, 120 - i * 3)
+      };
+    });
 
     rawCandidates = [...mockOthers, userObj];
   }
@@ -419,88 +363,64 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   // Top 3 Podium
   const currentPodium = rawCandidates.slice(0, 3);
 
-  // Remaining Users
+  // Remaining Users (Rank 4 onwards)
   const remainingUsers = rawCandidates.slice(3);
 
-  // Helper for Rank Badge Styling
-  const renderRankBadge = (rank: number) => {
-    if (rank === 1) {
-      return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] shadow-2xs border border-amber-200">
-          <Crown className="w-3 h-3 text-slate-950 fill-slate-950" />
-          <span>🥇 ১ম স্থান • চ্যাম্পিয়ন</span>
-        </span>
-      );
-    }
-    if (rank === 2) {
-      return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-[10px] shadow-2xs border border-slate-300 dark:border-slate-600">
-          <Medal className="w-3 h-3 text-slate-600 dark:text-slate-300" />
-          <span>🥈 ২য় স্থান • রানার-আপ</span>
-        </span>
-      );
-    }
-    if (rank === 3) {
-      return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-800 text-amber-100 font-black text-[10px] shadow-2xs border border-amber-600">
-          <Award className="w-3 h-3 text-amber-300" />
-          <span>🥉 ৩য় স্থান • ব্রোঞ্জ মেডেল</span>
-        </span>
-      );
-    }
-    if (rank <= 5) {
-      return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 font-extrabold text-[10px] border border-emerald-300 dark:border-emerald-800">
-          <Sparkles className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-          <span>🏅 টপ ৫ স্টার</span>
-        </span>
-      );
-    }
-    if (rank <= 10) {
-      return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-900 dark:bg-teal-950 dark:text-teal-300 font-bold text-[10px] border border-teal-300 dark:border-teal-800">
-          <Zap className="w-3 h-3 text-teal-600 dark:text-teal-400" />
-          <span>🌟 টপ ১০ পারফরমার</span>
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold text-[10px]">
-        <span>⭐ টপ ১৫%</span>
-      </span>
-    );
-  };
+  // Calculate Pagination
+  const totalRemainingPages = Math.max(1, Math.ceil(remainingUsers.length / ITEMS_PER_PAGE));
+  const validCurrentPage = Math.min(currentPage, totalRemainingPages);
+  
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedRemaining = remainingUsers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // Visual Accuracy Progress Bar Helper Component
-  const AccuracyProgressBar: React.FC<{ accuracy: number; showLabel?: boolean; compact?: boolean }> = ({ 
-    accuracy, 
-    showLabel = true,
-    compact = false
-  }) => {
+  // Helper to Render Avatar Circle
+  const renderAvatarCircle = (u: LeaderboardUser, sizeClass: string = 'w-8 h-8') => {
     return (
-      <div className="w-full space-y-1">
-        {showLabel && (
-          <div className="flex justify-between items-center text-[10px] font-bold">
-            <span className="text-slate-500 dark:text-slate-400">এক্যুরেসি:</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-black">{accuracy}%</span>
-          </div>
-        )}
-        <div className={`w-full ${compact ? 'h-1.5' : 'h-2'} rounded-full bg-slate-200 dark:bg-slate-700/80 overflow-hidden p-0.5 shadow-inner`}>
-          <div 
-            className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 transition-all duration-500 shadow-xs"
-            style={{ width: `${Math.min(100, Math.max(0, accuracy))}%` }}
-          />
+      <div className={`${sizeClass} rounded-full bg-gradient-to-tr from-emerald-500 via-teal-400 to-amber-400 p-0.5 shrink-0 shadow-xs`}>
+        <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center font-bold text-emerald-300 overflow-hidden">
+          {u.avatar ? (
+            <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-xs">{u.name.charAt(0)}</span>
+          )}
         </div>
       </div>
     );
   };
 
+  // Helper for Rank Badge Styling
+  const renderRankBadge = (rank: number) => {
+    if (rank === 1) {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] shadow-xs">
+          <Crown className="w-3 h-3 text-slate-950 fill-slate-950" />
+          <span>১ম স্থান</span>
+        </span>
+      );
+    }
+    if (rank === 2) {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-[10px]">
+          <Medal className="w-3 h-3 text-slate-600 dark:text-slate-300" />
+          <span>২য় স্থান</span>
+        </span>
+      );
+    }
+    if (rank === 3) {
+      return (
+        <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-800 text-amber-100 font-black text-[10px]">
+          <Award className="w-3 h-3 text-amber-300" />
+          <span>৩য় স্থান</span>
+        </span>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-24 animate-in fade-in duration-300">
       
-      {/* ========================================================= */}
-      {/* HEADER BANNER                                             */}
-      {/* ========================================================= */}
+      {/* HEADER BANNER */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-950 text-white p-6 sm:p-8 shadow-2xl border border-emerald-800/60">
         <div className="absolute -right-12 -bottom-12 w-60 h-60 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -left-12 -top-12 w-52 h-52 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
@@ -575,7 +495,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           </div>
         )}
 
-        {/* Filter Tabs (Hidden in Course Context) */}
+        {/* Filter Tabs */}
         {!hideFilters && !isCourseContext && (
           <div className="relative z-10 flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 mt-4 p-1.5 bg-emerald-900/60 backdrop-blur-md rounded-2xl border border-emerald-700/50 w-full overflow-x-auto">
             {[
@@ -603,9 +523,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         )}
       </div>
 
-      {/* ========================================================= */}
-      {/* TOP 3 WINNERS PODIUM DESIGN                               */}
-      {/* ========================================================= */}
+      {/* TOP 3 WINNERS PODIUM DESIGN */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-6">
         <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 text-center flex items-center justify-center space-x-2">
           <Sparkles className="w-5 h-5 text-amber-500" />
@@ -616,149 +534,147 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         <div className="grid grid-cols-3 gap-2 sm:gap-4 items-end pt-6 pb-2 max-w-2xl mx-auto">
           
           {/* 🥈 SILVER - Rank 2 (Left) */}
-          <div className="flex flex-col items-center space-y-2">
-            <div className="relative">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-slate-300 via-slate-100 to-slate-400 p-1 shadow-lg flex items-center justify-center">
-                <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center text-slate-200 font-extrabold text-lg sm:text-xl">
-                  {currentPodium[1]?.name.charAt(0) || '2'}
+          {currentPodium[1] && (
+            <div className="flex flex-col items-center space-y-2">
+              <div className="relative">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-slate-300 via-slate-100 to-slate-400 p-1 shadow-lg flex items-center justify-center overflow-hidden">
+                  {currentPodium[1].avatar ? (
+                    <img src={currentPodium[1].avatar} alt={currentPodium[1].name} className="w-full h-full object-cover rounded-xl" />
+                  ) : (
+                    <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center text-slate-200 font-extrabold text-lg sm:text-xl">
+                      {currentPodium[1].name.charAt(0)}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <span className="absolute -bottom-2 inset-x-0 mx-auto w-6 h-6 rounded-full bg-slate-300 text-slate-950 font-black text-xs flex items-center justify-center shadow-md border border-white">
-                🥈
-              </span>
-            </div>
-            
-            <div className="text-center space-y-0.5">
-              <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 block line-clamp-1">
-                {currentPodium[1]?.name}
-              </span>
-              <div className="my-1">{renderRankBadge(2)}</div>
-              <span className="text-[10px] text-slate-500 font-semibold block">{currentPodium[1]?.location}</span>
-              <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block">
-                {currentPodium[1]?.score} পয়েন্ট
-              </span>
-              {currentPodium[1]?.avgTimePerQuestionSec && (
-                <span className="text-[9px] font-bold text-slate-500 block">
-                  ⚡ {currentPodium[1]?.avgTimePerQuestionSec} সে./প্রশ্ন
+                <span className="absolute -bottom-2 inset-x-0 mx-auto w-6 h-6 rounded-full bg-slate-300 text-slate-950 font-black text-xs flex items-center justify-center shadow-md border border-white">
+                  🥈
                 </span>
-              )}
-            </div>
+              </div>
+              
+              <div className="text-center space-y-0.5">
+                <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 block line-clamp-1">
+                  {currentPodium[1].name}
+                </span>
+                <div className="my-1">{renderRankBadge(2)}</div>
+                <span className="text-[10px] text-slate-500 font-semibold block">
+                  {currentPodium[1].totalExamsTaken || 18}টি পরীক্ষা • গড় {currentPodium[1].avgPoints || 28.5}
+                </span>
+                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block">
+                  {currentPodium[1].score} পয়েন্ট
+                </span>
+              </div>
 
-            <div className="w-full px-1">
-              <AccuracyProgressBar accuracy={currentPodium[1]?.accuracyPercentage || 95} compact />
+              <div className="w-full mt-1 h-24 sm:h-28 rounded-t-2xl bg-gradient-to-t from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700/80 border border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center p-2 shadow-inner">
+                <span className="text-xl sm:text-2xl font-black text-slate-600 dark:text-slate-300">২</span>
+                <span className="text-[10px] font-bold text-slate-500">রানার-আপ</span>
+              </div>
             </div>
-
-            <div className="w-full mt-1 h-24 sm:h-28 rounded-t-2xl bg-gradient-to-t from-slate-200 to-slate-100 dark:from-slate-800 dark:to-slate-700/80 border border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center p-2 shadow-inner">
-              <span className="text-xl sm:text-2xl font-black text-slate-600 dark:text-slate-300">২</span>
-              <span className="text-[10px] font-bold text-slate-500">রানার-আপ</span>
-            </div>
-          </div>
+          )}
 
           {/* 🥇 GOLD - Rank 1 (Center - Tallest) */}
-          <div className="flex flex-col items-center -mt-6 space-y-2">
-            <div className="relative">
-              <div className="absolute -top-6 inset-x-0 mx-auto flex justify-center animate-bounce">
-                <Crown className="w-7 h-7 text-amber-400 drop-shadow-md" />
-              </div>
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-1.5 shadow-2xl flex items-center justify-center">
-                <div className="w-full h-full rounded-2xl bg-slate-950 flex items-center justify-center text-amber-300 font-black text-xl sm:text-2xl">
-                  {currentPodium[0]?.name.charAt(0) || '1'}
+          {currentPodium[0] && (
+            <div className="flex flex-col items-center -mt-6 space-y-2">
+              <div className="relative">
+                <div className="absolute -top-6 inset-x-0 mx-auto flex justify-center animate-bounce">
+                  <Crown className="w-7 h-7 text-amber-400 drop-shadow-md" />
                 </div>
-              </div>
-              <span className="absolute -bottom-2 inset-x-0 mx-auto w-7 h-7 rounded-full bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center shadow-lg border-2 border-white">
-                🥇
-              </span>
-            </div>
-
-            <div className="text-center space-y-0.5">
-              <span className="text-xs sm:text-base font-black text-slate-950 dark:text-slate-100 block line-clamp-1">
-                {currentPodium[0]?.name}
-              </span>
-              <div className="my-1">{renderRankBadge(1)}</div>
-              <span className="text-[11px] text-amber-600 dark:text-amber-400 font-bold block">{currentPodium[0]?.cadre}</span>
-              <span className="text-sm font-black text-amber-500 block">
-                {currentPodium[0]?.score} পয়েন্ট
-              </span>
-              {currentPodium[0]?.avgTimePerQuestionSec && (
-                <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 block">
-                  ⚡ {currentPodium[0]?.avgTimePerQuestionSec} সে./প্রশ্ন
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-1.5 shadow-2xl flex items-center justify-center overflow-hidden">
+                  {currentPodium[0].avatar ? (
+                    <img src={currentPodium[0].avatar} alt={currentPodium[0].name} className="w-full h-full object-cover rounded-2xl" />
+                  ) : (
+                    <div className="w-full h-full rounded-2xl bg-slate-950 flex items-center justify-center text-amber-300 font-black text-xl sm:text-2xl">
+                      {currentPodium[0].name.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <span className="absolute -bottom-2 inset-x-0 mx-auto w-7 h-7 rounded-full bg-amber-400 text-slate-950 font-black text-sm flex items-center justify-center shadow-lg border-2 border-white">
+                  🥇
                 </span>
-              )}
-            </div>
+              </div>
 
-            <div className="w-full px-1">
-              <AccuracyProgressBar accuracy={currentPodium[0]?.accuracyPercentage || 98} compact />
-            </div>
+              <div className="text-center space-y-0.5">
+                <span className="text-xs sm:text-base font-black text-slate-950 dark:text-slate-100 block line-clamp-1">
+                  {currentPodium[0].name}
+                </span>
+                <div className="my-1">{renderRankBadge(1)}</div>
+                <span className="text-[11px] text-amber-600 dark:text-amber-400 font-bold block">
+                  {currentPodium[0].totalExamsTaken || 25}টি পরীক্ষা • গড় {currentPodium[0].avgPoints || 29.0}
+                </span>
+                <span className="text-sm font-black text-amber-500 block">
+                  {currentPodium[0].score} পয়েন্ট
+                </span>
+              </div>
 
-            <div className="w-full mt-1 h-32 sm:h-36 rounded-t-2xl bg-gradient-to-t from-amber-500/30 via-amber-400/20 to-amber-300/10 dark:from-amber-900/40 dark:to-slate-800 border-2 border-amber-400/50 flex flex-col items-center justify-center p-2 shadow-lg">
-              <span className="text-2xl sm:text-3xl font-black text-amber-500">১</span>
-              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400">চ্যাম্পিয়ন</span>
+              <div className="w-full mt-1 h-32 sm:h-36 rounded-t-2xl bg-gradient-to-t from-amber-500/30 via-amber-400/20 to-amber-300/10 dark:from-amber-900/40 dark:to-slate-800 border-2 border-amber-400/50 flex flex-col items-center justify-center p-2 shadow-lg">
+                <span className="text-2xl sm:text-3xl font-black text-amber-500">১</span>
+                <span className="text-[11px] font-black text-amber-600 dark:text-amber-400">চ্যাম্পিয়ন</span>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* 🥉 BRONZE - Rank 3 (Right) */}
-          <div className="flex flex-col items-center space-y-2">
-            <div className="relative">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-amber-700 via-amber-600 to-amber-800 p-1 shadow-lg flex items-center justify-center">
-                <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center text-amber-200 font-extrabold text-lg sm:text-xl">
-                  {currentPodium[2]?.name.charAt(0) || '3'}
+          {currentPodium[2] && (
+            <div className="flex flex-col items-center space-y-2">
+              <div className="relative">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-amber-700 via-amber-600 to-amber-800 p-1 shadow-lg flex items-center justify-center overflow-hidden">
+                  {currentPodium[2].avatar ? (
+                    <img src={currentPodium[2].avatar} alt={currentPodium[2].name} className="w-full h-full object-cover rounded-xl" />
+                  ) : (
+                    <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center text-amber-200 font-extrabold text-lg sm:text-xl">
+                      {currentPodium[2].name.charAt(0)}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <span className="absolute -bottom-2 inset-x-0 mx-auto w-6 h-6 rounded-full bg-amber-700 text-white font-black text-xs flex items-center justify-center shadow-md border border-white">
-                🥉
-              </span>
-            </div>
-
-            <div className="text-center space-y-0.5">
-              <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 block line-clamp-1">
-                {currentPodium[2]?.name}
-              </span>
-              <div className="my-1">{renderRankBadge(3)}</div>
-              <span className="text-[10px] text-slate-500 font-semibold block">{currentPodium[2]?.location}</span>
-              <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block">
-                {currentPodium[2]?.score} পয়েন্ট
-              </span>
-              {currentPodium[2]?.avgTimePerQuestionSec && (
-                <span className="text-[9px] font-bold text-slate-500 block">
-                  ⚡ {currentPodium[2]?.avgTimePerQuestionSec} সে./প্রশ্ন
+                <span className="absolute -bottom-2 inset-x-0 mx-auto w-6 h-6 rounded-full bg-amber-700 text-white font-black text-xs flex items-center justify-center shadow-md border border-white">
+                  🥉
                 </span>
-              )}
-            </div>
+              </div>
 
-            <div className="w-full px-1">
-              <AccuracyProgressBar accuracy={currentPodium[2]?.accuracyPercentage || 92} compact />
-            </div>
+              <div className="text-center space-y-0.5">
+                <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 block line-clamp-1">
+                  {currentPodium[2].name}
+                </span>
+                <div className="my-1">{renderRankBadge(3)}</div>
+                <span className="text-[10px] text-slate-500 font-semibold block">
+                  {currentPodium[2].totalExamsTaken || 20}টি পরীক্ষা • গড় {currentPodium[2].avgPoints || 28.0}
+                </span>
+                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block">
+                  {currentPodium[2].score} পয়েন্ট
+                </span>
+              </div>
 
-            <div className="w-full mt-1 h-20 sm:h-24 rounded-t-2xl bg-gradient-to-t from-amber-900/20 to-slate-100 dark:from-slate-800 dark:to-slate-700/80 border border-amber-800/30 flex flex-col items-center justify-center p-2 shadow-inner">
-              <span className="text-xl sm:text-2xl font-black text-amber-700 dark:text-amber-400">৩</span>
-              <span className="text-[10px] font-bold text-slate-500">৩য় স্থান</span>
+              <div className="w-full mt-1 h-20 sm:h-24 rounded-t-2xl bg-gradient-to-t from-amber-900/20 to-slate-100 dark:from-slate-800 dark:to-slate-700/80 border border-amber-800/30 flex flex-col items-center justify-center p-2 shadow-inner">
+                <span className="text-xl sm:text-2xl font-black text-amber-700 dark:text-amber-400">৩</span>
+                <span className="text-[10px] font-bold text-slate-500">৩য় স্থান</span>
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
       </div>
 
-      {/* ========================================================= */}
-      {/* CURRENT USER HIGHLIGHTED CARD (My Rank - Slim Bar)        */}
-      {/* ========================================================= */}
+      {/* CURRENT USER HIGHLIGHTED CARD */}
       <div className="relative p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-600/10 via-emerald-500/15 to-teal-500/10 dark:from-emerald-950/90 dark:to-teal-950/90 border border-emerald-500/80 shadow-md backdrop-blur-md transition-all space-y-2">
         
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center space-x-3">
             <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-600 text-white font-black text-xs sm:text-sm flex items-center justify-center shrink-0 shadow-xs border border-emerald-400">
               {currentUser.rank}
             </span>
+            
+            {renderAvatarCircle(currentUser, 'w-10 h-10')}
+
             <div>
-              <div className="flex items-center space-x-1.5">
+              <div className="flex items-center space-x-2">
                 <h3 className="font-black text-xs sm:text-sm text-slate-900 dark:text-slate-100">
                   {currentUser.name}
                 </h3>
-                <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold">
                   আপনি
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 font-medium">
-                আপনার মেধা অবস্থান • {currentUser.cadre} ({currentUser.location})
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">
+                আপনার মেধা অবস্থান • {currentUser.totalExamsTaken || 18}টি পরীক্ষা • গড় {currentUser.avgPoints || 28.5} পয়েন্ট
               </p>
             </div>
           </div>
@@ -815,9 +731,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[9px] text-slate-400 block font-medium">গড় এক্যুরেসি</span>
+                  <span className="text-[9px] text-slate-400 block font-medium">গড় পয়েন্ট</span>
                   <span className="font-black text-xs text-emerald-600 dark:text-emerald-400">
-                    {currentUser.accuracyPercentage}%
+                    {currentUser.avgPoints || 28.0}
                   </span>
                 </div>
                 <div className="text-right">
@@ -830,24 +746,18 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             )}
           </div>
         </div>
-
-        {/* Compact Thin Accuracy Progress Line */}
-        <div className="w-full h-1.5 rounded-full bg-emerald-950/20 dark:bg-slate-700/80 overflow-hidden">
-          <div 
-            className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 transition-all duration-500"
-            style={{ width: `${Math.min(100, Math.max(0, currentUser.accuracyPercentage))}%` }}
-          />
-        </div>
       </div>
 
-      {/* ========================================================= */}
-      {/* REMAINING USERS LIST (SLIM / COMPACT LINE ITEM FORMAT)     */}
-      {/* ========================================================= */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-3">
-        <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-          <span>অন্যান্য পরীক্ষার্থীদের র‍্যাঙ্কিং</span>
-          <span className="text-xs font-semibold text-slate-500">মোট পরীক্ষার্থী: ৪,৮৫০+</span>
-        </h3>
+      {/* REMAINING USERS LIST WITH PAGINATION (MAX 20 CANDIDATES PER PAGE) */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 flex items-center space-x-2">
+            <span>অন্যান্য পরীক্ষার্থীদের র‍্যাঙ্কিং</span>
+          </h3>
+          <span className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
+            মোট পরীক্ষার্থী: {rawCandidates.length} জন
+          </span>
+        </div>
 
         {/* Compact Table / List Header */}
         <div className="hidden sm:flex items-center justify-between px-3 py-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -870,34 +780,51 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           ) : (
             <div className="flex items-center space-x-6 pr-2">
               <span>পরীক্ষা সংখ্যা</span>
-              <span>গড় এক্যুরেসি</span>
+              <span>গড় পয়েন্ট</span>
               <span>পয়েন্ট</span>
             </div>
           )}
         </div>
 
-        <div className="space-y-1.5">
-          {remainingUsers.map((u) => (
+        {/* List of Candidates */}
+        <div className="space-y-2">
+          {paginatedRemaining.map((u) => (
             <div
               key={u.rank}
-              className="py-2 px-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/60 flex items-center justify-between hover:bg-emerald-50/60 dark:hover:bg-slate-800 transition-colors"
+              className={`py-2.5 px-3.5 rounded-2xl border transition-colors flex items-center justify-between ${
+                u.isCurrentUser 
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-400/80' 
+                  : 'bg-slate-50/80 dark:bg-slate-800/50 border-slate-200/60 dark:border-slate-700/60 hover:bg-emerald-50/50 dark:hover:bg-slate-800'
+              }`}
             >
-              {/* 1. Serial Number & 2. Name */}
+              {/* 1. Serial Number, Avatar Image & Name */}
               <div className="flex items-center space-x-3 min-w-0">
                 <span className="w-7 h-7 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
                   {u.rank}
                 </span>
+
+                {/* Profile Picture */}
+                {renderAvatarCircle(u, 'w-8 h-8')}
+
                 <div className="min-w-0 space-y-0.5">
-                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
-                    {u.name}
-                  </h4>
-                  <p className="text-[10px] text-slate-500 font-medium truncate">
-                    {u.cadre} • {u.location}
+                  <div className="flex items-center space-x-1.5">
+                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 truncate">
+                      {u.name}
+                    </h4>
+                    {u.isCurrentUser && (
+                      <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-extrabold">
+                        আপনি
+                      </span>
+                    )}
+                  </div>
+                  {/* Under the name: Total exams and avg points / accuracy */}
+                  <p className="text-[11px] text-slate-500 font-medium truncate">
+                    {u.totalExamsTaken || 15}টি পরীক্ষা • {showThisExamStats ? `এক্যুরেসি ${u.accuracyPercentage}%` : `গড় পয়েন্ট ${u.avgPoints || 28.0}`}
                   </p>
                 </div>
               </div>
 
-              {/* 3. Stats Column */}
+              {/* 2. Stats Column */}
               {isCourseContext ? (
                 <div className="flex items-center space-x-3 sm:space-x-6 shrink-0 text-right">
                   <div className="text-right">
@@ -914,7 +841,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   </div>
                   <div className="text-right min-w-[55px]">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
-                    <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                    <span className="font-black text-sm sm:text-base text-amber-600 dark:text-amber-400">
                       {u.score}
                     </span>
                   </div>
@@ -935,7 +862,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   </div>
                   <div className="text-right min-w-[65px]">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
-                    <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                    <span className="font-black text-sm sm:text-base text-amber-600 dark:text-amber-400">
                       {u.score}
                     </span>
                   </div>
@@ -951,12 +878,12 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                   <div className="text-right">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">গড়:</span>
                     <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/60 dark:border-emerald-800/60">
-                      {u.accuracyPercentage}%
+                      {u.avgPoints || 28.0}
                     </span>
                   </div>
                   <div className="text-right min-w-[55px]">
                     <span className="text-[10px] text-slate-400 font-semibold block sm:hidden">পয়েন্ট:</span>
-                    <span className="font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400">
+                    <span className="font-black text-sm sm:text-base text-amber-600 dark:text-amber-400">
                       {u.score}
                     </span>
                   </div>
@@ -965,9 +892,52 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             </div>
           ))}
         </div>
+
+        {/* PAGINATION CONTROLS (Max 20 per page) */}
+        {totalRemainingPages > 1 && (
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-slate-500">
+              পৃষ্ঠা {validCurrentPage} এর {totalRemainingPages} (মোট {remainingUsers.length} জন)
+            </span>
+
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={validCurrentPage === 1}
+                className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-1"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>পূর্ববর্তী</span>
+              </button>
+
+              {Array.from({ length: totalRemainingPages }, (_, idx) => idx + 1).map((num) => (
+                <button
+                  key={num}
+                  onClick={() => setCurrentPage(num)}
+                  className={`w-9 h-9 rounded-xl font-extrabold text-xs transition-colors ${
+                    validCurrentPage === num
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalRemainingPages, p + 1))}
+                disabled={validCurrentPage === totalRemainingPages}
+                className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 font-bold text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-1"
+              >
+                <span>পরবর্তী</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
 
     </div>
   );
 };
-
