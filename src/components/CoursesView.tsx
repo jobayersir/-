@@ -1283,42 +1283,49 @@ export const CoursesView: React.FC = () => {
             )}
 
             {/* Modal 3: Specific Exam Leaderboard Modal */}
-            {examLeaderboardModal && (
-              <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
-                <div className="w-full max-w-3xl max-h-[92vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
-                  <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white flex items-center justify-between shrink-0">
-                    <div className="flex items-center space-x-3">
-                      <div className="p-2.5 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                        <Trophy className="w-6 h-6 stroke-[2.5]" />
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 block">
-                          পরীক্ষার বিশেষ মেধাতালিকা
-                        </span>
-                        <h3 className="font-black text-sm sm:text-base text-white">
-                          {examLeaderboardModal.exam.topic || examLeaderboardModal.exam.title}
-                        </h3>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setExamLeaderboardModal(null)}
-                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
-                  </div>
+            {examLeaderboardModal && (() => {
+              const attemptKey = activeCourse ? `${activeCourse.id}_${examLeaderboardModal.exam.id}` : '';
+              const attemptData = examAttempts[attemptKey];
 
-                  <div className="flex-1 overflow-y-auto p-4">
-                    <LeaderboardView
-                      examTitle={examLeaderboardModal.exam.topic || examLeaderboardModal.exam.title}
-                      isPremiumExam={true}
-                      isCourseContext={true}
-                      hideFilters={true}
-                    />
+              return (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
+                  <div className="w-full max-w-3xl max-h-[92vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
+                    <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white flex items-center justify-between shrink-0">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2.5 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                          <Trophy className="w-6 h-6 stroke-[2.5]" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 block">
+                            পরীক্ষার বিশেষ মেধাতালিকা
+                          </span>
+                          <h3 className="font-black text-sm sm:text-base text-white">
+                            {examLeaderboardModal.exam.topic || examLeaderboardModal.exam.title}
+                          </h3>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setExamLeaderboardModal(null)}
+                        className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4">
+                      <LeaderboardView
+                        examTitle={examLeaderboardModal.exam.topic || examLeaderboardModal.exam.title}
+                        isPremiumExam={true}
+                        isCourseContext={false}
+                        hideFilters={true}
+                        userScore={attemptData?.score}
+                        userMaxScore={attemptData?.maxScore}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
           </div>
         </div>

@@ -25,6 +25,8 @@ interface LeaderboardViewProps {
   isPremiumExam?: boolean;
   isCourseContext?: boolean;
   hideFilters?: boolean;
+  userScore?: number;
+  userMaxScore?: number;
 }
 
 export interface LeaderboardUser {
@@ -102,7 +104,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   examTitle,
   isPremiumExam = false,
   isCourseContext = false,
-  hideFilters = false
+  hideFilters = false,
+  userScore,
+  userMaxScore
 }) => {
   const [filterPeriod, setFilterPeriod] = useState<'thisExam' | 'weekly' | 'monthly' | 'allTime'>(
     isCourseContext ? 'allTime' : 'thisExam'
@@ -180,11 +184,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     rawCandidates = [...mockOthers, userObj];
 
   } else if (filterPeriod === 'thisExam') {
-    const examQuestions = latestResult ? latestResult.totalQuestions : 16;
-    const uScore = latestResult ? latestResult.score : Math.min(15, examQuestions);
-    const uCorrect = latestResult ? latestResult.correctCount : uScore;
-    const uWrong = latestResult ? latestResult.wrongCount : Math.max(0, examQuestions - uScore);
-    const uAcc = latestResult ? latestResult.percentage : (examQuestions > 0 ? Math.round((uScore / examQuestions) * 100) : 94);
+    const examQuestions = userMaxScore !== undefined ? userMaxScore : (latestResult ? latestResult.totalQuestions : 16);
+    const uScore = userScore !== undefined ? userScore : (latestResult ? latestResult.score : Math.min(15, examQuestions));
+    const uCorrect = uScore;
+    const uWrong = Math.max(0, examQuestions - uScore);
+    const uAcc = examQuestions > 0 ? Math.round((uScore / examQuestions) * 100) : 94;
 
     const userObj: LeaderboardUser = {
       rank: 1,
