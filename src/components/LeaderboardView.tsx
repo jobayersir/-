@@ -84,6 +84,17 @@ const MOCK_CANDIDATE_NAMES = [
   'মাওলানা রায়হান পারভেজ'
 ];
 
+export const PRESET_MOCK_AVATARS = [
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150',
+  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150',
+  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150',
+  'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150',
+  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150',
+  'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=150',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150'
+];
+
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ 
   user, 
   onTabChange,
@@ -200,6 +211,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: correct,
         maxScore: examQuestions,
         accuracyPercentage: acc,
@@ -241,6 +253,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: sc,
         maxScore: 500,
         accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),
@@ -280,6 +293,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: sc,
         maxScore: 2000,
         accuracyPercentage: Math.min(100, Math.max(60, 97 - i)),
@@ -320,6 +334,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       return {
         rank: i + 1,
         name,
+        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
         score: sc,
         maxScore: 5600,
         accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),

@@ -183,20 +183,23 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Sync Bengali font on body
+  // Sync Bengali font on body & CSS root variable
   useEffect(() => {
-    if (bengaliFont === 'Noto Serif Bengali') {
-      document.body.style.fontFamily = "'Noto Serif Bengali', 'Hind Siliguri', serif, system-ui";
-    } else {
-      document.body.style.fontFamily = "'Hind Siliguri', 'Noto Serif Bengali', sans-serif, system-ui";
-    }
+    const bnFontFamily = getBengaliFontFamily(bengaliFont);
+    document.documentElement.style.setProperty('--font-bengali', bnFontFamily);
+    document.body.style.fontFamily = bnFontFamily;
     localStorage.setItem('tamreen_bengali_font', bengaliFont);
   }, [bengaliFont]);
 
-  // Sync Arabic font preference
+  // Sync Arabic font preference & CSS root variable
+  useEffect(() => {
+    const arFontFamily = getArabicFontFamily(arabicFont);
+    document.documentElement.style.setProperty('--font-arabic', arFontFamily);
+    localStorage.setItem('tamreen_arabic_font', arabicFont);
+  }, [arabicFont]);
+
   const handleChangeArabicFont = (font: string) => {
     setArabicFont(font);
-    localStorage.setItem('tamreen_arabic_font', font);
   };
 
   // Dark mode toggle handler
