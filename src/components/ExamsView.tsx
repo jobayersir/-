@@ -60,6 +60,120 @@ export interface ExtendedExamItem extends ExamItem {
   isLiveNow?: boolean;
 }
 
+const toBnDigits = (num: number | string): string => {
+  const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(num).padStart(2, '0').replace(/\d/g, (d) => bnNums[parseInt(d, 10)]);
+};
+
+export const LiveCardTicker: React.FC = () => {
+  const [secondsLeft, setSecondsLeft] = useState<number>(2 * 3600 + 45 * 60 + 30);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const hours = Math.floor(secondsLeft / 3600);
+  const minutes = Math.floor((secondsLeft % 3600) / 60);
+  const seconds = secondsLeft % 60;
+
+  return (
+    <div className="bg-rose-500/10 border border-rose-500/30 p-2.5 rounded-2xl flex items-center justify-between text-xs font-bold text-rose-600 dark:text-rose-400">
+      <div className="flex items-center space-x-1.5">
+        <Timer className="w-4 h-4 animate-spin text-rose-500" />
+        <span>কাউন্টডাউন: <strong className="font-mono text-rose-600 dark:text-rose-300 font-extrabold">{toBnDigits(hours)}:{toBnDigits(minutes)}:{toBnDigits(seconds)}</strong></span>
+      </div>
+      <span className="text-[11px] bg-rose-500 text-white px-2 py-0.5 rounded-lg animate-pulse">লাইভ চলছে</span>
+    </div>
+  );
+};
+
+export const LiveExamCountdownBanner: React.FC<{
+  liveExam: ExtendedExamItem;
+  onStartExam: (exam: ExtendedExamItem) => void;
+}> = ({ liveExam, onStartExam }) => {
+  const [secondsLeft, setSecondsLeft] = useState<number>(2 * 3600 + 45 * 60 + 30);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const hours = Math.floor(secondsLeft / 3600);
+  const minutes = Math.floor((secondsLeft % 3600) / 60);
+  const seconds = secondsLeft % 60;
+
+  return (
+    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-950 via-slate-900 to-emerald-950 text-white p-5 sm:p-6 shadow-xl border border-rose-500/40 animate-in fade-in duration-300">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5">
+        <div className="space-y-2.5 text-center lg:text-left min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+            <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-rose-600 text-white font-black text-xs shadow-md animate-pulse">
+              <Radio className="w-3.5 h-3.5 text-white animate-ping" />
+              <span>লাইভ পরীক্ষা কাউন্টডাউন</span>
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-extrabold text-xs">
+              আজ রাত ৯:০০ টা
+            </span>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-black text-white leading-snug">
+            {liveExam.title}
+          </h2>
+
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs text-slate-300 font-medium">
+            <span>বিষয়: <strong className="text-amber-300">{liveExam.subject}</strong></span>
+            <span>•</span>
+            <span>সময়কাল: <strong className="text-white">{liveExam.durationMinutes} মিনিট</strong></span>
+            <span>•</span>
+            <span>অংশগ্রহণকারী: <strong className="text-emerald-300">{liveExam.participantsCount}</strong></span>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0 w-full lg:w-auto justify-center">
+          <div className="flex items-center space-x-2 bg-slate-950/90 p-3 px-4 rounded-2xl border border-rose-500/50 shadow-inner">
+            <div className="flex flex-col items-center">
+              <span className="text-2xl sm:text-3xl font-black text-rose-400 min-w-[2.5rem] text-center font-mono">
+                {toBnDigits(hours)}
+              </span>
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase">ঘণ্টা</span>
+            </div>
+            <span className="text-2xl font-black text-rose-500 animate-pulse">:</span>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl sm:text-3xl font-black text-amber-400 min-w-[2.5rem] text-center font-mono">
+                {toBnDigits(minutes)}
+              </span>
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase">মিনিট</span>
+            </div>
+            <span className="text-2xl font-black text-rose-500 animate-pulse">:</span>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-400 min-w-[2.5rem] text-center font-mono">
+                {toBnDigits(seconds)}
+              </span>
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase">সেকেন্ড</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onStartExam(liveExam)}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/20 flex items-center justify-center space-x-2 transition-all active:scale-95 cursor-pointer"
+          >
+            <Play className="w-4 h-4 fill-slate-950" />
+            <span>এখনই লাইভ পরীক্ষা দিন</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeaderboard }) => {
   const [selectedCategory, setSelectedCategory] = useState<ExamCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -398,6 +512,8 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     }
   };
 
+  const liveExamItem = examsList.find((ex) => ex.category === 'live') || examsList[0];
+
   return (
     <div className="space-y-6 pb-28 animate-in fade-in duration-300">
       
@@ -459,6 +575,11 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
           </div>
         </div>
       </div>
+
+      {/* ========================================================= */}
+      {/* 1.5 LIVE EXAM COUNTDOWN BANNER                            */}
+      {/* ========================================================= */}
+      <LiveExamCountdownBanner liveExam={liveExamItem} onStartExam={handleStartExam} />
 
       {/* ========================================================= */}
       {/* 2. SEARCH & FILTER CONTROLS                               */}
@@ -719,13 +840,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
                   {/* Live Exam Countdown or Participant Count */}
                   {isLive ? (
-                    <div className="bg-rose-500/10 border border-rose-500/30 p-2.5 rounded-2xl flex items-center justify-between text-xs font-bold text-rose-600 dark:text-rose-400">
-                      <div className="flex items-center space-x-1.5">
-                        <Timer className="w-4 h-4 animate-spin text-rose-500" />
-                        <span>{exam.scheduledTime}</span>
-                      </div>
-                      <span className="text-[11px] bg-rose-500 text-white px-2 py-0.5 rounded-lg animate-pulse">লাইভ চলছে</span>
-                    </div>
+                    <LiveCardTicker />
                   ) : isCompleted ? (
                     <div className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 font-bold">
                       <span>প্রাপ্ত স্কোর: <strong className="text-emerald-600 text-sm font-extrabold">{exam.score}/{exam.totalMarks}</strong></span>
