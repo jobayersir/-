@@ -2,7 +2,8 @@ import React from 'react';
 import { UserProfileData, NavTab, PostCadre } from '../types';
 import { LeaderboardView } from './LeaderboardView';
 import { ProfileView } from './ProfileView';
-export { LeaderboardView, ProfileView };
+import { WrongQuestionsView } from './WrongQuestionsView';
+export { LeaderboardView, ProfileView, WrongQuestionsView };
 import { 
   User, 
   Bookmark, 
@@ -67,43 +68,7 @@ export const BookmarksView: React.FC<ViewProps> = ({ onTabChange }) => (
   </div>
 );
 
-// 3. Wrong Questions View
-export const WrongQuestionsView: React.FC<ViewProps> = ({ onTabChange }) => (
-  <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
-    <div className="flex items-center space-x-2">
-      <AlertTriangle className="w-5 h-5 text-rose-500" />
-      <h2 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
-        ভুল উত্তরের ব্যাংক
-      </h2>
-    </div>
-
-    <p className="text-xs text-slate-500">
-      পূর্বে অনুষ্ঠিত মডেল টেস্টে যে প্রশ্নগুলো ভুল উত্তর দিয়েছিলেন, সেগুলো পুনরায় রিভিশন দিয়ে প্রস্তুতি নিখুঁত করুন।
-    </p>
-
-    <div className="space-y-3">
-      {[
-        { q: 'বালাগাত শাস্ত্রে ‘ইলমুল বায়ান’ এর মূল আলোচ্য বিষয় কী?', wrongAns: 'শব্দের সজ্জা', correctAns: 'তাশবীহ ও ইস্তিয়ারা', cadre: 'সহকারী শিক্ষক (আরবি)' },
-        { q: 'কিয়াস শব্দের অভিধানিক অর্থ কী?', wrongAns: 'সংক্ষেপকরণ', correctAns: 'অনুমান বা পরিমাপ করা', cadre: 'প্রভাষক (আরবি)' },
-      ].map((item, idx) => (
-        <div key={idx} className="p-4 rounded-2xl bg-rose-50/50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 space-y-2">
-          <h3 className="font-bold text-xs text-slate-900 dark:text-slate-100">{item.q}</h3>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <span className="text-rose-600 dark:text-rose-400">ভুল উত্তর: {item.wrongAns}</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-bold">সঠিক উত্তর: {item.correctAns}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-
-    <button
-      onClick={() => onTabChange('mcq')}
-      className="w-full py-3 rounded-2xl bg-emerald-600 text-white text-xs font-bold shadow-md"
-    >
-      পুনরায় ভুল প্রশ্নের পরীক্ষা দিন
-    </button>
-  </div>
-);
+// 3. Wrong Questions View is imported and exported from ./WrongQuestionsView above
 
 // 4. Leaderboard View is imported from ./LeaderboardView above
 
@@ -114,14 +79,14 @@ export const PremiumView: React.FC = () => (
       <Crown className="w-12 h-12 text-slate-950 mx-auto" />
       <h2 className="text-2xl font-black">ভিআইপি প্রিমিয়াম মেম্বারশিপ প্ল্যান</h2>
       <p className="text-xs sm:text-sm font-semibold max-w-xl mx-auto text-slate-900">
-        মাদ্রাসা বিষয়ভিত্তিক পরীক্ষায় সর্বোচ্চ নম্বর অর্জনে প্রিমিয়াম মেম্বার হয়ে আনলিমিটেড মক টেস্ট ও উস্তাদ এআই এক্সেস নিন।
+        মাদ্রাসা বিষয়ভিত্তিক পরীক্ষায় সর্বোচ্চ নম্বর অর্জনে প্রিমিয়াম মেম্বার হয়ে আনলিমিটেড মক টেস্ট ও তামরীন AI এক্সেস নিন।
       </p>
     </div>
 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
       {[
-        { plan: 'মাসিক প্ল্যান', price: '৳ ২৯৯', duration: '১ মাস এক্সেস', features: ['সকল ফ্রি কোর্স', 'ডেইলি মডেল টেস্ট', 'উস্তাদ এআই প্রম্পট ৫০টি'] },
-        { plan: 'ষাণ্মাসিক প্ল্যান', price: '৳ ৯৯৯', duration: '৬ মাস এক্সেস', popular: true, features: ['সকল প্রিমিয়াম ভিডিও কোর্স', 'আনলিমিটেড উস্তাদ এআই', 'লাইভ মক টেস্ট', 'বিগত ১০ বছরের ব্যাংক'] },
+        { plan: 'মাসিক প্ল্যান', price: '৳ ২৯৯', duration: '১ মাস এক্সেস', features: ['সকল ফ্রি কোর্স', 'ডেইলি মডেল টেস্ট', 'তামরীন AI প্রম্পট ৫০টি'] },
+        { plan: 'ষাণ্মাসিক প্ল্যান', price: '৳ ৯৯৯', duration: '৬ মাস এক্সেস', popular: true, features: ['সকল প্রিমিয়াম ভিডিও কোর্স', 'আনলিমিটেড তামরীন AI', 'লাইভ মক টেস্ট', 'বিগত ১০ বছরের ব্যাংক'] },
         { plan: 'বাৎসরিক ভিআইপি', price: '৳ ১,৪৯৯', duration: '১ বছর এক্সেস', features: ['সকল ক্যাডার কোর্স', '১:১ এআই সাপোর্ট', 'ব্যক্তিগত টিউটর গাইডেন্স', 'প্রিন্টযোগ্য লেকচার শিট'] },
       ].map((p, idx) => (
         <div

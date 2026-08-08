@@ -185,7 +185,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
                 className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm sm:text-base shadow-md disabled:opacity-50 flex items-center justify-center space-x-2 transition-all"
               >
                 <Send className="w-4 h-4" />
-                <span>{evaluating ? 'উস্তাদ এআই মূল্যায়ন করছে...' : 'উস্তাদ এআই মূল্যায়ন জমা দিন'}</span>
+                <span>{evaluating ? 'তামরীন AI মূল্যায়ন করছে...' : 'তামরীন AI মূল্যায়ন জমা দিন'}</span>
               </button>
 
               {/* AI Feedback Output Box */}
@@ -193,7 +193,7 @@ export const CqPracticeView: React.FC<CqPracticeViewProps> = ({ selectedCadre, a
                 <div className="p-5 rounded-2xl bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-800/80 space-y-3 animate-in fade-in">
                   <div className="flex items-center space-x-2 text-amber-900 dark:text-amber-300 font-bold text-base">
                     <Award className="w-5 h-5 text-amber-600" />
-                    <span>উস্তাদ এআই মূল্যায়ন রিপোর্ট:</span>
+                    <span>তামরীন AI মূল্যায়ন রিপোর্ট:</span>
                   </div>
                   <p className="text-sm sm:text-base text-slate-800 dark:text-slate-200 whitespace-pre-line leading-relaxed">
                     {aiEvaluation}

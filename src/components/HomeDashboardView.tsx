@@ -64,7 +64,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             </h2>
 
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী ক্যাডারের জন্য তামরীন একাডেমির বিশ্বস্ত আরবি-বাংলা-ইংরেজি সিলেবাস, উস্তাদ এআই, এমসিকিউ ও সিকিউ প্রস্তুতির সেরা ডিজিটাল প্ল্যাটফর্ম।
+              সহকারী শিক্ষক (আরবি), প্রভাষক (হাদিস/ফিকহ), সহকারী মৌলভী ও ইবতেদায়ী ক্যাডারের জন্য তামরীন একাডেমির বিশ্বস্ত আরবি-বাংলা-ইংরেজি সিলেবাস, তামরীন AI, এমসিকিউ ও সিকিউ প্রস্তুতির সেরা ডিজিটাল প্ল্যাটফর্ম।
             </p>
 
             <div className="pt-2 flex flex-wrap gap-3">
@@ -81,7 +81,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm backdrop-blur-md border border-white/20 flex items-center space-x-2 transition-all"
               >
                 <Bot className="w-4 h-4 text-teal-300" />
-                <span>উস্তাদ এআই সাহায্য নিন</span>
+                <span>তামরীন AI সাহায্য নিন</span>
               </button>
             </div>
           </div>
@@ -196,7 +196,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 সিকিউ ও লিখিত প্রস্তুতি
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                রচনামূলক ও সংক্ষিপ্ত প্রশ্ন, আরবি-বাংলা নমুনা উত্তর এবং আপনার হাতে লেখা বা টাইপ করা উত্তর উস্তাদ এআই দিয়ে মার্কিং করান।
+                রচনামূলক ও সংক্ষিপ্ত প্রশ্ন, আরবি-বাংলা নমুনা উত্তর এবং আপনার হাতে লেখা বা টাইপ করা উত্তর তামরীন AI দিয়ে মার্কিং করান।
               </p>
             </div>
             <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold text-teal-600 dark:text-teal-400">
@@ -205,7 +205,7 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
             </div>
           </div>
 
-          {/* Card 3: Ustad AI */}
+          {/* Card 3: Tamreen AI */}
           <div 
             onClick={() => onTabChange('ustad_ai')}
             className="group bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
@@ -215,10 +215,10 @@ export const HomeDashboardView: React.FC<HomeDashboardViewProps> = ({
                 <Bot className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                উস্তাদ এআই
+                তামরীন AI
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-                আরবি ব্যাকরণ, ফিকহ জটিলতা, হাদিসের সনদ বা নিবন্ধন সিলেবাস সম্পর্কিত যেকোনো প্রশ্ন উস্তাদ এআই-কে জিজ্ঞেস করুন।
+                আরবি ব্যাকরণ, ফিকহ জটিলতা, হাদিসের সনদ বা নিবন্ধন সিলেবাস সম্পর্কিত যেকোনো প্রশ্ন তামরীন AI-কে জিজ্ঞেস করুন।
               </p>
             </div>
             <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold text-amber-600 dark:text-amber-400">

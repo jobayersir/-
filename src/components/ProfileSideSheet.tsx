@@ -49,7 +49,6 @@ export const ProfileSideSheet: React.FC<ProfileSideSheetProps> = ({
     { id: 'wrong_questions', label: 'Wrong Questions', labelBn: 'ভুল উত্তরের ব্যাংক', icon: AlertTriangle, color: 'text-rose-600 bg-rose-50 dark:bg-rose-950/50' },
     { id: 'history', label: 'Exam History', labelBn: 'পরীক্ষার আর্কাইভ', icon: History, color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/50' },
     { id: 'leaderboard', label: 'Leaderboard', labelBn: 'মেধা তালিকা', icon: Trophy, color: 'text-amber-500 bg-amber-50 dark:bg-amber-950/50' },
-    { id: 'admin', label: 'Admin Panel', labelBn: 'এডমিন প্যানেল (প্রশ্ন ও ব্যাখ্যা)', icon: ShieldCheck, color: 'text-rose-600 bg-rose-50 dark:bg-rose-950/50 font-bold' },
     { id: 'premium', label: 'Premium', labelBn: 'প্রিমিয়াম মেম্বারশিপ', icon: Crown, color: 'text-emerald-500 bg-amber-100/60 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' },
     { id: 'settings', label: 'Settings', labelBn: 'সেটিংস ও পছন্দ', icon: Settings, color: 'text-slate-600 bg-slate-100 dark:bg-slate-800' },
   ];

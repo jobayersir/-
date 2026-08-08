@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Desktop Top Navigation Bar (Logo | Home | পরীক্ষা দিন | কোর্স | উস্তাদ AI) */}
+          {/* Desktop Top Navigation Bar (Logo | Home | পরীক্ষা দিন | কোর্স | তামরীন AI) */}
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 bg-slate-100/90 dark:bg-slate-900/90 p-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-[inset_2px_2px_4px_#cbd5e1,inset_-2px_-2px_4px_#ffffff] dark:shadow-[inset_2px_2px_4px_#020617,inset_-2px_-2px_4px_#1e293b]">
             {desktopNavItems.map((item) => {
               const Icon = item.icon;

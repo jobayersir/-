@@ -141,7 +141,7 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
         throw new Error(data.error || 'সার্ভার থেকে উত্তর পেতে সমস্যা হয়েছে।');
       }
 
-      const rawText = data.text || 'উস্তাদ এআই উত্তর প্রদান করতে পারেনি। অনুগ্রহ করে আবার চেষ্টা করুন।';
+      const rawText = data.text || 'তামরীন AI উত্তর প্রদান করতে পারেনি। অনুগ্রহ করে আবার চেষ্টা করুন।';
       const ustadMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ustad',
@@ -151,11 +151,11 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
 
       setMessages((prev) => [...prev, ustadMsg]);
     } catch (err: any) {
-      const errorMsg = err?.message || 'উস্তাদ এআই সংযোগে সমস্যা হয়েছে। ইন্টারনেট বা API কী চেক করে আবার চেষ্টা করুন।';
+      const errorMsg = err?.message || 'তামরীন AI সংযোগে সমস্যা হয়েছে। ইন্টারনেট বা API কী চেক করে আবার চেষ্টা করুন।';
       const ustadMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ustad',
-        text: cleanNoSymbols(`উস্তাদ এআই: ${errorMsg}`),
+        text: cleanNoSymbols(`তামরীন AI: ${errorMsg}`),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, ustadMsg]);

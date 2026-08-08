@@ -13,7 +13,6 @@ import { CqPracticeView } from './components/CqPracticeView';
 import { QuestionBankView } from './components/QuestionBankView';
 import { GlossaryView } from './components/GlossaryView';
 import { DeploymentGuideView } from './components/DeploymentGuideView';
-import { AdminView } from './components/AdminView';
 import { 
   ProfileView, 
   BookmarksView, 
@@ -330,7 +329,7 @@ export default function App() {
         )}
 
         {activeTab === 'wrong_questions' && (
-          <WrongQuestionsView user={userProfile} onTabChange={handleNavigateTab} />
+          <WrongQuestionsView user={userProfile} onTabChange={handleNavigateTab} harakatVisible={harakatVisible} />
         )}
 
         {activeTab === 'history' && (
@@ -339,10 +338,6 @@ export default function App() {
 
         {activeTab === 'leaderboard' && (
           <LeaderboardView user={userProfile} onTabChange={handleNavigateTab} />
-        )}
-
-        {activeTab === 'admin' && (
-          <AdminView />
         )}
 
         {activeTab === 'premium' && (
@@ -422,7 +417,7 @@ export default function App() {
             </button>
             <span>•</span>
             <button onClick={() => handleNavigateTab('ustad_ai')} className="text-emerald-600 dark:text-emerald-400 hover:underline">
-              উস্তাদ AI
+              তামরীন AI
             </button>
             <span>•</span>
             <span className="text-slate-400">© ২০২৬ তামরীন একাডেমি</span>

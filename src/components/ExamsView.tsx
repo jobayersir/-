@@ -1498,7 +1498,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>উস্তাদ এআই লিখিত উত্তর মূল্যায়ন ও ইনস্ট্যান্ট ফিডব্যাক</span>
+                <span>তামরীন AI লিখিত উত্তর মূল্যায়ন ও ইনস্ট্যান্ট ফিডব্যাক</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="w-4 h-4 text-emerald-600 shrink-0" />
