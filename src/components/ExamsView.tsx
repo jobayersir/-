@@ -965,29 +965,39 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                           {q.options.map((opt, optIdx) => {
                             const isCorrectOpt = optIdx === q.correctAnswer;
                             const isUserSelected = optIdx === mockUserOptIdx;
+                            const optionLabel = ['ক', 'খ', 'গ', 'ঘ'][optIdx] || `${optIdx + 1}`;
 
                             let optStyle = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300";
+                            let badgeStyle = "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400";
+
                             if (isCorrectOpt) {
-                              optStyle = "bg-emerald-50 dark:bg-emerald-950/80 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-black";
+                              optStyle = "bg-emerald-100 dark:bg-emerald-950/80 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-bold";
+                              badgeStyle = "bg-emerald-600 text-white font-extrabold";
                             } else if (isUserSelected && isMockWrong) {
-                              optStyle = "bg-rose-50 dark:bg-rose-950/80 border-rose-500 text-rose-950 dark:text-rose-100 font-black";
+                              optStyle = "bg-rose-100 dark:bg-rose-950/80 border-2 border-rose-500 text-rose-950 dark:text-rose-100 font-bold";
+                              badgeStyle = "bg-rose-600 text-white font-extrabold";
                             }
 
                             return (
                               <div
                                 key={optIdx}
-                                className={`p-2.5 rounded-xl border text-xs flex items-center justify-between transition-all ${optStyle}`}
+                                className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-2 transition-all ${optStyle}`}
                               >
-                                <span className="leading-snug">{opt}</span>
+                                <div className="flex items-center space-x-2 min-w-0 flex-1">
+                                  <span className={`w-6 h-6 rounded-md text-[11px] font-extrabold flex items-center justify-center shrink-0 ${badgeStyle}`}>
+                                    {optionLabel}
+                                  </span>
+                                  <span className="leading-snug font-bold">{opt}</span>
+                                </div>
                                 {isCorrectOpt && (
-                                  <span className="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-200 dark:bg-emerald-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
-                                    <Check className="w-3 h-3" />
+                                  <span className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-200 bg-emerald-200 dark:bg-emerald-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                    <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                                     <span>সঠিক উত্তর</span>
                                   </span>
                                 )}
                                 {isUserSelected && isMockWrong && (
-                                  <span className="text-[10px] font-extrabold text-rose-700 dark:text-rose-300 bg-rose-200 dark:bg-rose-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
-                                    <X className="w-3 h-3" />
+                                  <span className="text-[10px] font-extrabold text-rose-800 dark:text-rose-200 bg-rose-200 dark:bg-rose-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                    <X className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                                     <span>আপনার ভুল উত্তর</span>
                                   </span>
                                 )}

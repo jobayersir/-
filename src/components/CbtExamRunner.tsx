@@ -751,19 +751,66 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
                         </h4>
                       </div>
 
-                      {/* Answers Breakdown */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 text-xs font-bold">
-                        <div className={`p-3 rounded-xl border ${
-                          isCorrect ? 'bg-emerald-100/80 dark:bg-emerald-900/50 text-emerald-900 dark:text-emerald-200 border-emerald-300' : 'bg-rose-100/80 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border-rose-300'
-                        }`}>
-                          <span className="text-[10px] uppercase block text-slate-500 mb-0.5">আপনার উত্তর:</span>
-                          <span>{userChoice !== undefined ? q.options[userChoice] : 'উত্তর প্রদান করেননি'}</span>
-                        </div>
+                      {/* Options Grid (Matches Question Page) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3.5">
+                        {(() => {
+                          const isQArabic = /[\u0600-\u06FF]/.test(q.question);
+                          const isEngSub = q.subject === 'english';
+                          const optionBadgesList = isQArabic
+                            ? ['أ', 'ب', 'ج', 'د']
+                            : isEngSub
+                            ? ['A', 'B', 'C', 'D']
+                            : ['ক', 'খ', 'গ', 'ঘ'];
 
-                        <div className="p-3 rounded-xl bg-emerald-100/80 dark:bg-emerald-900/50 text-emerald-900 dark:text-emerald-200 border border-emerald-300">
-                          <span className="text-[10px] uppercase block text-slate-500 mb-0.5">সঠিক উত্তর:</span>
-                          <span>{q.options[q.correctAnswer]}</span>
-                        </div>
+                          return q.options.map((optionText, oIdx) => {
+                            const isCorrectOpt = oIdx === q.correctAnswer;
+                            const isUserSelected = userChoice === oIdx;
+                            const badgeText = optionBadgesList[oIdx] || `${oIdx + 1}`;
+                            const formattedOptionText = formatArabicText(optionText, harakatVisible);
+
+                            let optCardStyle = 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200';
+                            let badgeStyle = 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+
+                            if (isCorrectOpt) {
+                              optCardStyle = 'bg-emerald-100 dark:bg-emerald-950/90 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-xs';
+                              badgeStyle = 'bg-emerald-600 text-white font-black';
+                            } else if (isUserSelected && !isCorrect) {
+                              optCardStyle = 'bg-rose-100 dark:bg-rose-950/90 border-2 border-rose-500 text-rose-950 dark:text-rose-100 font-extrabold shadow-xs';
+                              badgeStyle = 'bg-rose-600 text-white font-black';
+                            }
+
+                            return (
+                              <div
+                                key={oIdx}
+                                className={`p-3 rounded-xl border flex items-center justify-between gap-2.5 transition-all ${optCardStyle}`}
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                  <span
+                                    className={`w-7 h-7 rounded-lg text-xs font-black flex items-center justify-center shrink-0 ${badgeStyle}`}
+                                  >
+                                    {badgeText}
+                                  </span>
+                                  <span className="text-xs sm:text-sm font-bold leading-snug break-words">
+                                    {formattedOptionText}
+                                  </span>
+                                </div>
+
+                                {isCorrectOpt && (
+                                  <span className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-200 bg-emerald-200 dark:bg-emerald-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                    <span>সঠিক উত্তর</span>
+                                  </span>
+                                )}
+                                {isUserSelected && !isCorrect && (
+                                  <span className="text-[10px] font-extrabold text-rose-800 dark:text-rose-200 bg-rose-200 dark:bg-rose-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                    <XCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+                                    <span>আপনার ভুল উত্তর</span>
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          });
+                        })()}
                       </div>
 
                       {/* Manual & Ustad AI Explanation Section */}
