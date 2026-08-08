@@ -37,6 +37,7 @@ interface CbtExamRunnerProps {
   questions: MCQQuestion[];
   onClose: () => void;
   onOpenLeaderboard?: (exam?: ExtendedExamItem) => void;
+  onComplete?: (result: { score: number; maxScore: number; userAnswers: Record<number, number> }) => void;
   harakatVisible?: boolean;
 }
 
@@ -45,6 +46,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
   questions,
   onClose,
   onOpenLeaderboard,
+  onComplete,
   harakatVisible = true
 }) => {
   // Active Question Index
@@ -221,6 +223,14 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
     });
 
     setUserRank(saved.rank);
+
+    if (onComplete) {
+      onComplete({
+        score: cCount,
+        maxScore: questions.length,
+        userAnswers
+      });
+    }
 
     // Default open first 3 explanations
     const initialExps: Record<number, boolean> = {};

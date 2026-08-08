@@ -918,37 +918,40 @@ export const CoursesView: React.FC = () => {
                       return (
                         <div
                           key={item.id}
-                          className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-3 transition-all hover:border-slate-300 dark:hover:border-slate-700"
+                          className="p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-white via-slate-50/60 to-slate-100/50 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950/80 border border-slate-200/90 dark:border-slate-800 shadow-[6px_6px_18px_rgba(0,0,0,0.05),-6px_-6px_18px_rgba(255,255,255,0.85)] dark:shadow-[6px_6px_18px_rgba(0,0,0,0.45),-6px_-6px_18px_rgba(255,255,255,0.02)] space-y-4 transition-all duration-300 hover:scale-[1.008] hover:border-emerald-500/30 dark:hover:border-emerald-500/30"
                         >
-                          {/* Top Row: Date, Merit List Badge, Title & Topic */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-                            <div className="space-y-1.5 min-w-0 flex-1">
+                          {/* Top Row: Date, Marks/Time, Title & Topic */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/60 dark:border-slate-800/80 pb-3.5">
+                            <div className="space-y-2 min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 {/* Date Badge */}
-                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center space-x-1 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg">
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-xl shadow-2xs border border-slate-200/50 dark:border-slate-700/50">
                                   <Calendar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                   <span>{dateDisplay} ({dayDisplay})</span>
                                 </span>
 
                                 {/* Marks & Time Info */}
-                                <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+                                <span className="text-xs font-extrabold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-xl shadow-2xs border border-slate-200/50 dark:border-slate-700/50">
                                   {item.code || '৫০টি প্রশ্ন'} • {item.sizeOrTime || '৩০ মিনিট'}
                                 </span>
                               </div>
 
-                              {/* Title / Exam Number */}
-                              <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-slate-100 flex items-center space-x-2">
-                                <span>{examNoDisplay}</span>
+                              {/* Title / Exam Number & Score Badge */}
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-slate-100 tracking-tight">
+                                  {examNoDisplay}
+                                </h3>
                                 {attemptData && (
-                                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                                    স্কোর: {attemptData.score}/{attemptData.maxScore}
+                                  <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 shadow-xs flex items-center space-x-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                    <span>স্কোর: {attemptData.score}/{attemptData.maxScore}</span>
                                   </span>
                                 )}
-                              </h3>
+                              </div>
 
                               {/* Topic */}
-                              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-semibold">
-                                <span className="font-extrabold text-emerald-700 dark:text-emerald-400 mr-1">টপিক:</span>
+                              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+                                <span className="font-extrabold text-emerald-700 dark:text-emerald-400 mr-1.5 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md border border-emerald-200/50 dark:border-emerald-900/50">টপিক</span>
                                 <span>{topicDisplay}</span>
                               </p>
                             </div>
@@ -957,12 +960,12 @@ export const CoursesView: React.FC = () => {
                             {(!isExamsUnlocked || item.isUpcoming) && (
                               <div className="shrink-0 flex items-center space-x-2">
                                 {!isExamsUnlocked ? (
-                                  <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 text-xs font-bold border border-amber-300">
+                                  <span className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 text-xs font-black border border-amber-300 dark:border-amber-800 shadow-2xs">
                                     <Lock className="w-3.5 h-3.5 text-amber-600" />
                                     <span>লকড</span>
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 text-xs font-extrabold animate-pulse">
+                                  <span className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 text-xs font-extrabold animate-pulse shadow-2xs">
                                     <Clock className="w-3.5 h-3.5 text-amber-600" />
                                     <span>Upcoming</span>
                                   </span>
@@ -981,14 +984,14 @@ export const CoursesView: React.FC = () => {
                               </span>
                               <button
                                 onClick={() => setShowEnrollAlert(true)}
-                                className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-sm active:scale-95 transition-all"
+                                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-md active:scale-95 transition-all"
                               >
                                 আনলক করুন
                               </button>
                             </div>
                           ) : item.isUpcoming ? (
                             /* 2. Upcoming Exam -> Disabled Notice */
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200/80 dark:border-amber-900/50">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs bg-amber-50/80 dark:bg-amber-950/40 p-3 rounded-2xl border border-amber-200/80 dark:border-amber-900/50">
                               <span className="text-amber-900 dark:text-amber-200 font-bold flex items-center space-x-1.5">
                                 <Calendar className="w-4 h-4 text-amber-600" />
                                 <span>পরীক্ষার নির্ধারিত দিন: {dateDisplay} ({dayDisplay})</span>
@@ -1002,20 +1005,20 @@ export const CoursesView: React.FC = () => {
                             <div className="pt-1">
                               <button
                                 onClick={() => setRunningExamModal({ exam: item, isRetake: false })}
-                                className="w-full py-2.5 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-2 active:scale-95 transition-all"
+                                className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 hover:from-slate-800 hover:to-slate-900 dark:from-emerald-600 dark:via-emerald-500 dark:to-teal-600 dark:hover:from-emerald-500 dark:hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-md hover:shadow-lg flex items-center justify-center space-x-2 active:scale-98 transition-all cursor-pointer"
                               >
                                 <Play className="w-4 h-4 fill-white" />
                                 <span>পরীক্ষা দিন</span>
                               </button>
                             </div>
                           ) : (
-                            /* 4. Completed Exam -> Show EXACTLY 3 Buttons: প্র্যাকটিস, উত্তরমালা, মেধাতালিকা */
-                            <div className="pt-1 space-y-2">
-                              <div className="grid grid-cols-3 gap-2">
+                            /* 4. Completed Exam -> Show EXACTLY 3 Neumorphic / Colorful Buttons: প্র্যাকটিস, উত্তরমালা, মেধাতালিকা */
+                            <div className="pt-1 space-y-2.5">
+                              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                                 {/* Button 1: প্র্যাকটিস */}
                                 <button
                                   onClick={() => setRunningExamModal({ exam: item, isRetake: true })}
-                                  className="px-2 sm:px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/80 dark:hover:bg-amber-900 text-amber-950 dark:text-amber-200 border border-amber-300/80 dark:border-amber-800 font-extrabold text-xs flex items-center justify-center space-x-1 active:scale-95 transition-all shadow-2xs"
+                                  className="px-2.5 sm:px-3 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/80 text-amber-950 dark:text-amber-200 border border-amber-200/90 dark:border-amber-800/80 font-extrabold text-xs flex items-center justify-center space-x-1.5 active:scale-95 transition-all shadow-2xs hover:shadow-xs"
                                 >
                                   <RotateCcw className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
                                   <span className="truncate">প্র্যাকটিস</span>
@@ -1028,7 +1031,7 @@ export const CoursesView: React.FC = () => {
                                     attempt: attemptData,
                                     questions: getExamQuestions(item)
                                   })}
-                                  className="px-2 sm:px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/80 dark:hover:bg-indigo-900 text-indigo-950 dark:text-indigo-200 border border-indigo-300/80 dark:border-indigo-800 font-extrabold text-xs flex items-center justify-center space-x-1 active:scale-95 transition-all shadow-2xs"
+                                  className="px-2.5 sm:px-3 py-2.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/80 text-indigo-950 dark:text-indigo-200 border border-indigo-200/90 dark:border-indigo-800/80 font-extrabold text-xs flex items-center justify-center space-x-1.5 active:scale-95 transition-all shadow-2xs hover:shadow-xs"
                                 >
                                   <FileText className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400 shrink-0" />
                                   <span className="truncate">উত্তরমালা</span>
@@ -1037,7 +1040,7 @@ export const CoursesView: React.FC = () => {
                                 {/* Button 3: মেধাতালিকা */}
                                 <button
                                   onClick={() => setExamLeaderboardModal({ exam: item })}
-                                  className="px-2 sm:px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 text-emerald-950 dark:text-emerald-200 border border-emerald-300/80 dark:border-emerald-800 font-extrabold text-xs flex items-center justify-center space-x-1 active:scale-95 transition-all shadow-2xs"
+                                  className="px-2.5 sm:px-3 py-2.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 text-emerald-950 dark:text-emerald-200 border border-emerald-200/90 dark:border-emerald-800/80 font-extrabold text-xs flex items-center justify-center space-x-1.5 active:scale-95 transition-all shadow-2xs hover:shadow-xs"
                                 >
                                   <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                                   <span className="truncate">মেধাতালিকা</span>
@@ -1163,6 +1166,29 @@ export const CoursesView: React.FC = () => {
                         exam={cbtExamData}
                         questions={questions}
                         onClose={() => setRunningExamModal(null)}
+                        onComplete={(res) => {
+                          if (activeCourse && runningExamModal) {
+                            const key = `${activeCourse.id}_${runningExamModal.exam.id}`;
+                            setExamAttempts((prev) => {
+                              const updated = {
+                                ...prev,
+                                [key]: {
+                                  score: res.score,
+                                  maxScore: res.maxScore,
+                                  userAnswers: res.userAnswers,
+                                  completedAt: new Date().toISOString(),
+                                  attemptsCount: (prev[key]?.attemptsCount || 0) + 1
+                                }
+                              };
+                              try {
+                                localStorage.setItem('tamreen_course_exam_attempts', JSON.stringify(updated));
+                              } catch (e) {
+                                console.error('Failed to save exam attempt', e);
+                              }
+                              return updated;
+                            });
+                          }
+                        }}
                         onOpenLeaderboard={() => {
                           const examToPass = runningExamModal.exam;
                           setRunningExamModal(null);
