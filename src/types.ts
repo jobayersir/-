@@ -130,6 +130,13 @@ export interface CourseContentItem {
   code?: string;
   sizeOrTime?: string;
   isLocked?: boolean; // Override individual lock status
+  examNumber?: string; // e.g. "পরীক্ষা ০১"
+  topic?: string;      // e.g. "আল-কুরআন ও তাফসীর"
+  date?: string;       // e.g. "১০ আগস্ট, ২০২৬"
+  dayName?: string;    // e.g. "সোমবার"
+  isUpcoming?: boolean; // true if exam is scheduled in future
+  questionsCount?: number;
+  durationMinutes?: number;
 }
 
 export interface CourseItem {

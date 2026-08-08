@@ -79,7 +79,10 @@ export const DEFAULT_COURSES: CourseItem[] = [
       { id: 's2', title: 'English Grammar Quick Revision Sheet.pdf', code: 'PDF Sheet 02', sizeOrTime: '২.০ মেগাবাইট', isLocked: false },
     ],
     customExams: [
-      { id: 'e1', title: 'ফ্রি মডেল টেস্ট 01: সাধারণ অংশ পূর্ণাঙ্গ প্রস্তুতি', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট', isLocked: false },
+      { id: 'e1', title: 'পরীক্ষা 01: সাধারণ বাংলা ও সাহিত্য মডেল টেস্ট', examNumber: 'পরীক্ষা ০১', topic: 'সাধারণ বাংলা ও সাহিত্য', date: '১০ আগস্ট, ২০২৬', dayName: 'সোমবার', isUpcoming: false, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট', isLocked: false },
+      { id: 'e2', title: 'পরীক্ষা 02: ইংলিশ গ্রামার ও ভোকাবুলারি মডেল টেস্ট', examNumber: 'পরীক্ষা ০২', topic: 'English Grammar & Vocabulary', date: '১২ আগস্ট, ২০২৬', dayName: 'বুধবার', isUpcoming: false, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট', isLocked: false },
+      { id: 'e3', title: 'পরীক্ষা 03: সাধারণ গণিত ও মানসিক দক্ষতা কুইজ', examNumber: 'পরীক্ষা ০৩', topic: 'সাধারণ গণিত ও মানসিক দক্ষতা', date: '১৫ আগস্ট, ২০২৬', dayName: 'শনিবার', isUpcoming: true, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট', isLocked: false },
+      { id: 'e4', title: 'পরীক্ষা 04: বাংলাদেশ ও আন্তর্জাতিক বিষয়াবলি মডেল টেস্ট', examNumber: 'পরীক্ষা ০৪', topic: 'বাংলাদেশ ও আন্তর্জাতিক বিষয়াবলি', date: '১৮ আগস্ট, ২০২৬', dayName: 'মঙ্গলবার', isUpcoming: true, code: '১০০টি প্রশ্ন', sizeOrTime: '৬০ মিনিট', isLocked: false },
     ],
   },
   {
@@ -120,10 +123,10 @@ export const DEFAULT_COURSES: CourseItem[] = [
       { id: 's5', title: 'Exam- 05 নাহু ও সরফ তারকীব রুলস.pdf', code: 'PDF Sheet 05' },
     ],
     customExams: [
-      { id: 'e1', title: 'পরীক্ষা 01: আল-কুরআন ও তাফসীর মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
-      { id: 'e2', title: 'পরীক্ষা 02: আল-হাদিস ও সানাদ মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
-      { id: 'e3', title: 'পরীক্ষা 03: নাহু ও সরফ অধ্যায় মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
-      { id: 'e4', title: 'পরীক্ষা 04: ফিকহ ও মূল মাসআলা মডেল টেস্ট', code: '১০০টি প্রশ্ন', sizeOrTime: '৬০ মিনিট' },
+      { id: 'e1', title: 'পরীক্ষা 01: আল-কুরআন ও তাফসীর মডেল টেস্ট', examNumber: 'পরীক্ষা ০১', topic: 'আল-কুরআন ও তাফসীর', date: '০৫ আগস্ট, ২০২৬', dayName: 'বুধবার', isUpcoming: false, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+      { id: 'e2', title: 'পরীক্ষা 02: আল-হাদিস ও সানাদ মডেল টেস্ট', examNumber: 'পরীক্ষা ০২', topic: 'আল-হাদিস ও আসমাউর রিজাল', date: '০৭ আগস্ট, ২০২৬', dayName: 'শুক্রবার', isUpcoming: false, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+      { id: 'e3', title: 'পরীক্ষা 03: নাহু ও সরফ অধ্যায় মডেল টেস্ট', examNumber: 'পরীক্ষা ০৩', topic: 'নাহু, সরফ ও তারকীব', date: '১২ আগস্ট, ২০২৬', dayName: 'বুধবার', isUpcoming: true, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+      { id: 'e4', title: 'পরীক্ষা 04: ফিকহ ও মূল মাসআলা মডেল টেস্ট', examNumber: 'পরীক্ষা ০৪', topic: 'ফিকহুস সুন্নাহ্ ও উসূল', date: '১৬ আগস্ট, ২০২৬', dayName: 'রবিবার', isUpcoming: true, code: '১০০টি প্রশ্ন', sizeOrTime: '৬০ মিনিট' },
     ],
   },
   {

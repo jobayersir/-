@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
-import { getStoredExamResult, getLatestExamResult } from '../utils/examStorage';
+import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
 import { 
   FileCheck2, 
   Clock, 
@@ -80,6 +80,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
   // State for viewing exam specific leaderboard
   const [viewingLeaderboardExam, setViewingLeaderboardExam] = useState<ExtendedExamItem | null>(null);
+  const [modalFilter, setModalFilter] = useState<'thisExam' | 'weekly' | 'monthly' | 'allTime'>('thisExam');
 
   // State for Premium Upgrade Modal
   const [showPremiumModal, setShowPremiumModal] = useState(false);

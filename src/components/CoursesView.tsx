@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CourseItem, PostCadre, CourseContentItem } from '../types';
+import { CourseItem, PostCadre, CourseContentItem, MCQQuestion } from '../types';
 import { getStoredCourses, saveCoursesToStorage } from '../data/coursesData';
+import { QUESTION_BANK } from '../data/questionBank';
 import { Logo } from './Logo';
 import { LeaderboardView } from './LeaderboardView';
+import { CbtExamRunner } from './CbtExamRunner';
+import { ExtendedExamItem } from './ExamsView';
+import { formatArabicText } from '../utils/arabic';
 import { 
   GraduationCap, 
   BookOpen, 
@@ -12,6 +16,7 @@ import {
   Crown, 
   Search, 
   CheckCircle2, 
+  XCircle,
   Clock, 
   ChevronRight, 
   ChevronLeft,
@@ -43,7 +48,10 @@ import {
   Flame,
   Award,
   Target,
-  TrendingUp
+  TrendingUp,
+  RotateCcw,
+  X,
+  AlertCircle
 } from 'lucide-react';
 
 export const CoursesView: React.FC = () => {
@@ -52,6 +60,89 @@ export const CoursesView: React.FC = () => {
   const [activeCourse, setActiveCourse] = useState<CourseItem | null>(null);
   const [detailTab, setDetailTab] = useState<'plan' | 'routine' | 'syllabus' | 'sheets' | 'exams' | 'leaderboard'>('plan');
   const [showEnrollAlert, setShowEnrollAlert] = useState(false);
+
+  // Exam Attempt States & Modals for Course Exams Tab
+  const [examAttempts, setExamAttempts] = useState<Record<string, {
+    score: number;
+    maxScore: number;
+    userAnswers: Record<number, number>;
+    completedAt: string;
+    attemptsCount: number;
+  }>>(() => {
+    try {
+      const saved = localStorage.getItem('tamreen_course_exam_attempts');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error('Failed to load course exam attempts', e);
+    }
+    return {};
+  });
+
+  const [runningExamModal, setRunningExamModal] = useState<{
+    exam: CourseContentItem;
+    isRetake: boolean;
+  } | null>(null);
+
+  const [reviewExamModal, setReviewExamModal] = useState<{
+    exam: CourseContentItem;
+    attempt: {
+      score: number;
+      maxScore: number;
+      userAnswers: Record<number, number>;
+      completedAt: string;
+    };
+    questions: MCQQuestion[];
+  } | null>(null);
+
+  const [examLeaderboardModal, setExamLeaderboardModal] = useState<{
+    exam: CourseContentItem;
+  } | null>(null);
+
+  const getExamQuestions = (examItem: CourseContentItem): MCQQuestion[] => {
+    if (QUESTION_BANK.length === 0) return [];
+    const charSum = examItem.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const startIdx = charSum % Math.max(1, QUESTION_BANK.length - 8);
+    return QUESTION_BANK.slice(startIdx, startIdx + 10);
+  };
+
+  const handleFinishCourseExam = (
+    examItem: CourseContentItem,
+    score: number,
+    maxScore: number,
+    userAnswers: Record<number, number>,
+    isRetake: boolean
+  ) => {
+    if (!activeCourse) return;
+    const key = `${activeCourse.id}_${examItem.id}`;
+    
+    setExamAttempts((prev) => {
+      const existing = prev[key];
+      const attemptsCount = existing ? existing.attemptsCount + 1 : 1;
+      // On first attempt, we save the first score. On retake, we preserve the original score for leaderboard points.
+      const firstScore = existing ? existing.score : score;
+
+      const updated = {
+        ...prev,
+        [key]: {
+          score: firstScore,
+          maxScore,
+          userAnswers,
+          completedAt: new Date().toISOString(),
+          attemptsCount,
+        }
+      };
+
+      try {
+        localStorage.setItem('tamreen_course_exam_attempts', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+
+      return updated;
+    });
+
+    setRunningExamModal(null);
+  };
 
   const cadreScrollRef = useRef<HTMLDivElement>(null);
 
@@ -779,60 +870,162 @@ export const CoursesView: React.FC = () => {
               {/* EXAMS TAB */}
               {detailTab === 'exams' && (() => {
                 const isExamsUnlocked = activeCourse.isEnrolled || activeCourse.isExamsLocked === false;
-                const examsToRender = (activeCourse.customExams && activeCourse.customExams.length > 0)
+                const rawExams = (activeCourse.customExams && activeCourse.customExams.length > 0)
                   ? activeCourse.customExams
                   : [
-                      { id: 'e1', title: 'পরীক্ষা 01: আল-কুরআন ও তাফসীর মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
-                      { id: 'e2', title: 'পরীক্ষা 02: আল-হাদিস ও সানাদ মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
-                      { id: 'e3', title: 'পরীক্ষা 03: নাহু ও সরফ অধ্যায় মডেল টেস্ট', code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
-                      { id: 'e4', title: 'পরীক্ষা 04: ফিকহ ও মূল মাসআলা মডেল টেস্ট', code: '১০০টি প্রশ্ন', sizeOrTime: '৬০ মিনিট' },
+                      { id: 'e1', title: 'পরীক্ষা 01: আল-কুরআন ও তাফসীর মডেল টেস্ট', examNumber: 'পরীক্ষা ০১', topic: 'আল-কুরআন ও তাফসীর', date: '০৫ আগস্ট, ২০২৬', dayName: 'বুধবার', isUpcoming: false, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+                      { id: 'e2', title: 'পরীক্ষা 02: আল-হাদিস ও সানাদ মডেল টেস্ট', examNumber: 'পরীক্ষা ০২', topic: 'আল-হাদিস ও আসমাউর রিজাল', date: '০৮ আগস্ট, ২০২৬', dayName: 'শনিবার', isUpcoming: false, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+                      { id: 'e3', title: 'পরীক্ষা 03: নাহু ও সরফ অধ্যায় মডেল টেস্ট', examNumber: 'পরীক্ষা ০৩', topic: 'নাহু, সরফ ও তারকীব', date: '১২ আগস্ট, ২০২৬', dayName: 'বুধবার', isUpcoming: true, code: '৫০টি প্রশ্ন', sizeOrTime: '৩০ মিনিট' },
+                      { id: 'e4', title: 'পরীক্ষা 04: ফিকহ ও মূল মাসআলা মডেল টেস্ট', examNumber: 'পরীক্ষা ০৪', topic: 'ফিকহুস সুন্নাহ্ ও উসূল', date: '১৬ আগস্ট, ২০২৬', dayName: 'রবিবার', isUpcoming: true, code: '১০০টি প্রশ্ন', sizeOrTime: '৬০ মিনিট' },
                     ];
 
                 return (
-                  <div className="space-y-2.5">
-                    {examsToRender.map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => {
-                          if (!isExamsUnlocked) {
-                            setShowEnrollAlert(true);
-                          }
-                        }}
-                        className={`p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex items-center justify-between transition-all ${
-                          !isExamsUnlocked ? 'cursor-pointer hover:border-amber-300' : 'hover:border-emerald-300'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3 min-w-0 pr-2">
-                          <div className={`p-2.5 rounded-xl shrink-0 ${
-                            isExamsUnlocked ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
-                          }`}>
-                            <PenTool className="w-5 h-5" />
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-slate-200 truncate">
-                              {item.title}
-                            </h4>
-                            <span className="text-[10px] font-semibold text-slate-400 block mt-0.5">
-                              {item.code} {item.sizeOrTime ? `• ${item.sizeOrTime}` : ''}
-                            </span>
-                          </div>
-                        </div>
+                  <div className="space-y-3">
+                    {rawExams.map((item, idx) => {
+                      const attemptKey = `${activeCourse.id}_${item.id}`;
+                      const attemptData = examAttempts[attemptKey];
+                      const examNoDisplay = item.examNumber || `পরীক্ষা ০${idx + 1}`;
+                      const topicDisplay = item.topic || item.title;
+                      const dateDisplay = item.date || '১৫ আগস্ট, ২০২৬';
+                      const dayDisplay = item.dayName || 'শনিবার';
 
-                        <div>
+                      return (
+                        <div
+                          key={item.id}
+                          className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-3 transition-all hover:border-slate-300 dark:hover:border-slate-700"
+                        >
+                          {/* Top Row: Exam Number, Topic, Date & Day, Meta/Status */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                            <div className="space-y-1.5 min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                {/* Exam No Badge */}
+                                <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-900 dark:bg-emerald-950/90 dark:text-emerald-300 font-extrabold text-xs border border-emerald-300/80 dark:border-emerald-800">
+                                  {examNoDisplay}
+                                </span>
+
+                                {/* Date & Day Name */}
+                                <span className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center space-x-1 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg">
+                                  <Calendar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                  <span>{dateDisplay} ({dayDisplay})</span>
+                                </span>
+                              </div>
+
+                              {/* Topic */}
+                              <h4 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-snug break-words">
+                                <span className="text-emerald-700 dark:text-emerald-400 font-black mr-1.5">টপিক:</span>
+                                <span>{topicDisplay}</span>
+                              </h4>
+                            </div>
+
+                            {/* Status Badge or Questions info */}
+                            <div className="shrink-0 flex items-center space-x-2">
+                              {!isExamsUnlocked ? (
+                                <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 text-xs font-bold border border-amber-300">
+                                  <Lock className="w-3.5 h-3.5 text-amber-600" />
+                                  <span>লকড</span>
+                                </span>
+                              ) : item.isUpcoming ? (
+                                <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800 text-xs font-extrabold animate-pulse">
+                                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                                  <span>Upcoming</span>
+                                </span>
+                              ) : attemptData ? (
+                                <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/90 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800 text-xs font-black shadow-2xs">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                  <span>সম্পন্ন (স্কোর: {attemptData.score}/{attemptData.maxScore})</span>
+                                </span>
+                              ) : (
+                                <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
+                                  {item.code || '৫০টি প্রশ্ন'} • {item.sizeOrTime || '৩০ মিনিট'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Action Buttons Section */}
+                          {/* 1. Unenrolled & Paid Course -> Show Lock Alert Button */}
                           {!isExamsUnlocked ? (
-                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center space-x-1">
-                              <Lock className="w-4 h-4 text-amber-600" />
-                              <span className="text-[10px] font-bold text-amber-700 hidden sm:inline">লকড</span>
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center space-x-1">
+                                <Lock className="w-3.5 h-3.5" />
+                                <span>কোর্সে ভর্তি হয়ে পরীক্ষাটি আনলক করুন</span>
+                              </span>
+                              <button
+                                onClick={() => setShowEnrollAlert(true)}
+                                className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs shadow-sm active:scale-95 transition-all"
+                              >
+                                আনলক করুন
+                              </button>
+                            </div>
+                          ) : item.isUpcoming ? (
+                            /* 2. Upcoming Exam -> Disabled Notice */
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-xs bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200/80 dark:border-amber-900/50">
+                              <span className="text-amber-900 dark:text-amber-200 font-bold flex items-center space-x-1.5">
+                                <Calendar className="w-4 h-4 text-amber-600" />
+                                <span>পরীক্ষার নির্ধারিত দিন: {dateDisplay} ({dayDisplay})</span>
+                              </span>
+                              <span className="px-3 py-1 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-extrabold text-[11px] self-start sm:self-auto">
+                                শীঘ্রই শুরু হবে (Upcoming)
+                              </span>
+                            </div>
+                          ) : !attemptData ? (
+                            /* 3. Available Active Exam NOT yet completed -> Show "পরীক্ষা দিন" */
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                                অনলাইন সিবিটি ফরম্যাটে পরীক্ষা দিতে প্রস্তুত হন
+                              </span>
+                              <button
+                                onClick={() => setRunningExamModal({ exam: item, isRetake: false })}
+                                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm shadow-md flex items-center space-x-1.5 active:scale-95 transition-all"
+                              >
+                                <Play className="w-4 h-4 fill-white" />
+                                <span>পরীক্ষা দিন</span>
+                              </button>
                             </div>
                           ) : (
-                            <button className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-2xs flex items-center space-x-1">
-                              <Play className="w-3 h-3 fill-white" />
-                              <span>পরীক্ষা দিন</span>
-                            </button>
+                            /* 4. Completed Exam -> Show EXACTLY 3 Buttons */
+                            <div className="pt-1 space-y-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                {/* Button 1: পুনরায় পরীক্ষা দিন / প্র্যাকটিস */}
+                                <button
+                                  onClick={() => setRunningExamModal({ exam: item, isRetake: true })}
+                                  className="flex-1 min-w-[150px] px-3 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/80 dark:hover:bg-amber-900 text-amber-950 dark:text-amber-200 border border-amber-300/80 dark:border-amber-800 font-extrabold text-xs flex items-center justify-center space-x-1.5 active:scale-95 transition-all shadow-2xs"
+                                >
+                                  <RotateCcw className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+                                  <span>পুনরায় পরীক্ষা দিন (প্র্যাকটিস)</span>
+                                </button>
+
+                                {/* Button 2: ব্যাখ্যা সহ উত্তর */}
+                                <button
+                                  onClick={() => setReviewExamModal({
+                                    exam: item,
+                                    attempt: attemptData,
+                                    questions: getExamQuestions(item)
+                                  })}
+                                  className="flex-1 min-w-[130px] px-3 py-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-950/80 dark:hover:bg-indigo-900 text-indigo-950 dark:text-indigo-200 border border-indigo-300/80 dark:border-indigo-800 font-extrabold text-xs flex items-center justify-center space-x-1.5 active:scale-95 transition-all shadow-2xs"
+                                >
+                                  <FileText className="w-3.5 h-3.5 text-indigo-700 dark:text-indigo-400" />
+                                  <span>ব্যাখ্যা সহ উত্তর</span>
+                                </button>
+
+                                {/* Button 3: মেধাতালিকা */}
+                                <button
+                                  onClick={() => setExamLeaderboardModal({ exam: item })}
+                                  className="flex-1 min-w-[110px] px-3 py-2 rounded-xl bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 text-emerald-950 dark:text-emerald-200 border border-emerald-300/80 dark:border-emerald-800 font-extrabold text-xs flex items-center justify-center space-x-1.5 active:scale-95 transition-all shadow-2xs"
+                                >
+                                  <Trophy className="w-3.5 h-3.5 text-amber-500" />
+                                  <span>মেধাতালিকা</span>
+                                </button>
+                              </div>
+
+                              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 italic">
+                                * দ্রষ্টব্য: পুনরায় পরীক্ষা (প্র্যাকটিস) দিলে নতুন পয়েন্ট যুক্ত হবে না। লিডারবোর্ডে ১ম চেষ্টার ফলাফল সংরক্ষিত থাকবে।
+                              </p>
+                            </div>
                           )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 );
               })()}
@@ -906,6 +1099,222 @@ export const CoursesView: React.FC = () => {
                     >
                       এখনই ভর্তি হন
                     </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Modal 1: CBT Exam Runner Modal */}
+            {runningExamModal && activeCourse && (() => {
+              const cbtExamData: ExtendedExamItem = {
+                id: runningExamModal.exam.id,
+                title: `${runningExamModal.exam.examNumber || 'পরীক্ষা'}: ${runningExamModal.exam.topic || runningExamModal.exam.title}`,
+                category: 'premium',
+                durationMinutes: runningExamModal.exam.durationMinutes || 30,
+                totalQuestions: runningExamModal.exam.questionsCount || 10,
+                difficulty: 'মাঝারি',
+                participantsCount: '১,৪২০ জন',
+                subject: activeCourse.title,
+                isPremium: activeCourse.isPremium,
+                date: runningExamModal.exam.date || '১৫ আগস্ট, ২০২৬',
+                totalMarks: (runningExamModal.exam.questionsCount || 10) * 2,
+                subjectIcon: 'general'
+              };
+
+              const questions = getExamQuestions(runningExamModal.exam);
+
+              return (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+                  <div className="w-full max-w-4xl h-[95vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
+                    {runningExamModal.isRetake && (
+                      <div className="bg-amber-50 dark:bg-amber-950/80 border-b border-amber-200 dark:border-amber-900 p-2.5 text-center text-xs font-extrabold text-amber-900 dark:text-amber-200 flex items-center justify-center space-x-2 shrink-0">
+                        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>প্র্যাকটিস পরীক্ষা মোড: এই ফলাফলের নতুন পয়েন্ট লিডারবোর্ডে যুক্ত হবে না (১ম ট্রাই এর পয়েন্ট ও স্থান সংরক্ষিত থাকবে)।</span>
+                      </div>
+                    )}
+                    <div className="flex-1 overflow-y-auto">
+                      <CbtExamRunner
+                        exam={cbtExamData}
+                        questions={questions}
+                        onClose={() => setRunningExamModal(null)}
+                        onOpenLeaderboard={() => {
+                          const examToPass = runningExamModal.exam;
+                          setRunningExamModal(null);
+                          setExamLeaderboardModal({ exam: examToPass });
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Modal 2: Answer Review Modal (ব্যাখ্যা সহ উত্তর) */}
+            {reviewExamModal && (
+              <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
+                <div className="w-full max-w-3xl max-h-[92vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
+                  {/* Review Header */}
+                  <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between shrink-0">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2.5 rounded-2xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        <FileText className="w-6 h-6 stroke-[2.5]" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-300 block">
+                          পরীক্ষার উত্তর ও বিস্তারিত ব্যাখ্যা
+                        </span>
+                        <h3 className="font-black text-sm sm:text-base text-white">
+                          {reviewExamModal.exam.topic || reviewExamModal.exam.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black border border-emerald-500/30">
+                        প্রাপ্ত নম্বর: {reviewExamModal.attempt.score}/{reviewExamModal.attempt.maxScore}
+                      </span>
+                      <button
+                        onClick={() => setReviewExamModal(null)}
+                        className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Question List */}
+                  <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                    {reviewExamModal.questions.map((q, qIdx) => {
+                      const userAns = reviewExamModal.attempt.userAnswers[qIdx];
+                      const correctAns = q.correctAnswer;
+                      const banglaOptionBadges = ['ক', 'খ', 'গ', 'ঘ'];
+
+                      return (
+                        <div
+                          key={q.id || qIdx}
+                          className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-3"
+                        >
+                          {/* Question Title & Arabic */}
+                          <div className="space-y-1">
+                            <span className="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 block">
+                              প্রশ্ন {qIdx + 1} / {reviewExamModal.questions.length}
+                            </span>
+                            <h4 className="font-black text-sm sm:text-base text-slate-900 dark:text-slate-100 leading-snug">
+                              {q.question}
+                            </h4>
+                            {q.questionArabic && (
+                              <p className="font-serif text-base sm:text-lg text-emerald-800 dark:text-emerald-300 dir-rtl text-right pt-1 leading-loose">
+                                {formatArabicText(q.questionArabic)}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* 4 Options Grid */}
+                          <div className="grid grid-cols-1 gap-2.5 pt-2">
+                            {q.options.map((opt, oIdx) => {
+                              const isCorrectChoice = oIdx === correctAns;
+                              const isUserWrongChoice = userAns === oIdx && !isCorrectChoice;
+
+                              let cardClass = "bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300";
+                              if (isCorrectChoice) {
+                                cardClass = "bg-emerald-100 dark:bg-emerald-950/90 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-2xs";
+                              } else if (isUserWrongChoice) {
+                                cardClass = "bg-rose-100 dark:bg-rose-950/90 border-2 border-rose-500 text-rose-950 dark:text-rose-100 font-extrabold shadow-2xs";
+                              }
+
+                              return (
+                                <div
+                                  key={oIdx}
+                                  className={`p-3 rounded-xl border flex items-center justify-between transition-all ${cardClass}`}
+                                >
+                                  <div className="flex items-center space-x-3 min-w-0 pr-2">
+                                    <span className={`w-7 h-7 rounded-lg font-black text-xs flex items-center justify-center shrink-0 ${
+                                      isCorrectChoice
+                                        ? 'bg-emerald-600 text-white'
+                                        : isUserWrongChoice
+                                        ? 'bg-rose-600 text-white'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                                    }`}>
+                                      {banglaOptionBadges[oIdx] || oIdx + 1}
+                                    </span>
+                                    <span className="text-xs sm:text-sm font-bold leading-snug">
+                                      {opt}
+                                    </span>
+                                  </div>
+
+                                  {/* Result Indicator Badges */}
+                                  <div className="shrink-0">
+                                    {isCorrectChoice && (
+                                      <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-black flex items-center space-x-1 shadow-2xs">
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        <span>সঠিক উত্তর</span>
+                                      </span>
+                                    )}
+                                    {isUserWrongChoice && (
+                                      <span className="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-black flex items-center space-x-1 shadow-2xs">
+                                        <XCircle className="w-3.5 h-3.5" />
+                                        <span>আপনার ভুল উত্তর</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Detailed Explanation Box */}
+                          {q.explanation && (
+                            <div className="mt-3 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200/90 dark:border-amber-800 text-amber-950 dark:text-amber-200 space-y-1 text-xs sm:text-sm">
+                              <div className="font-black text-amber-900 dark:text-amber-300 flex items-center space-x-1.5">
+                                <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                <span>বিস্তারিত ব্যাখ্যা:</span>
+                              </div>
+                              <p className="font-semibold leading-relaxed pl-5 text-slate-800 dark:text-slate-200">
+                                {q.explanation}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Modal 3: Specific Exam Leaderboard Modal */}
+            {examLeaderboardModal && (
+              <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
+                <div className="w-full max-w-3xl max-h-[92vh] bg-white dark:bg-slate-900 rounded-3xl overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 text-white flex items-center justify-between shrink-0">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2.5 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                        <Trophy className="w-6 h-6 stroke-[2.5]" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 block">
+                          পরীক্ষার বিশেষ মেধাতালিকা
+                        </span>
+                        <h3 className="font-black text-sm sm:text-base text-white">
+                          {examLeaderboardModal.exam.topic || examLeaderboardModal.exam.title}
+                        </h3>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setExamLeaderboardModal(null)}
+                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-4">
+                    <LeaderboardView
+                      examTitle={examLeaderboardModal.exam.topic || examLeaderboardModal.exam.title}
+                      isPremiumExam={true}
+                      isCourseContext={true}
+                      hideFilters={true}
+                    />
                   </div>
                 </div>
               </div>
