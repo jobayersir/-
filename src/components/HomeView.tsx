@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavTab, CourseItem, ExamItem } from '../types';
 import { Logo } from './Logo';
+import { fetchExamsFromSupabase } from '../lib/supabase';
 import { 
   Sparkles, 
   Zap, 
@@ -85,45 +86,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
     },
   ];
 
-  // Daily & Free Exams mock list
-  const sampleExams: ExamItem[] = [
-    {
-      id: 'e1',
-      title: 'আজকের ডেইলি মডেল টেস্ট (২৫ প্রশ্ন)',
-      titleArabic: 'الاختبار اليومي النموذجية',
-      category: 'daily',
-      durationMinutes: 20,
-      totalQuestions: 25,
-      difficulty: 'মাঝারি',
-      participantsCount: '১.৮k+',
-      subject: 'আরবি ব্যাকরণ ও ফিকহ',
-      isPremium: false,
-    },
-    {
-      id: 'e2',
-      title: 'মাদ্রাসা বিষয়ভিত্তিক ফ্রি স্পেশাল টেস্ট - ১',
-      titleArabic: 'الاختبار العام المجاني',
-      category: 'free',
-      durationMinutes: 30,
-      totalQuestions: 50,
-      difficulty: 'সহজ',
-      participantsCount: '৪.২k+',
-      subject: 'সাধারণ বিষয় (বাংলা, ইংরেজি, গণিত, সাধারণ জ্ঞান)',
-      isPremium: false,
-    },
-    {
-      id: 'e3',
-      title: 'ভিআইপি প্রিমিয়াম লাইভ মক টেস্ট - প্রভাষক ক্যাডার',
-      titleArabic: 'اختبار المحاضرين المتميز',
-      category: 'premium',
-      durationMinutes: 60,
-      totalQuestions: 100,
-      difficulty: 'কঠিন',
-      participantsCount: '৯৫০+',
-      subject: 'আল-কুরআন, হাদিস, বালাগাত ও ফিকহুস সুন্নাহ্',
-      isPremium: true,
-    },
-  ];
+  // Daily & Free Exams dynamic list synced from Supabase
+  const [sampleExams, setSampleExams] = useState<ExamItem[]>([]);
+
+  useEffect(() => {
+    fetchExamsFromSupabase().then((res) => {
+      if (res && res.length > 0) {
+        setSampleExams(res.slice(0, 3));
+      } else {
+        setSampleExams([]);
+      }
+    }).catch((err) => {
+      console.error('Error fetching exams on home:', err);
+      setSampleExams([]);
+    });
+  }, []);
 
   // Leaderboard Top 3 Candidates
   const topLeaders = [
@@ -358,60 +335,78 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {sampleExams.map((exam) => (
-            <div
-              key={exam.id}
+        {sampleExams.length === 0 ? (
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200/80 dark:border-slate-800 text-center space-y-3 shadow-sm">
+            <FileCheck2 className="w-10 h-10 text-emerald-500 mx-auto" />
+            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              বর্তমানে অ্যাডমিন প্যানেল থেকে তৈরি কোনো পরীক্ষা সিঙ্ক করা নেই
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+              নতুন মডেল টেস্ট বা কুইজ তৈরি হলে এখানে রিয়েল-টাইমে দেখা যাবে।
+            </p>
+            <button
               onClick={() => onTabChange('exams')}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between space-y-4 cursor-pointer hover:border-emerald-300"
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md"
             >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
-                    exam.category === 'daily'
-                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300'
-                      : exam.category === 'free'
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
-                      : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300'
-                  }`}>
-                    {exam.category === 'daily' ? 'আজকের ডেইলি টেস্ট' : exam.category === 'free' ? 'ফ্রি পরীক্ষা' : 'প্রিমিয়াম স্পেশাল'}
-                  </span>
-
-                  <span className="text-xs text-slate-400 font-medium">
-                    {exam.difficulty} স্তর
-                  </span>
-                </div>
-
-                <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 leading-snug">
-                  {exam.title}
-                </h3>
-
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  বিষয়: <span className="font-semibold text-slate-700 dark:text-slate-300">{exam.subject}</span>
-                </p>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center space-x-1">
-                    <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>{exam.durationMinutes} মিনিট</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <FileCheck2 className="w-3.5 h-3.5 text-teal-600" />
-                    <span>{exam.totalQuestions} প্রশ্ন</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
+              পরীক্ষা দিন ট্যাবে যান
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {sampleExams.map((exam) => (
+              <div
+                key={exam.id}
                 onClick={() => onTabChange('exams')}
-                className="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-1.5 transition-colors"
+                className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between space-y-4 cursor-pointer hover:border-emerald-300"
               >
-                <span>পরীক্ষা দিন</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
+                      exam.category === 'daily'
+                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300'
+                        : exam.category === 'free'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
+                        : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300'
+                    }`}>
+                      {exam.category === 'daily' ? 'আজকের ডেইলি টেস্ট' : exam.category === 'free' ? 'ফ্রি পরীক্ষা' : 'প্রিমিয়াম স্পেশাল'}
+                    </span>
+
+                    <span className="text-xs text-slate-400 font-medium">
+                      {exam.difficulty} স্তর
+                    </span>
+                  </div>
+
+                  <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100 leading-snug">
+                    {exam.title}
+                  </h3>
+
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    বিষয়: <span className="font-semibold text-slate-700 dark:text-slate-300">{exam.subject}</span>
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center space-x-1">
+                      <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{exam.durationMinutes} মিনিট</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <FileCheck2 className="w-3.5 h-3.5 text-teal-600" />
+                      <span>{exam.totalQuestions} প্রশ্ন</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => onTabChange('exams')}
+                  className="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-1.5 transition-colors"
+                >
+                  <span>পরীক্ষা দিন</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 5. AI Ustad Interactive Banner */}

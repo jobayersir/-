@@ -395,7 +395,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     }
   };
 
-  const liveExamItem = examsList.find((ex) => ex.category === 'live') || examsList[0];
+  const liveExamItem = examsList.find((ex) => ex.category === 'live');
 
   // If an exam is currently active/running
   if (activeExam) {
@@ -444,7 +444,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <div className="flex items-center space-x-1.5 bg-emerald-900/60 border border-emerald-700/50 px-3 py-1 rounded-xl text-xs font-semibold text-emerald-200">
                 <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>আজকের পরীক্ষা: <strong className="text-white font-black">২৭টি</strong></span>
+                <span>উপলব্ধ পরীক্ষা: <strong className="text-white font-black">{examsList.length}টি</strong></span>
               </div>
               <div className="flex items-center space-x-1.5 bg-emerald-900/60 border border-emerald-700/50 px-3 py-1 rounded-xl text-xs font-semibold text-emerald-200">
                 <FileCheck2 className="w-3.5 h-3.5 text-teal-300 shrink-0" />
