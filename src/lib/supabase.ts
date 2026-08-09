@@ -1,6 +1,25 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { MCQQuestion, CQQuestion, CourseItem, ExamItem } from '../types';
 
+// Helper to race a promise with a timeout (essential for slow/flaky mobile data connections)
+function withTimeout<T>(promiseLike: PromiseLike<T>, timeoutMs: number = 3500): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Network request timed out after ${timeoutMs}ms (mobile data / connection delay)`));
+    }, timeoutMs);
+
+    Promise.resolve(promiseLike)
+      .then((res) => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
 // Helper to get active Supabase credentials
 export function getSupabaseCredentials(): { url: string; anonKey: string } {
   const env = (import.meta as any).env || {};
@@ -46,22 +65,40 @@ export function getSupabaseClient(): SupabaseClient | null {
 export const supabase = getSupabaseClient();
 
 /**
- * Fetch MCQ Questions from Supabase if configured
+ * Fetch MCQ Questions from Supabase if configured (with timeout & offline cache for mobile data)
  */
 export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | null> {
+  // Check local cache first for instant mobile load
+  let cached: MCQQuestion[] | null = null;
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('tamreen_cached_mcqs');
+      if (saved) cached = JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse cached MCQs:', e);
+    }
+  }
+
+  // If strictly offline, return cached immediately
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return cached;
+  }
+
   const client = getSupabaseClient();
-  if (!client) return null;
+  if (!client) return cached;
 
   const tablesToTry = ['mcq_questions', 'questions', 'question_bank'];
   for (const table of tablesToTry) {
     try {
-      const { data, error } = await client
+      const queryPromise = client
         .from(table)
         .select('*')
         .order('created_at', { ascending: false });
 
+      const { data, error } = await withTimeout(queryPromise, 3000);
+
       if (!error && data && data.length > 0) {
-        return data.map((q: any) => ({
+        const formatted: MCQQuestion[] = data.map((q: any) => ({
           id: String(q.id || Math.random()),
           question: q.question || q.title || q.question_text || '',
           questionArabic: q.question_arabic || q.questionArabic || undefined,
@@ -75,32 +112,61 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
           yearTag: q.year_tag || q.yearTag || undefined,
           difficulty: q.difficulty || 'medium',
         }));
+
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('tamreen_cached_mcqs', JSON.stringify(formatted));
+          } catch (e) {
+            console.warn('Cache write failed:', e);
+          }
+        }
+
+        return formatted;
       }
     } catch (err) {
-      console.warn(`Fetch from ${table} error:`, err);
+      console.warn(`Fetch from ${table} notice (mobile timeout/error):`, err);
     }
   }
-  return null;
+
+  return cached;
 }
 
 /**
  * Fetch Exams from Supabase (tries 'exams', 'model_tests', 'quizzes', 'tests')
  */
 export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
+  // Check local cache first for instant mobile load
+  let cached: ExamItem[] | null = null;
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('tamreen_cached_exams');
+      if (saved) cached = JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse cached exams:', e);
+    }
+  }
+
+  // If strictly offline, return cached immediately
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return cached;
+  }
+
   const client = getSupabaseClient();
-  if (!client) return null;
+  if (!client) return cached;
 
   const tablesToTry = ['exams', 'model_tests', 'quizzes', 'tests'];
 
   for (const table of tablesToTry) {
     try {
-      const { data, error } = await client
+      const queryPromise = client
         .from(table)
         .select('*')
         .order('created_at', { ascending: false });
 
+      const { data, error } = await withTimeout(queryPromise, 3000);
+
       if (!error && data && data.length > 0) {
-        return data.map((e: any) => {
+        const formatted: ExamItem[] = data.map((e: any) => {
           let rawCategory = (e.category || e.type || e.exam_type || 'free').toLowerCase();
           let normalizedCategory: any = 'free';
 
@@ -152,31 +218,57 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
             questions,
           };
         });
+
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('tamreen_cached_exams', JSON.stringify(formatted));
+          } catch (e) {
+            console.warn('Cache write failed:', e);
+          }
+        }
+
+        return formatted;
       }
     } catch (err) {
-      console.warn(`Fetch from ${table} error:`, err);
+      console.warn(`Fetch from ${table} notice (mobile timeout/error):`, err);
     }
   }
 
-  return null;
+  return cached;
 }
 
 /**
  * Fetch Courses from Supabase if configured
  */
 export async function fetchCoursesFromSupabase(): Promise<CourseItem[] | null> {
+  let cached: CourseItem[] | null = null;
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('tamreen_cached_courses');
+      if (saved) cached = JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse cached courses:', e);
+    }
+  }
+
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return cached;
+  }
+
   const client = getSupabaseClient();
-  if (!client) return null;
+  if (!client) return cached;
 
   try {
-    const { data, error } = await client
+    const queryPromise = client
       .from('courses')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error || !data) return null;
+    const { data, error } = await withTimeout(queryPromise, 3000);
 
-    return data.map((c: any) => ({
+    if (error || !data) return cached;
+
+    const formatted: CourseItem[] = data.map((c: any) => ({
       id: String(c.id),
       title: c.title || c.name || '',
       titleArabic: c.title_arabic || c.titleArabic || undefined,
@@ -201,9 +293,19 @@ export async function fetchCoursesFromSupabase(): Promise<CourseItem[] | null> {
       customSheets: c.custom_sheets || [],
       customExams: c.custom_exams || [],
     }));
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('tamreen_cached_courses', JSON.stringify(formatted));
+      } catch (e) {
+        console.warn('Cache write failed:', e);
+      }
+    }
+
+    return formatted;
   } catch (err) {
-    console.error('Failed to fetch Courses from Supabase:', err);
-    return null;
+    console.warn('Failed to fetch Courses from Supabase (mobile timeout/error):', err);
+    return cached;
   }
 }
 
@@ -215,7 +317,7 @@ export async function saveExamResultToSupabase(result: any): Promise<boolean> {
   if (!client) return false;
 
   try {
-    const { error } = await client
+    const insertPromise = client
       .from('exam_results')
       .insert([{
         user_email: result.userEmail || 'guest@tamreen.com',
@@ -230,9 +332,11 @@ export async function saveExamResultToSupabase(result: any): Promise<boolean> {
         created_at: new Date().toISOString()
       }]);
 
+    const { error } = await withTimeout(insertPromise, 4000);
     return !error;
   } catch (err) {
     console.error('Failed to save exam result to Supabase:', err);
     return false;
   }
 }
+
