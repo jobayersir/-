@@ -92,9 +92,11 @@ export const LiveCardTicker: React.FC = () => {
 };
 
 export const LiveExamCountdownBanner: React.FC<{
-  liveExam: ExtendedExamItem;
+  liveExam?: ExtendedExamItem;
   onStartExam: (exam: ExtendedExamItem) => void;
 }> = ({ liveExam, onStartExam }) => {
+  if (!liveExam) return null;
+
   const [secondsLeft, setSecondsLeft] = useState<number>(2 * 3600 + 45 * 60 + 30);
 
   React.useEffect(() => {
@@ -200,171 +202,8 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
   // State for Premium Upgrade Modal
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
-  // Extended mock exams catalog with rich metadata
-  const [examsList, setExamsList] = useState<ExtendedExamItem[]>([
-    {
-      id: 'ex-daily-1',
-      title: 'আজকের স্পেশাল ডেইলি মডেল টেস্ট (২৯তম দিন)',
-      titleArabic: 'الاختبار اليومي النموذج المتخصص - اليوم ٢٩',
-      category: 'daily',
-      durationMinutes: 25,
-      totalQuestions: 25,
-      totalMarks: 25,
-      difficulty: 'মাঝারি',
-      participantsCount: '২,৮৫০+',
-      subject: 'আরবি ব্যাকরণ (নাহু ও সরফ)',
-      isPremium: false,
-      date: 'আজকের টেস্ট',
-      subjectIcon: 'grammar',
-    },
-    {
-      id: 'ex-daily-2',
-      title: 'ডেইলি স্পেশাল মডেল টেস্ট - ইবতেদায়ী আরবি',
-      titleArabic: 'اختبار القواعد واللغة العربية',
-      category: 'daily',
-      durationMinutes: 20,
-      totalQuestions: 20,
-      totalMarks: 20,
-      difficulty: 'সহজ',
-      participantsCount: '১,৪২০+',
-      subject: 'তাজবীদ ও বালাগাত শাস্ত্র',
-      isPremium: false,
-      date: 'আজকের টেস্ট',
-      subjectIcon: 'quran',
-    },
-    {
-      id: 'ex-free-1',
-      title: 'বিশেষ বিষয়ভিত্তিক ফ্রি প্রি-রেজিস্ট্রেশন ফুল মক টেস্ট',
-      titleArabic: 'اختبار التسجيل العام المجاني الكامل',
-      category: 'free',
-      durationMinutes: 45,
-      totalQuestions: 50,
-      totalMarks: 50,
-      difficulty: 'মাঝারি',
-      participantsCount: '৬,৫০০+',
-      subject: 'বাংলা, ইংরেজি, গণিত ও সাধারণ জ্ঞান',
-      isPremium: false,
-      date: 'চলতি সপ্তাহ',
-      subjectIcon: 'general',
-    },
-    {
-      id: 'ex-free-2',
-      title: 'সহকারী মৌলভী বিষয়ভিত্তিক ফ্রি প্র্যাকটিস টেস্ট',
-      titleArabic: 'اختبار المعلم المساعد في الفقه والحديث',
-      category: 'free',
-      durationMinutes: 30,
-      totalQuestions: 30,
-      totalMarks: 30,
-      difficulty: 'সহজ',
-      participantsCount: '৩,২০০+',
-      subject: 'ফিকহ ও উসূলে ফিকহ',
-      isPremium: false,
-      date: 'চলতি সপ্তাহ',
-      subjectIcon: 'fiqh',
-    },
-    {
-      id: 'ex-prem-1',
-      title: 'ভিআইপি প্রভাষক (আরবি ক্যাডার) প্রিমিয়াম মেগা মডেল টেস্ট',
-      titleArabic: 'اختبار المحاضرين الفائق المتميز المحترف',
-      category: 'premium',
-      durationMinutes: 90,
-      totalQuestions: 100,
-      totalMarks: 100,
-      difficulty: 'কঠিন',
-      participantsCount: '১,১৯৮০+',
-      subject: 'আল-কুরআন, হাদিস, বালাগাত ও ফিকহুস সুন্নাহ্',
-      isPremium: true,
-      date: 'স্পেশাল ভিআইপি',
-      subjectIcon: 'hadith',
-    },
-    {
-      id: 'ex-prem-2',
-      title: 'প্রভাষক ইসলামী ইতিহাস ও সংস্কৃতি প্রিমিয়াম স্পেশাল',
-      titleArabic: 'اختبار التاريخ الإسلامي والثقافة',
-      category: 'premium',
-      durationMinutes: 60,
-      totalQuestions: 75,
-      totalMarks: 75,
-      difficulty: 'কঠিন',
-      participantsCount: '১,১৫০+',
-      subject: 'ইসলামী ইতিহাস ও সংস্কৃতি',
-      isPremium: true,
-      date: 'স্পেশাল ভিআইপি',
-      subjectIcon: 'history',
-    },
-    {
-      id: 'ex-live-1',
-      title: 'আজকের লাইভ গ্র্যান্ড অল-বাংলাদেশ মক টেস্ট',
-      titleArabic: 'الاختبار المباشر الكبيـر على مستوى البلاد',
-      category: 'live',
-      durationMinutes: 60,
-      totalQuestions: 80,
-      totalMarks: 80,
-      difficulty: 'মাঝারি',
-      participantsCount: '৪,১২০+ লাইভ',
-      subject: 'সহকারী শিক্ষক (আরবি) অল সাবজেক্ট',
-      isPremium: false,
-      date: 'আজ রাত ৯:০০ টা',
-      scheduledTime: 'আজ রাত ৯:০০ টা',
-      isLiveNow: true,
-      subjectIcon: 'grammar',
-    },
-    {
-      id: 'ex-live-2',
-      title: 'আগামীকালের লাইভ সাবজেক্ট উইকলি ব্যাটল',
-      titleArabic: 'المنافسة الأسبوعية المباشرة القادمة',
-      category: 'live',
-      durationMinutes: 40,
-      totalQuestions: 40,
-      totalMarks: 40,
-      difficulty: 'কঠিন',
-      participantsCount: '২,১৫০+ নিবন্ধিত',
-      subject: 'নাহু-সরফ ও আরবি সাহিত্য',
-      isPremium: false,
-      date: 'আগামীকাল সন্ধ্যা ৭:৩০ মি.',
-      scheduledTime: 'আগামীকাল সন্ধ্যা ৭:৩০ মি.',
-      isLiveNow: false,
-      subjectIcon: 'grammar',
-    },
-    {
-      id: 'ex-comp-1',
-      title: 'বিগত সপ্তাহের সম্পন্নকৃত মডেল টেস্ট - ১',
-      titleArabic: 'الاختبار المكتمل الأسبوعي الماضي',
-      category: 'completed',
-      durationMinutes: 30,
-      totalQuestions: 30,
-      totalMarks: 30,
-      difficulty: 'মাঝারি',
-      participantsCount: '৫,০০০+',
-      subject: 'ইসলামী ইতিহাস ও সমাজবিজ্ঞান',
-      isPremium: false,
-      date: '২ দিন আগে সম্পন্ন',
-      subjectIcon: 'history',
-      score: 26,
-      correctAnswers: 26,
-      wrongAnswers: 4,
-      accuracy: 87,
-    },
-    {
-      id: 'ex-comp-2',
-      title: 'মাদ্রাসা বিষয়ভিত্তিক বিগত বছরের প্রশ্ন সমাধান টেস্ট',
-      titleArabic: 'اختبار حل أسئلة الامتحان السابق',
-      category: 'completed',
-      durationMinutes: 50,
-      totalQuestions: 50,
-      totalMarks: 50,
-      difficulty: 'মাঝারি',
-      participantsCount: '৮,২০০+',
-      subject: 'আরবি ও সাধারণ বিষয়াবলি',
-      isPremium: false,
-      date: '৫ দিন আগে সম্পন্ন',
-      subjectIcon: 'general',
-      score: 44,
-      correctAnswers: 44,
-      wrongAnswers: 6,
-      accuracy: 88,
-    },
-  ]);
+  // Dynamic exams list state synced with Supabase (no static mock defaults)
+  const [examsList, setExamsList] = useState<ExtendedExamItem[]>([]);
 
   // Load Exams from Supabase on mount & refresh
   const loadSupabaseExams = async () => {
@@ -389,11 +228,9 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
           questions: e.questions,
         }));
 
-        setExamsList((prev) => {
-          const remoteIds = new Set(formatted.map((f) => f.id));
-          const filteredLocal = prev.filter((p) => !remoteIds.has(p.id));
-          return [...formatted, ...filteredLocal];
-        });
+        setExamsList(formatted);
+      } else {
+        setExamsList([]);
       }
     } catch (err) {
       console.error('Error loading Supabase exams:', err);
