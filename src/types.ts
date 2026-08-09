@@ -113,15 +113,16 @@ export interface ExamItem {
   id: string;
   title: string;
   titleArabic?: string;
-  category: ExamCategory;
+  category: ExamCategory | string;
   durationMinutes: number;
   totalQuestions: number;
-  difficulty: 'সহজ' | 'মাঝারি' | 'কঠিন';
+  difficulty: 'সহজ' | 'মাঝারি' | 'কঠিন' | string;
   participantsCount: string;
   subject: string;
   isPremium: boolean;
   thumbnailUrl?: string;
   scheduledTime?: string;
+  questions?: MCQQuestion[];
 }
 
 export interface CourseContentItem {

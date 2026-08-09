@@ -22,6 +22,8 @@ import {
   SettingsView 
 } from './components/SecondaryViews';
 import { QUESTION_BANK } from './data/questionBank';
+import { fetchMcqQuestionsFromSupabase } from './lib/supabase';
+import { MCQQuestion } from './types';
 import { Logo } from './components/Logo';
 import { getBengaliFontFamily, getArabicFontFamily } from './utils/arabic';
 
@@ -33,6 +35,9 @@ export default function App() {
   const [arabicFont, setArabicFont] = useState<string>('Noto Naskh Arabic');
   const [harakatVisible, setHarakatVisible] = useState<boolean>(true);
   const [isProfileSideSheetOpen, setIsProfileSideSheetOpen] = useState<boolean>(false);
+
+  // Dynamic MCQ questions state synced with Supabase
+  const [mcqQuestions, setMcqQuestions] = useState<MCQQuestion[]>(QUESTION_BANK);
 
   // User persistent state
   const [examResults, setExamResults] = useState<ExamResult[]>([]);
@@ -171,6 +176,17 @@ export default function App() {
     } catch (e) {
       console.error('Failed to parse local storage', e);
     }
+
+    // Load MCQs from Supabase if configured
+    fetchMcqQuestionsFromSupabase().then((remoteQuestions) => {
+      if (remoteQuestions && remoteQuestions.length > 0) {
+        setMcqQuestions((prev) => {
+          const remoteIds = new Set(remoteQuestions.map((q) => q.id));
+          const filteredLocal = prev.filter((q) => !remoteIds.has(q.id));
+          return [...remoteQuestions, ...filteredLocal];
+        });
+      }
+    });
   }, []);
 
   // Sync dark mode class on documentElement
@@ -293,7 +309,7 @@ export default function App() {
         )}
 
         {activeTab === 'exams' && (
-          <ExamsView mcqQuestions={QUESTION_BANK} onOpenLeaderboard={() => handleNavigateTab('leaderboard')} />
+          <ExamsView mcqQuestions={mcqQuestions} onOpenLeaderboard={() => handleNavigateTab('leaderboard')} />
         )}
 
         {activeTab === 'courses' && (

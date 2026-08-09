@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
 import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
+import { fetchExamsFromSupabase } from '../lib/supabase';
 import { 
   FileCheck2, 
   Clock, 
@@ -200,7 +201,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   // Extended mock exams catalog with rich metadata
-  const examsList: ExtendedExamItem[] = [
+  const [examsList, setExamsList] = useState<ExtendedExamItem[]>([
     {
       id: 'ex-daily-1',
       title: 'আজকের স্পেশাল ডেইলি মডেল টেস্ট (২৯তম দিন)',
@@ -270,7 +271,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       totalQuestions: 100,
       totalMarks: 100,
       difficulty: 'কঠিন',
-      participantsCount: '১,৯৮০+',
+      participantsCount: '১,১৯৮০+',
       subject: 'আল-কুরআন, হাদিস, বালাগাত ও ফিকহুস সুন্নাহ্',
       isPremium: true,
       date: 'স্পেশাল ভিআইপি',
@@ -363,7 +364,45 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       wrongAnswers: 6,
       accuracy: 88,
     },
-  ];
+  ]);
+
+  // Load Exams from Supabase on mount & refresh
+  const loadSupabaseExams = async () => {
+    try {
+      const remote = await fetchExamsFromSupabase();
+      if (remote && remote.length > 0) {
+        const formatted: ExtendedExamItem[] = remote.map((e) => ({
+          id: e.id,
+          title: e.title,
+          titleArabic: e.titleArabic,
+          category: (e.category as any) || 'free',
+          durationMinutes: e.durationMinutes || 30,
+          totalQuestions: e.totalQuestions || 30,
+          totalMarks: e.totalQuestions || 30,
+          difficulty: e.difficulty || 'মাঝারি',
+          participantsCount: e.participantsCount || '১,০০০+',
+          subject: e.subject || 'সাধারণ বিষয়',
+          isPremium: Boolean(e.isPremium),
+          date: e.scheduledTime || 'এখনই লঞ্চ করা',
+          scheduledTime: e.scheduledTime,
+          subjectIcon: 'general',
+          questions: e.questions,
+        }));
+
+        setExamsList((prev) => {
+          const remoteIds = new Set(formatted.map((f) => f.id));
+          const filteredLocal = prev.filter((p) => !remoteIds.has(p.id));
+          return [...formatted, ...filteredLocal];
+        });
+      }
+    } catch (err) {
+      console.error('Error loading Supabase exams:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadSupabaseExams();
+  }, []);
 
   // Handle Share Exam Deep Link
   const handleShareExam = async (exam: ExtendedExamItem) => {
@@ -401,13 +440,14 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
   }
 
   // Handle manual Refresh trigger
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setIsRefreshing(true);
     setIsLoadingSkeleton(true);
+    await loadSupabaseExams();
     setTimeout(() => {
       setIsRefreshing(false);
       setIsLoadingSkeleton(false);
-    }, 600);
+    }, 400);
   };
 
   const handleCategoryChange = (catId: any) => {
@@ -420,7 +460,13 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
   // Filtering Logic
   const filteredExams = examsList.filter((exam) => {
-    const matchesCategory = selectedCategory === 'all' || exam.category === selectedCategory;
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      exam.category === selectedCategory ||
+      (selectedCategory === 'daily' && (exam.category === 'model_test' || exam.category === 'modelTest' || exam.category === 'daily')) ||
+      (selectedCategory === 'free' && (exam.category === 'free' || exam.category === 'model_test' || !exam.isPremium)) ||
+      (selectedCategory === 'premium' && (exam.category === 'premium' || exam.isPremium)) ||
+      (selectedCategory === 'live' && exam.category === 'live');
     const matchesSearch =
       exam.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       exam.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -514,6 +560,25 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
   const liveExamItem = examsList.find((ex) => ex.category === 'live') || examsList[0];
 
+  // If an exam is currently active/running
+  if (activeExam) {
+    const questionsForThisExam = (activeExam.questions && activeExam.questions.length > 0)
+      ? activeExam.questions
+      : mcqQuestions.slice(0, activeExam.totalQuestions || 20);
+
+    return (
+      <CbtExamRunner
+        exam={activeExam}
+        questions={questionsForThisExam}
+        onClose={() => setActiveExam(null)}
+        onOpenLeaderboard={() => {
+          setViewingLeaderboardExam(activeExam);
+          setActiveExam(null);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6 pb-28 animate-in fade-in duration-300">
       
@@ -586,6 +651,28 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       {/* ========================================================= */}
       <div className="space-y-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg">
         
+        {/* Supabase Live Sync Status Indicator */}
+        <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs font-semibold text-emerald-900 dark:text-emerald-200 shadow-2xs">
+          <div className="flex items-center space-x-2 min-w-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="truncate">
+              সুপাবেজ রিয়েল-টাইম সিঙ্ক: <strong className="font-bold text-emerald-700 dark:text-emerald-300">এডমিন প্যানেলে তৈরি নতুন মডেল টেস্ট স্বয়ংক্রিয়ভাবে অ্যাপে যুক্ত হচ্ছে</strong>
+            </span>
+          </div>
+          <div className="flex items-center space-x-2 shrink-0">
+            <span className="bg-emerald-200/80 dark:bg-emerald-900/80 px-2.5 py-0.5 rounded-full text-[11px] font-bold text-emerald-900 dark:text-emerald-100">
+              মোট পরীক্ষা: {examsList.length}টি
+            </span>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="text-emerald-700 dark:text-emerald-300 underline text-xs font-bold hover:text-emerald-900 dark:hover:text-emerald-100 flex items-center space-x-1"
+            >
+              <span>{isRefreshing ? 'সিঙ্ক হচ্ছে...' : 'এখনই রিফ্রেশ'}</span>
+            </button>
+          </div>
+        </div>
+
         {/* Large Search Bar */}
         <div className="relative">
           <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />

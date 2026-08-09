@@ -31,6 +31,7 @@ import { MCQQuestion } from '../types';
 import { formatArabicText } from '../utils/arabic';
 
 import { saveExamResult } from '../utils/examStorage';
+import { saveExamResultToSupabase } from '../lib/supabase';
 
 interface CbtExamRunnerProps {
   exam: ExtendedExamItem;
@@ -220,6 +221,19 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       totalQuestions: questions.length,
       percentage: pct,
       timestamp: Date.now()
+    });
+
+    // Also sync result to Supabase if connected
+    saveExamResultToSupabase({
+      examId: exam.id,
+      score: cCount,
+      totalQuestions: questions.length,
+      correctAnswers: cCount,
+      wrongAnswers: wCount,
+      skipped: questions.length - (cCount + wCount),
+      timeTakenSeconds: usedSecs,
+      cadre: 'all',
+      subjectFilter: exam.subject || 'all',
     });
 
     setUserRank(saved.rank);
