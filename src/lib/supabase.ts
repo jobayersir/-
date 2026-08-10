@@ -165,7 +165,12 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
 
       const { data, error } = await withTimeout(queryPromise, 3000);
 
-      if (!error && data && data.length > 0) {
+      if (!error && Array.isArray(data)) {
+        if (data.length === 0 && table !== 'tests') {
+          // Try next table in case 'exams' table is unused but 'model_tests' exists
+          continue;
+        }
+
         const formatted: ExamItem[] = data.map((e: any) => {
           let rawCategory = (e.category || e.type || e.exam_type || 'free').toLowerCase();
           let normalizedCategory: any = 'free';
