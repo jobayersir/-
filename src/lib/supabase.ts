@@ -135,26 +135,42 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
  * Fetch Exams from Supabase (tries 'exams', 'model_tests', 'quizzes', 'tests')
  */
 export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
-  // Check local cache first for instant mobile load
+  // Check local cache first
   let cached: ExamItem[] | null = null;
   if (typeof window !== 'undefined') {
     try {
       const saved = localStorage.getItem('tamreen_cached_exams');
-      if (saved) cached = JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Purge legacy hardcoded default mock exams from cache if present
+        if (Array.isArray(parsed)) {
+          const hasLegacyMocks = parsed.some((e: any) => 
+            ['e1', 'e2', 'e3', 'e4', 'm1', 'm2', 'm3', 'm4', 'm5', 'l1', 'f1', 'f2'].includes(e.id) ||
+            (e.title && (e.title.includes('ইবতেদায়ী শিক্ষকমণ্ডলী') || e.title.includes('সহকারী শিক্ষক (আরবি)') || e.title.includes('প্রভাষক (আরবি)')))
+          );
+          if (hasLegacyMocks) {
+            localStorage.removeItem('tamreen_cached_exams');
+          } else {
+            cached = parsed;
+          }
+        }
+      }
     } catch (e) {
       console.warn('Failed to parse cached exams:', e);
+      localStorage.removeItem('tamreen_cached_exams');
     }
   }
 
-  // If strictly offline, return cached immediately
+  // If strictly offline, return non-legacy cached immediately
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
-    return cached;
+    return cached || [];
   }
 
   const client = getSupabaseClient();
-  if (!client) return cached;
+  if (!client) return cached || [];
 
   const tablesToTry = ['exams', 'model_tests', 'quizzes', 'tests'];
+  let foundTable = false;
 
   for (const table of tablesToTry) {
     try {
@@ -166,8 +182,10 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
       const { data, error } = await withTimeout(queryPromise, 3000);
 
       if (!error && Array.isArray(data)) {
+        foundTable = true;
+        
         if (data.length === 0 && table !== 'tests') {
-          // Try next table in case 'exams' table is unused but 'model_tests' exists
+          // Try next table in case 'exams' table is empty but 'model_tests' exists
           continue;
         }
 
@@ -215,7 +233,7 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
             durationMinutes: Number(e.duration_minutes || e.durationMinutes || e.duration || e.time_limit || 30),
             totalQuestions: Number(e.total_questions || e.totalQuestions || e.questions_count || (questions ? questions.length : 30)),
             difficulty: e.difficulty || e.level || 'মাঝারি',
-            participantsCount: e.participants_count || e.participantsCount || e.participants || '১,০০০+',
+            participantsCount: e.participants_count || e.participantsCount || e.participants || '০',
             subject: e.subject || e.subject_name || 'সাধারণ বিষয়',
             isPremium: Boolean(e.is_premium || e.isPremium || e.paid || normalizedCategory === 'premium'),
             thumbnailUrl: e.thumbnail_url || e.thumbnailUrl || undefined,
@@ -239,7 +257,15 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
     }
   }
 
-  return cached;
+  // If tables checked and empty, cache empty array and return []
+  if (foundTable) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tamreen_cached_exams', JSON.stringify([]));
+    }
+    return [];
+  }
+
+  return cached || [];
 }
 
 /**
