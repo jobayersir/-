@@ -21,6 +21,7 @@ export interface RealLeaderboardEntry {
   examTitle: string;
   userName: string;
   userPhone: string;
+  userAvatar?: string;
   score: number;
   maxScore: number;
   correctCount: number;
@@ -44,6 +45,17 @@ export const getRegisteredUserInfo = (): RegisteredUserInfo | null => {
         return parsed;
       }
     }
+    // Fallback check on user profile
+    const profileData = localStorage.getItem('tamreen_user_profile');
+    if (profileData) {
+      const parsedProfile = JSON.parse(profileData);
+      if (parsedProfile && parsedProfile.name && (parsedProfile.phone || parsedProfile.email)) {
+        return {
+          name: parsedProfile.name,
+          phone: parsedProfile.phone || parsedProfile.email || '০১৭০০-০০০০০'
+        };
+      }
+    }
   } catch (e) {
     console.error('Error reading registered user info:', e);
   }
@@ -53,11 +65,23 @@ export const getRegisteredUserInfo = (): RegisteredUserInfo | null => {
 export const saveRegisteredUserInfo = (info: RegisteredUserInfo): void => {
   try {
     localStorage.setItem(REGISTERED_USER_KEY, JSON.stringify(info));
-    // Also sync to tamreen_user_profile if present
-    const existingProfile = localStorage.getItem('tamreen_user_profile');
-    let profile = existingProfile ? JSON.parse(existingProfile) : {};
+    // Automatically create / sync Free Member profile
+    const existingProfileStr = localStorage.getItem('tamreen_user_profile');
+    let profile = existingProfileStr ? JSON.parse(existingProfileStr) : {};
     profile.name = info.name;
     profile.phone = info.phone;
+    if (profile.isPremium === undefined) {
+      profile.isPremium = false;
+    }
+    if (!profile.role) {
+      profile.role = 'ফ্রি মেম্বার';
+    }
+    if (!profile.joinedDate) {
+      profile.joinedDate = new Date().toLocaleDateString('bn-BD', { month: 'long', year: 'numeric' });
+    }
+    if (!profile.institution) {
+      profile.institution = 'সাধারণ লার্নার';
+    }
     localStorage.setItem('tamreen_user_profile', JSON.stringify(profile));
   } catch (e) {
     console.error('Error saving registered user info:', e);

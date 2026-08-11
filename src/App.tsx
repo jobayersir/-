@@ -37,7 +37,7 @@ export default function App() {
   const [isProfileSideSheetOpen, setIsProfileSideSheetOpen] = useState<boolean>(false);
 
   // Dynamic MCQ questions state synced with Supabase
-  const [mcqQuestions, setMcqQuestions] = useState<MCQQuestion[]>(QUESTION_BANK);
+  const [mcqQuestions, setMcqQuestions] = useState<MCQQuestion[]>([]);
 
   // User persistent state
   const [examResults, setExamResults] = useState<ExamResult[]>([]);
@@ -180,11 +180,7 @@ export default function App() {
     // Load MCQs from Supabase if configured
     fetchMcqQuestionsFromSupabase().then((remoteQuestions) => {
       if (remoteQuestions && remoteQuestions.length > 0) {
-        setMcqQuestions((prev) => {
-          const remoteIds = new Set(remoteQuestions.map((q) => q.id));
-          const filteredLocal = prev.filter((q) => !remoteIds.has(q.id));
-          return [...remoteQuestions, ...filteredLocal];
-        });
+        setMcqQuestions(remoteQuestions);
       }
     });
   }, []);

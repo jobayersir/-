@@ -226,14 +226,18 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
 
     // Save real leaderboard entry for registered user
     const regUser = getRegisteredUserInfo();
-    const currentUserName = regUser?.name || 'পরীক্ষার্থী';
-    const currentUserPhone = regUser?.phone || 'অজানা';
+    const storedProfileStr = typeof window !== 'undefined' ? localStorage.getItem('tamreen_user_profile') : null;
+    const storedProfile = storedProfileStr ? JSON.parse(storedProfileStr) : null;
+    const currentUserName = storedProfile?.name || regUser?.name || 'পরীক্ষার্থী';
+    const currentUserPhone = storedProfile?.phone || regUser?.phone || 'অজানা';
+    const currentUserAvatar = storedProfile?.avatarUrl || '';
 
     saveRealLeaderboardEntry({
       examId: exam.id,
       examTitle: exam.title,
       userName: currentUserName,
       userPhone: currentUserPhone,
+      userAvatar: currentUserAvatar,
       score: cCount,
       maxScore: questions.length,
       correctCount: cCount,

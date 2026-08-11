@@ -93,7 +93,10 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   const storedTotalPoints = getStoredUserTotalPoints();
   const realEntries = getRealLeaderboardEntries();
   const regUser = getRegisteredUserInfo();
-  const currentUserName = user?.name || regUser?.name || 'পরীক্ষার্থী';
+  const storedProfileStr = typeof window !== 'undefined' ? localStorage.getItem('tamreen_user_profile') : null;
+  const storedProfile = storedProfileStr ? JSON.parse(storedProfileStr) : null;
+  const currentUserName = user?.name || storedProfile?.name || regUser?.name || 'পরীক্ষার্থী';
+  const currentUserAvatar = user?.avatarUrl || storedProfile?.avatarUrl || '';
 
   // Dynamic candidate list built strictly from real exam submissions
   let rawCandidates: LeaderboardUser[] = [];
@@ -107,22 +110,25 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       );
     }
 
-    rawCandidates = filteredEntries.map((entry) => ({
-      rank: 1,
-      name: entry.userName,
-      avatar: '',
-      score: entry.score,
-      maxScore: entry.maxScore,
-      accuracyPercentage: entry.accuracyPercentage,
-      correctCount: entry.correctCount,
-      wrongCount: entry.wrongCount,
-      timeSpentMinutes: entry.timeSpentMinutes,
-      avgTimePerQuestionSec: 24,
-      totalExamsTaken: 1,
-      avgPoints: entry.score,
-      streakDays: 1,
-      isCurrentUser: Boolean((regUser && entry.userPhone === regUser.phone) || entry.userName === currentUserName)
-    }));
+    rawCandidates = filteredEntries.map((entry) => {
+      const isCurrUser = Boolean((regUser && entry.userPhone === regUser.phone) || entry.userName === currentUserName);
+      return {
+        rank: 1,
+        name: entry.userName,
+        avatar: entry.userAvatar || (isCurrUser ? currentUserAvatar : ''),
+        score: entry.score,
+        maxScore: entry.maxScore,
+        accuracyPercentage: entry.accuracyPercentage,
+        correctCount: entry.correctCount,
+        wrongCount: entry.wrongCount,
+        timeSpentMinutes: entry.timeSpentMinutes,
+        avgTimePerQuestionSec: 24,
+        totalExamsTaken: 1,
+        avgPoints: entry.score,
+        streakDays: 1,
+        isCurrentUser: isCurrUser
+      };
+    });
 
     // If current user completed exam, ensure present
     if (latestResult && rawCandidates.length === 0 && (!examTitle || latestResult.examTitle === examTitle || latestResult.examId === examTitle)) {
@@ -131,7 +137,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       rawCandidates.push({
         rank: 1,
         name: currentUserName,
-        avatar: user?.avatarUrl || '',
+        avatar: currentUserAvatar,
         score: uScore,
         maxScore: uMax,
         accuracyPercentage: latestResult.percentage,
@@ -150,12 +156,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     const userMap: Record<string, LeaderboardUser> = {};
 
     realEntries.forEach((entry) => {
+      const isCurrUser = Boolean((regUser && entry.userPhone === regUser.phone) || entry.userName === currentUserName);
       const key = entry.userPhone || entry.userName;
       if (!userMap[key]) {
         userMap[key] = {
           rank: 1,
           name: entry.userName,
-          avatar: '',
+          avatar: entry.userAvatar || (isCurrUser ? currentUserAvatar : ''),
           score: 0,
           maxScore: 0,
           accuracyPercentage: 0,
@@ -165,10 +172,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
           totalExamsTaken: 0,
           avgPoints: 0,
           streakDays: 1,
-          isCurrentUser: Boolean((regUser && entry.userPhone === regUser.phone) || entry.userName === currentUserName)
+          isCurrentUser: isCurrUser
         };
       }
       const u = userMap[key];
+      if (!u.avatar && entry.userAvatar) {
+        u.avatar = entry.userAvatar;
+      }
       u.score += entry.score;
       u.maxScore += entry.maxScore;
       u.correctCount = (u.correctCount || 0) + entry.correctCount;
@@ -186,7 +196,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
       rawCandidates.push({
         rank: 1,
         name: currentUserName,
-        avatar: user?.avatarUrl || '',
+        avatar: currentUserAvatar,
         score: latestResult.score,
         maxScore: latestResult.totalQuestions,
         accuracyPercentage: latestResult.percentage,

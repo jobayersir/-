@@ -222,7 +222,38 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
   }, []);
 
   // Dynamic exams list state synced with Supabase (no static mock defaults)
-  const [examsList, setExamsList] = useState<ExtendedExamItem[]>([]);
+  const [examsList, setExamsList] = useState<ExtendedExamItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('tamreen_cached_exams');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map((e: any) => ({
+              id: e.id,
+              title: e.title,
+              titleArabic: e.titleArabic,
+              category: (e.category as any) || 'free',
+              durationMinutes: e.durationMinutes || 30,
+              totalQuestions: e.totalQuestions || 30,
+              totalMarks: e.totalQuestions || 30,
+              difficulty: e.difficulty || 'মাঝারি',
+              participantsCount: e.participantsCount || '১,০০০+',
+              subject: e.subject || 'সাধারণ বিষয়',
+              isPremium: Boolean(e.isPremium),
+              date: e.scheduledTime || 'এখনই লঞ্চ করা',
+              scheduledTime: e.scheduledTime,
+              subjectIcon: 'general',
+              questions: e.questions,
+            }));
+          }
+        }
+      } catch (e) {
+        console.warn('Initial exam cache read error:', e);
+      }
+    }
+    return [];
+  });
 
   // Load Exams from Supabase on mount & refresh
   const loadSupabaseExams = async () => {

@@ -175,17 +175,17 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
 
   for (const table of tablesToTry) {
     try {
-      // 1st attempt: with created_at ordering and 8 second timeout
+      // 1st attempt: with created_at ordering and 2 second timeout
       let res = await withTimeout(
         client.from(table).select('*').order('created_at', { ascending: false }),
-        8000
+        2000
       ).catch(() => null);
 
       // 2nd attempt fallback: if order('created_at') failed (e.g. column created_at missing), try select('*') without ordering
       if (!res || res.error) {
         res = await withTimeout(
           client.from(table).select('*'),
-          8000
+          2000
         ).catch(() => null);
       }
 
@@ -245,7 +245,7 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
                   .from('questions')
                   .select('*')
                   .or(`exam_id.eq.${e.id},test_id.eq.${e.id},model_test_id.eq.${e.id}`),
-                4000
+                1500
               ).catch(() => null);
 
               if (qTableRes && !qTableRes.error && Array.isArray(qTableRes.data) && qTableRes.data.length > 0) {
