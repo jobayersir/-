@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
+import { LeaderboardView } from './LeaderboardView';
 import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints, getRegisteredUserInfo, saveRegisteredUserInfo, getRealLeaderboardEntries } from '../utils/examStorage';
 import { fetchExamsFromSupabase, getSupabaseClient } from '../lib/supabase';
 import { copyToClipboard } from '../utils/clipboard';
@@ -43,7 +44,8 @@ import {
   Copy,
   MapPin,
   UserCheck,
-  Medal
+  Medal,
+  ArrowLeft
 } from 'lucide-react';
 
 interface ExamsViewProps {
@@ -508,6 +510,268 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     );
   }
 
+  if (viewingLeaderboardExam) {
+    return (
+      <div className="space-y-6 pb-28 animate-in fade-in duration-300">
+        <button
+          onClick={() => setViewingLeaderboardExam(null)}
+          className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-xs sm:text-sm transition-all shadow-sm active:scale-95"
+        >
+          <ArrowLeft className="w-4 h-4 text-emerald-600" />
+          <span>সকল পরীক্ষার তালিকায় ফিরে যান</span>
+        </button>
+
+        <LeaderboardView
+          examTitle={viewingLeaderboardExam.title}
+          onBackToExam={() => setViewingLeaderboardExam(null)}
+          userScore={viewingLeaderboardExam.score}
+          userMaxScore={viewingLeaderboardExam.totalMarks}
+        />
+      </div>
+    );
+  }
+
+  if (viewingReportExam) {
+    const reportQuestions = mcqQuestions.slice(0, viewingReportExam.totalQuestions || 10);
+    const filteredReportQuestions = reportQuestions.filter((q, qIdx) => {
+      const isMockWrong = qIdx % 7 === 1;
+      if (reportFilter === 'wrong') return isMockWrong;
+      if (reportFilter === 'correct') return !isMockWrong;
+      return true;
+    });
+
+    return (
+      <div className="space-y-6 pb-28 animate-in fade-in duration-300">
+        <button
+          onClick={() => setViewingReportExam(null)}
+          className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-extrabold text-xs sm:text-sm transition-all shadow-sm active:scale-95"
+        >
+          <ArrowLeft className="w-4 h-4 text-emerald-600" />
+          <span>সকল পরীক্ষার তালিকায় ফিরে যান</span>
+        </button>
+
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-7 space-y-6 shadow-xl">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="font-extrabold text-lg sm:text-2xl text-slate-950 dark:text-slate-100 leading-snug">
+                  ব্যাখ্যা সহ উত্তর ও প্রশ্নব্যাংক
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                  {viewingReportExam.title} ({viewingReportExam.subject})
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setViewingReportExam(null)}
+              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 text-xs font-bold transition-all"
+            >
+              বন্ধ করুন
+            </button>
+          </div>
+
+          {/* Stats Summary Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 text-center">
+            <div>
+              <span className="text-[11px] text-slate-400 block font-semibold">প্রাপ্ত নম্বর</span>
+              <span className="font-extrabold text-base sm:text-lg text-emerald-600 dark:text-emerald-400">{viewingReportExam.score}/{viewingReportExam.totalMarks}</span>
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 block font-semibold">সঠিক উত্তর</span>
+              <span className="font-extrabold text-base sm:text-lg text-teal-600 dark:text-teal-400">{viewingReportExam.correctAnswers || viewingReportExam.score}টি</span>
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 block font-semibold">ভুল উত্তর</span>
+              <span className="font-extrabold text-base sm:text-lg text-rose-500">{viewingReportExam.wrongAnswers || (viewingReportExam.totalMarks - (viewingReportExam.score || 0))}টি</span>
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 block font-semibold">নির্ভুলতা</span>
+              <span className="font-extrabold text-base sm:text-lg text-amber-500">{viewingReportExam.accuracy}%</span>
+            </div>
+          </div>
+
+          {/* Filter Tabs for Questions */}
+          <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+            <button
+              onClick={() => setReportFilter('all')}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
+                reportFilter === 'all'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+              }`}
+            >
+              সকল প্রশ্ন ({reportQuestions.length})
+            </button>
+            <button
+              onClick={() => setReportFilter('wrong')}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
+                reportFilter === 'wrong'
+                  ? 'bg-rose-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+              }`}
+            >
+              ভুল উত্তর ({reportQuestions.filter((_, idx) => idx % 7 === 1).length})
+            </button>
+            <button
+              onClick={() => setReportFilter('correct')}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
+                reportFilter === 'correct'
+                  ? 'bg-teal-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+              }`}
+            >
+              সঠিক উত্তর ({reportQuestions.filter((_, idx) => idx % 7 !== 1).length})
+            </button>
+          </div>
+
+          {/* Questions List with Explanations */}
+          <div className="space-y-4">
+            {filteredReportQuestions.length === 0 ? (
+              <div className="text-center py-10 text-slate-500 text-sm font-bold bg-slate-50 dark:bg-slate-800/40 rounded-2xl">
+                এই ক্যাটাগরিতে কোনো প্রশ্ন পাওয়া যায়নি।
+              </div>
+            ) : (
+              filteredReportQuestions.map((q, idx) => {
+                const originalIndex = reportQuestions.findIndex(item => item.question === q.question);
+                const qNum = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
+                const isMockWrong = originalIndex % 7 === 1;
+                const mockUserOptIdx = isMockWrong ? (q.correctAnswer + 1) % q.options.length : q.correctAnswer;
+
+                return (
+                  <div
+                    key={idx}
+                    className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3.5 shadow-xs"
+                  >
+                    {/* Question Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-black">
+                          প্রশ্ন {qNum}
+                        </span>
+                        <span className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400">
+                          বিষয়: {q.subject || viewingReportExam.subject}
+                        </span>
+                      </div>
+                      {isMockWrong ? (
+                        <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black flex items-center space-x-1">
+                          <XCircle className="w-3.5 h-3.5 text-rose-600" />
+                          <span>ভুল উত্তর</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black flex items-center space-x-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>সঠিক উত্তর</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Question Text */}
+                    <h4 className="font-bold text-[17px] sm:text-lg text-slate-900 dark:text-slate-100 leading-snug">
+                      {q.question}
+                    </h4>
+                    {q.questionArabic && (
+                      <p className="text-sm text-emerald-800 dark:text-emerald-300 font-arabic font-semibold" style={{ fontFamily: "'Amiri', serif" }}>
+                        {q.questionArabic}
+                      </p>
+                    )}
+
+                    {/* Options Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      {q.options.map((opt, optIdx) => {
+                        const isCorrectOpt = optIdx === q.correctAnswer;
+                        const isUserSelected = optIdx === mockUserOptIdx;
+                        const optionLabel = ['ক', 'খ', 'গ', 'ঘ'][optIdx] || `${optIdx + 1}`;
+
+                        let optStyle = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300";
+                        let badgeStyle = "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400";
+
+                        if (isCorrectOpt) {
+                          optStyle = "bg-emerald-100 dark:bg-emerald-950/80 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-bold";
+                          badgeStyle = "bg-emerald-600 text-white font-extrabold";
+                        } else if (isUserSelected && isMockWrong) {
+                          optStyle = "bg-rose-100 dark:bg-rose-950/80 border-2 border-rose-500 text-rose-950 dark:text-rose-100 font-bold";
+                          badgeStyle = "bg-rose-600 text-white font-extrabold";
+                        }
+
+                        return (
+                          <div
+                            key={optIdx}
+                            className={`p-3 rounded-xl border text-xs sm:text-sm flex items-center justify-between gap-2 transition-all ${optStyle}`}
+                          >
+                            <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+                              <span className={`w-6 h-6 rounded-md text-xs font-extrabold flex items-center justify-center shrink-0 ${badgeStyle}`}>
+                                {optionLabel}
+                              </span>
+                              <span className="leading-snug font-bold">{opt}</span>
+                            </div>
+                            {isCorrectOpt && (
+                              <span className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-200 bg-emerald-200 dark:bg-emerald-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                <span>সঠিক উত্তর</span>
+                              </span>
+                            )}
+                            {isUserSelected && isMockWrong && (
+                              <span className="text-[10px] font-extrabold text-rose-800 dark:text-rose-200 bg-rose-200 dark:bg-rose-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
+                                <X className="w-3 h-3 text-rose-600 dark:text-rose-400" />
+                                <span>আপনার ভুল উত্তর</span>
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* EXPLANATION BOX */}
+                    <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 space-y-1.5 mt-2">
+                      <div className="flex items-center space-x-1.5 text-amber-900 dark:text-amber-300 font-black text-xs sm:text-sm">
+                        <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                        <span>💡 বিস্তারিত ব্যাখ্যা:</span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
+                        {q.explanation || 'এই প্রশ্নের উত্তর সরাসরি তামরীন একাডেমির প্রমিত পাঠ্যবই ও বিগত বছরের বোর্ড প্রশ্ন রেফারেন্স অনুযায়ী সবিস্তারে ব্যাখ্যাকৃত।'}
+                      </p>
+                      {q.reference && (
+                        <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 pt-1">
+                          📚 রেফারেন্স: {q.reference}
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Bottom Actions */}
+          <div className="pt-3 flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={() => {
+                setViewingLeaderboardExam(viewingReportExam);
+                setViewingReportExam(null);
+              }}
+              className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
+            >
+              <Trophy className="w-4 h-4 text-slate-950" />
+              <span>জাতীয় মেধা তালিকা দেখুন</span>
+            </button>
+            <button
+              onClick={() => setViewingReportExam(null)}
+              className="px-8 py-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs sm:text-sm hover:bg-slate-300 dark:hover:bg-slate-700 transition-all"
+            >
+              বন্ধ করুন
+            </button>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 pb-28 animate-in fade-in duration-300">
       
@@ -910,541 +1174,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
           onClose={() => setActiveExam(null)}
           onOpenLeaderboard={onOpenLeaderboard}
         />
-      )}
-
-      {/* ========================================================= */}
-      {/* 5. COMPLETED EXAM REPORT & DETAILED ANSWERS MODAL         */}
-      {/* ========================================================= */}
-      {viewingReportExam && (() => {
-        const reportQuestions = mcqQuestions.slice(0, viewingReportExam.totalQuestions || 10);
-        
-        // Filter report questions based on reportFilter ('all' | 'wrong' | 'correct')
-        const filteredReportQuestions = reportQuestions.filter((q, qIdx) => {
-          const isMockWrong = qIdx % 7 === 1; // realistic mock answer distribution matching score
-          if (reportFilter === 'wrong') return isMockWrong;
-          if (reportFilter === 'correct') return !isMockWrong;
-          return true;
-        });
-
-        return (
-          <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-7 space-y-5 relative max-h-[90vh] flex flex-col my-auto">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 shrink-0">
-                <div className="flex items-center space-x-2.5">
-                  <div className="p-2 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                    <BookOpen className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-extrabold text-base sm:text-lg text-slate-950 dark:text-slate-100 leading-snug">
-                      ব্যাখ্যা সহ উত্তর ও প্রশ্নব্যাংক
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium">
-                      {viewingReportExam.title} ({viewingReportExam.subject})
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setViewingReportExam(null)}
-                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Stats Summary Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700 text-center shrink-0">
-                <div>
-                  <span className="text-[11px] text-slate-400 block font-semibold">প্রাপ্ত নম্বর</span>
-                  <span className="font-extrabold text-sm sm:text-base text-emerald-600 dark:text-emerald-400">{viewingReportExam.score}/{viewingReportExam.totalMarks}</span>
-                </div>
-                <div>
-                  <span className="text-[11px] text-slate-400 block font-semibold">সঠিক উত্তর</span>
-                  <span className="font-extrabold text-sm sm:text-base text-teal-600 dark:text-teal-400">{viewingReportExam.correctAnswers || viewingReportExam.score}টি</span>
-                </div>
-                <div>
-                  <span className="text-[11px] text-slate-400 block font-semibold">ভুল উত্তর</span>
-                  <span className="font-extrabold text-sm sm:text-base text-rose-500">{viewingReportExam.wrongAnswers || (viewingReportExam.totalMarks - (viewingReportExam.score || 0))}টি</span>
-                </div>
-                <div>
-                  <span className="text-[11px] text-slate-400 block font-semibold">নির্ভুলতা</span>
-                  <span className="font-extrabold text-sm sm:text-base text-amber-500">{viewingReportExam.accuracy}%</span>
-                </div>
-              </div>
-
-              {/* Filter Tabs for Questions (সকল, ভুল উত্তর, সঠিক উত্তর) */}
-              <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl shrink-0">
-                <button
-                  onClick={() => setReportFilter('all')}
-                  className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
-                    reportFilter === 'all'
-                      ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-                  }`}
-                >
-                  সকল প্রশ্ন ({reportQuestions.length})
-                </button>
-                <button
-                  onClick={() => setReportFilter('wrong')}
-                  className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
-                    reportFilter === 'wrong'
-                      ? 'bg-rose-600 text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-                  }`}
-                >
-                  ভুল উত্তর ({reportQuestions.filter((_, idx) => idx % 7 === 1).length})
-                </button>
-                <button
-                  onClick={() => setReportFilter('correct')}
-                  className={`flex-1 py-2 rounded-xl text-xs font-black transition-all ${
-                    reportFilter === 'correct'
-                      ? 'bg-teal-600 text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-                  }`}
-                >
-                  সঠিক উত্তর ({reportQuestions.filter((_, idx) => idx % 7 !== 1).length})
-                </button>
-              </div>
-
-              {/* Questions List with Explanations */}
-              <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-                {filteredReportQuestions.length === 0 ? (
-                  <div className="text-center py-8 text-slate-500 text-xs font-bold">
-                    এই ক্যাটাগরিতে কোনো প্রশ্ন পাওয়া যায়নি।
-                  </div>
-                ) : (
-                  filteredReportQuestions.map((q, idx) => {
-                    const originalIndex = reportQuestions.findIndex(item => item.question === q.question);
-                    const qNum = originalIndex !== -1 ? originalIndex + 1 : idx + 1;
-                    const isMockWrong = originalIndex % 7 === 1;
-                    const mockUserOptIdx = isMockWrong ? (q.correctAnswer + 1) % q.options.length : q.correctAnswer;
-
-                    return (
-                      <div
-                        key={idx}
-                        className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3"
-                      >
-                        {/* Question Header */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center space-x-2">
-                            <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-black">
-                              প্রশ্ন {qNum}
-                            </span>
-                            <span className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400">
-                              বিষয়: {q.subject || viewingReportExam.subject}
-                            </span>
-                          </div>
-                          {isMockWrong ? (
-                            <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black flex items-center space-x-1">
-                              <XCircle className="w-3 h-3 text-rose-600" />
-                              <span>ভুল উত্তর</span>
-                            </span>
-                          ) : (
-                            <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black flex items-center space-x-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                              <span>সঠিক উত্তর</span>
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Question Text */}
-                        <h4 className="font-bold text-[17px] text-slate-900 dark:text-slate-100 leading-snug">
-                          {q.question}
-                        </h4>
-                        {q.questionArabic && (
-                          <p className="text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 font-arabic font-semibold" style={{ fontFamily: "'Amiri', serif" }}>
-                            {q.questionArabic}
-                          </p>
-                        )}
-
-                        {/* Options Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                          {q.options.map((opt, optIdx) => {
-                            const isCorrectOpt = optIdx === q.correctAnswer;
-                            const isUserSelected = optIdx === mockUserOptIdx;
-                            const optionLabel = ['ক', 'খ', 'গ', 'ঘ'][optIdx] || `${optIdx + 1}`;
-
-                            let optStyle = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300";
-                            let badgeStyle = "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400";
-
-                            if (isCorrectOpt) {
-                              optStyle = "bg-emerald-100 dark:bg-emerald-950/80 border-2 border-emerald-500 text-emerald-950 dark:text-emerald-100 font-bold";
-                              badgeStyle = "bg-emerald-600 text-white font-extrabold";
-                            } else if (isUserSelected && isMockWrong) {
-                              optStyle = "bg-rose-100 dark:bg-rose-950/80 border-2 border-rose-500 text-rose-950 dark:text-rose-100 font-bold";
-                              badgeStyle = "bg-rose-600 text-white font-extrabold";
-                            }
-
-                            return (
-                              <div
-                                key={optIdx}
-                                className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-2 transition-all ${optStyle}`}
-                              >
-                                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                                  <span className={`w-6 h-6 rounded-md text-[11px] font-extrabold flex items-center justify-center shrink-0 ${badgeStyle}`}>
-                                    {optionLabel}
-                                  </span>
-                                  <span className="leading-snug font-bold">{opt}</span>
-                                </div>
-                                {isCorrectOpt && (
-                                  <span className="text-[10px] font-extrabold text-emerald-800 dark:text-emerald-200 bg-emerald-200 dark:bg-emerald-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
-                                    <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                                    <span>সঠিক উত্তর</span>
-                                  </span>
-                                )}
-                                {isUserSelected && isMockWrong && (
-                                  <span className="text-[10px] font-extrabold text-rose-800 dark:text-rose-200 bg-rose-200 dark:bg-rose-900 px-2 py-0.5 rounded-md flex items-center space-x-1 shrink-0 ml-1">
-                                    <X className="w-3 h-3 text-rose-600 dark:text-rose-400" />
-                                    <span>আপনার ভুল উত্তর</span>
-                                  </span>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* 💡 EXPLANATION BOX (ব্যাখ্যা সহ উত্তর) */}
-                        <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 space-y-1 mt-2">
-                          <div className="flex items-center space-x-1.5 text-amber-900 dark:text-amber-300 font-black text-xs">
-                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
-                            <span>💡 বিস্তারিত ব্যাখ্যা:</span>
-                          </div>
-                          <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-semibold">
-                            {q.explanation || 'এই প্রশ্নের উত্তর সরাসরি তামরীন একাডেমির প্রমিত পাঠ্যবই ও বিগত বছরের বোর্ড প্রশ্ন রেফারেন্স অনুযায়ী সবিস্তারে ব্যাখ্যাকৃত।'}
-                          </p>
-                          {q.reference && (
-                            <div className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 pt-1">
-                              📚 রেফারেন্স: {q.reference}
-                            </div>
-                          )}
-                        </div>
-
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* Bottom Actions */}
-              <div className="pt-2 flex flex-col sm:flex-row gap-2 shrink-0">
-                <button
-                  onClick={() => {
-                    setViewingLeaderboardExam(viewingReportExam);
-                    setViewingReportExam(null);
-                  }}
-                  className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-                >
-                  <Trophy className="w-4 h-4 text-slate-950" />
-                  <span>জাতীয় মেধা তালিকা দেখুন</span>
-                </button>
-                <button
-                  onClick={() => setViewingReportExam(null)}
-                  className="px-6 py-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs hover:bg-slate-300 dark:hover:bg-slate-700 transition-all"
-                >
-                  বন্ধ করুন
-                </button>
-              </div>
-
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* ========================================================= */}
-      {/* EXAM SPECIFIC LEADERBOARD MODAL (Matches Screen 3)       */}
-      {/* ========================================================= */}
-      {viewingLeaderboardExam && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-emerald-500/30 p-5 sm:p-6 space-y-4 relative">
-            
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-              <div className="flex items-center space-x-2">
-                <Crown className="w-6 h-6 text-amber-500 shrink-0" />
-                <div>
-                  <div className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-800 text-[10px] font-black text-emerald-800 dark:text-emerald-300 mb-1">
-                    {viewingLeaderboardExam.isPremium 
-                      ? 'প্রিমিয়াম পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা' 
-                      : 'ফ্রি পরীক্ষায় অংশগ্রহণকারীদের মেধা তালিকা'}
-                  </div>
-                  <h3 className="font-black text-sm sm:text-base text-slate-950 dark:text-slate-100 flex items-center space-x-1.5">
-                    <span>বিষয়ের মেধা তালিকা</span>
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 font-extrabold truncate max-w-[220px] sm:max-w-xs">
-                    বিষয়: {viewingLeaderboardExam.title}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setViewingLeaderboardExam(null)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Filter Tabs in Exam Modal (এই পরীক্ষা, এই সপ্তাহে, এই মাসে, সর্বকালের) */}
-            <div className="flex items-center gap-1 p-1 bg-slate-200/80 dark:bg-slate-800/80 rounded-xl text-[11px] font-bold">
-              <button
-                onClick={() => setModalFilter('thisExam')}
-                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
-                  modalFilter === 'thisExam'
-                    ? 'bg-amber-400 text-slate-950 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
-                }`}
-              >
-                এই পরীক্ষা
-              </button>
-              <button
-                onClick={() => setModalFilter('weekly')}
-                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
-                  modalFilter === 'weekly'
-                    ? 'bg-amber-400 text-slate-950 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
-                }`}
-              >
-                এই সপ্তাহে
-              </button>
-              <button
-                onClick={() => setModalFilter('monthly')}
-                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
-                  modalFilter === 'monthly'
-                    ? 'bg-amber-400 text-slate-950 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
-                }`}
-              >
-                এই মাসে
-              </button>
-              <button
-                onClick={() => setModalFilter('allTime')}
-                className={`flex-1 py-1.5 rounded-lg font-black transition-all ${
-                  modalFilter === 'allTime'
-                    ? 'bg-amber-400 text-slate-950 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-300/50 dark:hover:bg-slate-700/50'
-                }`}
-              >
-                সর্বকালের
-              </button>
-            </div>
-
-            {(() => {
-              const totalQ = viewingLeaderboardExam ? (viewingLeaderboardExam.questionsCount || viewingLeaderboardExam.questions?.length || 16) : 16;
-              const activeRes = viewingLeaderboardExam ? (getStoredExamResult(viewingLeaderboardExam.id) || getLatestExamResult()) : null;
-              const storedPoints = getStoredUserTotalPoints();
-
-              let modalCandidatesList: Array<{
-                name: string;
-                correct: number;
-                wrong: number;
-                score: number;
-                maxScore: number;
-                percentage: number;
-                isUser?: boolean;
-                rank?: number;
-              }> = [];
-
-              if (modalFilter === 'thisExam') {
-                const uScore = activeRes ? activeRes.score : Math.min(14, totalQ);
-                const uCorrect = activeRes ? activeRes.correctCount : uScore;
-                const uWrong = activeRes ? activeRes.wrongCount : Math.max(0, totalQ - uScore);
-                const uPerc = activeRes ? activeRes.percentage : (totalQ > 0 ? Math.round((uScore / totalQ) * 100) : 88);
-
-                modalCandidatesList = [
-                  { name: 'মুশফিকুর রহমান', correct: totalQ, wrong: 0, score: totalQ, maxScore: totalQ, percentage: 100 },
-                  { name: 'আহমাদ রাফি', correct: Math.max(1, totalQ - 1), wrong: 1, score: Math.max(1, totalQ - 1), maxScore: totalQ, percentage: Math.round(((totalQ - 1) / totalQ) * 100) },
-                  { name: 'ফারিহা নূর', correct: Math.max(1, totalQ - 1), wrong: 1, score: Math.max(1, totalQ - 1), maxScore: totalQ, percentage: Math.round(((totalQ - 1) / totalQ) * 100) },
-                  { name: 'তানভীর আহমেদ', correct: Math.max(1, totalQ - 2), wrong: 2, score: Math.max(1, totalQ - 2), maxScore: totalQ, percentage: Math.round(((totalQ - 2) / totalQ) * 100) },
-                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uCorrect, wrong: uWrong, score: uScore, maxScore: totalQ, percentage: uPerc, isUser: true },
-                  { name: 'সাবিহা আক্তার', correct: Math.max(0, totalQ - 3), wrong: 3, score: Math.max(0, totalQ - 3), maxScore: totalQ, percentage: Math.round(((totalQ - 3) / totalQ) * 100) },
-                  { name: 'নাজমুল হাসান', correct: Math.max(0, totalQ - 4), wrong: 4, score: Math.max(0, totalQ - 4), maxScore: totalQ, percentage: Math.round(((totalQ - 4) / totalQ) * 100) },
-                  { name: 'ইসরাত জাহান', correct: Math.max(0, totalQ - 5), wrong: 5, score: Math.max(0, totalQ - 5), maxScore: totalQ, percentage: Math.round(((totalQ - 5) / totalQ) * 100) },
-                ];
-              } else if (modalFilter === 'weekly') {
-                const uWeekly = Math.min(500, 360 + (storedPoints - 840));
-                modalCandidatesList = [
-                  { name: 'মুশফিকুর রহমান', correct: 485, wrong: 5, score: 485, maxScore: 500, percentage: 97 },
-                  { name: 'আহমাদ রাফি', correct: 470, wrong: 10, score: 470, maxScore: 500, percentage: 94 },
-                  { name: 'ফারিহা নূর', correct: 450, wrong: 15, score: 450, maxScore: 500, percentage: 90 },
-                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uWeekly, wrong: 15, score: uWeekly, maxScore: 500, percentage: Math.round((uWeekly / 500) * 100), isUser: true },
-                  { name: 'তানভীর আহমেদ', correct: 410, wrong: 20, score: 410, maxScore: 500, percentage: 82 },
-                  { name: 'সাবিহা আক্তার', correct: 380, wrong: 25, score: 380, maxScore: 500, percentage: 76 },
-                  { name: 'নাজমুল হাসান', correct: 340, wrong: 30, score: 340, maxScore: 500, percentage: 68 },
-                  { name: 'ইসরাত জাহান', correct: 300, wrong: 35, score: 300, maxScore: 500, percentage: 60 },
-                ];
-              } else if (modalFilter === 'monthly') {
-                const uMonthly = Math.min(2000, 1480 + (storedPoints - 840));
-                modalCandidatesList = [
-                  { name: 'মুশফিকুর রহমান', correct: 1920, wrong: 20, score: 1920, maxScore: 2000, percentage: 96 },
-                  { name: 'আহমাদ রাফি', correct: 1880, wrong: 30, score: 1880, maxScore: 2000, percentage: 94 },
-                  { name: 'ফারিহা নূর', correct: 1840, wrong: 40, score: 1840, maxScore: 2000, percentage: 92 },
-                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uMonthly, wrong: 40, score: uMonthly, maxScore: 2000, percentage: Math.round((uMonthly / 2000) * 100), isUser: true },
-                  { name: 'তানভীর আহমেদ', correct: 1600, wrong: 50, score: 1600, maxScore: 2000, percentage: 80 },
-                  { name: 'সাবিহা আক্তার', correct: 1450, wrong: 60, score: 1450, maxScore: 2000, percentage: 72 },
-                  { name: 'নাজমুল হাসান', correct: 1300, wrong: 70, score: 1300, maxScore: 2000, percentage: 65 },
-                ];
-              } else {
-                const uAllTime = Math.min(5600, 3800 + (storedPoints - 840) * 3);
-                modalCandidatesList = [
-                  { name: 'মুশফিকুর রহমান', correct: 5420, wrong: 60, score: 5420, maxScore: 5600, percentage: 97 },
-                  { name: 'আহমাদ রাফি', correct: 5180, wrong: 80, score: 5180, maxScore: 5600, percentage: 92 },
-                  { name: 'ফারিহা নূর', correct: 4950, wrong: 100, score: 4950, maxScore: 5600, percentage: 88 },
-                  { name: 'আরিফুল ইসলাম (আপনি)', correct: uAllTime, wrong: 120, score: uAllTime, maxScore: 5600, percentage: Math.round((uAllTime / 5600) * 100), isUser: true },
-                  { name: 'তানভীর আহমেদ', correct: 4100, wrong: 150, score: 4100, maxScore: 5600, percentage: 73 },
-                  { name: 'সাবিহা আক্তার', correct: 3600, wrong: 180, score: 3600, maxScore: 5600, percentage: 64 },
-                  { name: 'নাজমুল হাসান', correct: 3100, wrong: 200, score: 3100, maxScore: 5600, percentage: 55 },
-                ];
-              }
-
-              // Sort descending by score
-              modalCandidatesList.sort((a, b) => b.score - a.score);
-              modalCandidatesList.forEach((c, idx) => { c.rank = idx + 1; });
-
-              const top2 = modalCandidatesList[1] || modalCandidatesList[0];
-              const top1 = modalCandidatesList[0];
-              const top3 = modalCandidatesList[2] || modalCandidatesList[0];
-
-              return (
-                <>
-                  {/* Top 3 Winners Podium Cards */}
-                  <div className="grid grid-cols-3 gap-2 items-end pt-2">
-                    
-                    {/* Rank 2 */}
-                    <div className="bg-slate-100 dark:bg-slate-800/80 rounded-2xl p-2.5 sm:p-3 border border-slate-200 dark:border-slate-700 text-center flex flex-col items-center">
-                      <div className="relative mb-1">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-900 dark:text-slate-100 font-black text-xs sm:text-sm flex items-center justify-center border-2 border-slate-400 overflow-hidden">
-                          {top2.name.charAt(0)}
-                        </div>
-                        <span className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-slate-400 text-white font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow">
-                          {top2.rank}
-                        </span>
-                      </div>
-                      <span className="font-extrabold text-[11px] sm:text-xs text-slate-900 dark:text-slate-100 truncate w-full">
-                        {top2.name}
-                      </span>
-                      <span className="text-[11px] sm:text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        {top2.percentage}%
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] text-slate-500 font-semibold">
-                        {top2.score} পয়েন্ট
-                      </span>
-                    </div>
-
-                    {/* Rank 1 */}
-                    <div className="bg-amber-100 dark:bg-amber-950/60 rounded-2xl p-3 sm:p-3.5 border-2 border-amber-400 text-center flex flex-col items-center -mt-3 shadow-md">
-                      <Crown className="w-4 h-4 text-amber-500 mb-0.5 animate-bounce" />
-                      <div className="relative mb-1">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-200 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center border-2 border-amber-500 overflow-hidden shadow">
-                          {top1.name.charAt(0)}
-                        </div>
-                        <span className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-amber-500 text-slate-950 font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow">
-                          {top1.rank}
-                        </span>
-                      </div>
-                      <span className="font-black text-[11px] sm:text-xs text-slate-950 dark:text-amber-200 truncate w-full">
-                        {top1.name}
-                      </span>
-                      <span className="text-[11px] sm:text-xs font-black text-amber-700 dark:text-amber-400 mt-0.5">
-                        {top1.percentage}%
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] text-amber-800 dark:text-amber-300 font-bold">
-                        {top1.score} পয়েন্ট
-                      </span>
-                    </div>
-
-                    {/* Rank 3 */}
-                    <div className="bg-amber-50/80 dark:bg-slate-800/80 rounded-2xl p-2.5 sm:p-3 border border-amber-200/80 dark:border-slate-700 text-center flex flex-col items-center">
-                      <div className="relative mb-1">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-200/80 text-amber-900 font-black text-xs sm:text-sm flex items-center justify-center border-2 border-amber-600 overflow-hidden">
-                          {top3.name.charAt(0)}
-                        </div>
-                        <span className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-amber-700 text-white font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow">
-                          {top3.rank}
-                        </span>
-                      </div>
-                      <span className="font-extrabold text-[11px] sm:text-xs text-slate-900 dark:text-slate-100 truncate w-full">
-                        {top3.name}
-                      </span>
-                      <span className="text-[11px] sm:text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        {top3.percentage}%
-                      </span>
-                      <span className="text-[9px] sm:text-[10px] text-slate-500 font-semibold">
-                        {top3.score} পয়েন্ট
-                      </span>
-                    </div>
-
-                  </div>
-
-                  {/* Ranked Users List */}
-                  <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
-                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 pb-1 border-b border-slate-200 dark:border-slate-800">
-                      <span>ক্রম ও পরীক্ষার্থীর নাম</span>
-                      <div className="flex items-center space-x-4 pr-1">
-                        <span>সঠিক</span>
-                        <span>ভুল</span>
-                        <span>পয়েন্ট</span>
-                      </div>
-                    </div>
-                    {modalCandidatesList.map((row, idx) => (
-                      <div
-                        key={idx}
-                        className={`px-3 py-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${
-                          row.isUser
-                            ? 'bg-emerald-100/90 dark:bg-emerald-950/80 border-emerald-400 text-emerald-950 dark:text-emerald-100 font-extrabold shadow-2xs'
-                            : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/70 text-slate-900 dark:text-slate-100 font-bold'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-2.5 min-w-0">
-                          <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                            {row.rank}
-                          </span>
-                          <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-xs shrink-0">
-                            {row.name.charAt(0)}
-                          </div>
-                          <span className="truncate max-w-[110px] sm:max-w-[150px]">{row.name}</span>
-                        </div>
-
-                        <div className="flex items-center space-x-3 text-right shrink-0">
-                          <span className="font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/60">{row.correct}টি</span>
-                          <span className="font-bold text-xs text-rose-500 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded border border-rose-200/60 dark:border-rose-800/60">{row.wrong}টি</span>
-                          <span className="font-black text-amber-600 dark:text-amber-400 text-xs min-w-[55px]">{row.score} পয়েন্ট</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              );
-            })()}
-
-            {/* Bottom Modal Actions */}
-            <div className="space-y-2 pt-1">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setViewingLeaderboardExam(null);
-                    if (onOpenLeaderboard) {
-                      onOpenLeaderboard();
-                    }
-                  }}
-                  className="flex-1 py-3.5 rounded-2xl bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-sm shadow-md flex items-center justify-center space-x-2 transition-all active:scale-95"
-                >
-                  <Trophy className="w-4 h-4 text-amber-400" />
-                  <span>সম্পূর্ণ লিডারবোর্ড দেখুন</span>
-                </button>
-                <button
-                  onClick={() => {
-                    handleShareExam(viewingLeaderboardExam);
-                  }}
-                  className="px-4 py-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-sm shadow-md flex items-center justify-center space-x-1.5 transition-all active:scale-95"
-                  title="লিডারবোর্ড শেয়ার করুন"
-                >
-                  <Share2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
       )}
 
       {/* ========================================================= */}

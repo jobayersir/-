@@ -54,55 +54,6 @@ export interface LeaderboardUser {
   isCurrentUser?: boolean;
 }
 
-const MOCK_CANDIDATE_NAMES = [
-  'মাওলানা হাফেজ আব্দুল মালেক',
-  'মুফতি তানভীর আহমেদ',
-  'কারি মোশতাক মাহমুদ',
-  'হাফেজ মাওলানা সিফাত উল্লাহ',
-  'মাওলানা উবায়দুল ইসলাম',
-  'মুফতি আব্দুর রশীদ',
-  'কারী কামরুল হাসান',
-  'হাফেজ তরিকুল ইসলাম',
-  'মাওলানা জহিরুল ইসলাম',
-  'মুফতি শফিকুল ইসলাম',
-  'হাফেজ জুবায়ের আহমেদ',
-  'মাওলানা আব্দুল কাইয়ুম',
-  'কারী হাবিবুর রহমান',
-  'মুফতি সালাহউদ্দিন',
-  'হাফেজ মিরাজ হোসেন',
-  'মাওলানা মাহমুদ হাসান',
-  'মুফতি ইব্রাহিম খলিল',
-  'মাওলানা আনোয়ার হোসেন',
-  'হাফেজ নাজমুল হুদা',
-  'মাওলানা তাওহীদুল ইসলাম',
-  'মুফতি আমানুল্লাহ',
-  'হাফেজ বিলাল হোসেন',
-  'মাওলানা আশরাফ আলী',
-  'মুফতি রফিকুল ইসলাম',
-  'হাফেজ জাকারিয়া হাসান',
-  'মাওলানা ফরিদুল আলম',
-  'মুফতি শামীম আহমেদ',
-  'হাফেজ উসামা ইবনে যেয়াদ',
-  'মাওলানা আরিফুর রহমান',
-  'মুফতি মুবাশশির আহমেদ',
-  'হাফেজ তালহা জুবায়ের',
-  'মাওলানা সায়েম হোসাইন',
-  'মুফতি হাসানাত মাহমুদ',
-  'হাফেজ কাওসার আহমেদ',
-  'মাওলানা রায়হান পারভেজ'
-];
-
-export const PRESET_MOCK_AVATARS = [
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150',
-  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150',
-  'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150',
-  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150',
-  'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=150',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150'
-];
-
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ 
   user, 
   onTabChange,
