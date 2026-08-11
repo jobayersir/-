@@ -66,7 +66,79 @@ export interface ExtendedExamItem extends ExamItem {
 
 const toBnDigits = (num: number | string): string => {
   const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-  return String(num).padStart(2, '0').replace(/\d/g, (d) => bnNums[parseInt(d, 10)]);
+  return String(num).replace(/\d/g, (d) => bnNums[parseInt(d, 10)]);
+};
+
+const bnMonths = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+const bnDays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+
+export const formatBengaliDateAndDay = (rawDateStr?: string, rawScheduledTime?: string): string => {
+  let dateObj: Date | null = null;
+
+  if (rawScheduledTime && !isNaN(Date.parse(rawScheduledTime))) {
+    dateObj = new Date(rawScheduledTime);
+  } else if (rawDateStr && !isNaN(Date.parse(rawDateStr))) {
+    dateObj = new Date(rawDateStr);
+  }
+
+  if (!dateObj || isNaN(dateObj.getTime())) {
+    dateObj = new Date();
+  }
+
+  const dayNum = toBnDigits(dateObj.getDate());
+  const monthName = bnMonths[dateObj.getMonth()];
+  const yearNum = toBnDigits(dateObj.getFullYear());
+  const dayOfWeek = bnDays[dateObj.getDay()];
+
+  let hours = dateObj.getHours();
+  const minutes = dateObj.getMinutes();
+  const ampm = hours >= 12 ? 'অপরাহ্ন' : 'পূর্বাহ্ন';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const formattedTime = `${toBnDigits(hours)}:${minutes < 10 ? '০' : ''}${toBnDigits(minutes)} ${ampm}`;
+
+  return `${dayNum} ${monthName} ${yearNum}, ${dayOfWeek} (${formattedTime})`;
+};
+
+export const UpcomingCountdownTicker: React.FC<{ targetTimeStr: string; onExpire?: () => void }> = ({ targetTimeStr, onExpire }) => {
+  const targetTime = new Date(targetTimeStr).getTime();
+  const [diff, setDiff] = useState<number>(() => Math.max(0, targetTime - Date.now()));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const remaining = Math.max(0, targetTime - Date.now());
+      setDiff(remaining);
+      if (remaining <= 0) {
+        clearInterval(timer);
+        if (onExpire) onExpire();
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [targetTime, onExpire]);
+
+  if (diff <= 0) return null;
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  return (
+    <div className="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-2xl flex items-center justify-between text-xs font-bold text-amber-900 dark:text-amber-300">
+      <div className="flex items-center space-x-1.5 min-w-0">
+        <Clock className="w-4 h-4 text-amber-500 animate-spin shrink-0" />
+        <span className="truncate">
+          কাউন্টডাউন: <strong className="font-mono text-amber-700 dark:text-amber-300 font-black">
+            {days > 0 ? `${toBnDigits(days)}দিন ` : ''}
+            {toBnDigits(hours)}:{toBnDigits(minutes)}:{toBnDigits(seconds)}
+          </strong>
+        </span>
+      </div>
+      <span className="text-[10px] bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded-lg shrink-0">
+        আপকামিং
+      </span>
+    </div>
+  );
 };
 
 export const LiveCardTicker: React.FC = () => {
@@ -438,6 +510,17 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
   };
 
   const handleStartExam = (exam: ExtendedExamItem, bypassRegCheck = false) => {
+    const isUpcoming = Boolean(
+      exam.scheduledTime &&
+      !isNaN(new Date(exam.scheduledTime).getTime()) &&
+      new Date(exam.scheduledTime).getTime() > Date.now()
+    );
+
+    if (isUpcoming) {
+      alert(`এই পরীক্ষাটি এখনও শুরু হয়নি। প্রকাশের নির্ধারিত সময়ে (${formatBengaliDateAndDay(exam.date, exam.scheduledTime)}) পরীক্ষাটি উন্মুক্ত হবে।`);
+      return;
+    }
+
     if (exam.isPremium) {
       setShowPremiumModal(true);
       window.history.pushState({ tab: 'exams', subview: 'premiumModal' }, '', '#exams-premium');
@@ -1003,12 +1086,19 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
             const isLive = exam.category === 'live';
             const isDaily = exam.category === 'daily';
             const isPremium = exam.isPremium;
+            const isUpcoming = Boolean(
+              exam.scheduledTime &&
+              !isNaN(new Date(exam.scheduledTime).getTime()) &&
+              new Date(exam.scheduledTime).getTime() > Date.now()
+            );
 
             return (
               <div
                 key={exam.id}
                 className={`bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-4 hover:-translate-y-1 relative group overflow-hidden ${
-                  isPremium
+                  isUpcoming
+                    ? 'border-amber-300/80 dark:border-amber-800/80 bg-gradient-to-b from-amber-50/10 to-white dark:from-slate-900 dark:to-slate-900'
+                    : isPremium
                     ? 'border-amber-400/60 dark:border-amber-500/50 bg-gradient-to-b from-amber-50/20 to-white dark:from-slate-900 dark:to-slate-900'
                     : isLive
                     ? 'border-rose-300 dark:border-rose-900/60'
@@ -1017,11 +1107,14 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                     : 'border-slate-200/80 dark:border-slate-800'
                 }`}
               >
-                {/* Top Subtle Glow for Premium or Live */}
-                {isPremium && (
+                {/* Top Subtle Glow for Premium, Live or Upcoming */}
+                {isUpcoming && (
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-yellow-500 animate-pulse" />
+                )}
+                {!isUpcoming && isPremium && (
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
                 )}
-                {isLive && (
+                {!isUpcoming && isLive && (
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-red-600 animate-pulse" />
                 )}
 
@@ -1036,7 +1129,9 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
                       {/* Category Pill */}
                       <span className={`px-3 py-1 rounded-full text-xs font-black flex items-center space-x-1 ${
-                        isDaily
+                        isUpcoming
+                          ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/90 dark:text-amber-300 border border-amber-300/60'
+                          : isDaily
                           ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/90 dark:text-amber-300 border border-amber-300/50'
                           : exam.category === 'free'
                           ? 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950/90 dark:text-emerald-300 border border-emerald-300/50'
@@ -1046,10 +1141,11 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                           ? 'bg-rose-100 text-rose-900 dark:bg-rose-950/90 dark:text-rose-300 border border-rose-300/50'
                           : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300'
                       }`}>
-                        {isLive && <Radio className="w-3 h-3 text-rose-600 dark:text-rose-400 animate-pulse" />}
-                        {isPremium && <Crown className="w-3.5 h-3.5 text-slate-950" />}
+                        {isUpcoming && <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 animate-spin" />}
+                        {!isUpcoming && isLive && <Radio className="w-3 h-3 text-rose-600 dark:text-rose-400 animate-pulse" />}
+                        {!isUpcoming && isPremium && <Crown className="w-3.5 h-3.5 text-slate-950" />}
                         <span>
-                          {isDaily ? 'দৈনিক মডেল টেস্ট' : exam.category === 'free' ? 'ফ্রি এক্সাম' : isPremium ? 'প্রিমিয়াম ভিআইপি' : isLive ? 'লাইভ পরীক্ষা' : 'সম্পন্নকৃত'}
+                          {isUpcoming ? 'আপকামিং পরীক্ষা' : isDaily ? 'দৈনিক মডেল টেস্ট' : exam.category === 'free' ? 'ফ্রি এক্সাম' : isPremium ? 'প্রিমিয়াম ভিআইপি' : isLive ? 'লাইভ পরীক্ষা' : 'সম্পন্নকৃত'}
                         </span>
                       </span>
                     </div>
@@ -1109,8 +1205,22 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                     </div>
                   </div>
 
-                  {/* Live Exam Countdown or Participant Count */}
-                  {isLive ? (
+                  {/* Live Exam Countdown, Upcoming Countdown, or Participant Count */}
+                  {isUpcoming ? (
+                    <div className="space-y-2">
+                      <UpcomingCountdownTicker targetTimeStr={exam.scheduledTime!} />
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-0.5">
+                        <div className="flex items-center space-x-1.5">
+                          <Users className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{exam.participantsCount} পরীক্ষার্থী</span>
+                        </div>
+                        <div className="flex items-center space-x-1 text-amber-700 dark:text-amber-300 font-bold">
+                          <Calendar className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                          <span className="truncate">{formatBengaliDateAndDay(exam.date, exam.scheduledTime)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : isLive ? (
                     <LiveCardTicker />
                   ) : isCompleted ? (
                     <div className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 font-bold">
@@ -1123,7 +1233,10 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         <Users className="w-3.5 h-3.5 text-slate-400" />
                         <span>{exam.participantsCount} পরীক্ষার্থী</span>
                       </div>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">{exam.date}</span>
+                      <div className="flex items-center space-x-1 text-emerald-700 dark:text-emerald-300 font-bold">
+                        <Calendar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span>{formatBengaliDateAndDay(exam.date, exam.scheduledTime)}</span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1159,6 +1272,14 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         <span>লিডারবোর্ড</span>
                       </button>
                     </div>
+                  ) : isUpcoming ? (
+                    <button
+                      onClick={() => handleStartExam(exam)}
+                      className="w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-sm flex items-center justify-center space-x-2 transition-all active:scale-95"
+                    >
+                      <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 animate-spin" />
+                      <span>পরীক্ষা শীঘ্রই শুরু হবে (আপকামিং)</span>
+                    </button>
                   ) : (
                     <button
                       onClick={() => handleStartExam(exam)}
