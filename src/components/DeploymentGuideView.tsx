@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { DEPLOYMENT_ROADMAP, SUPABASE_SQL_SCRIPT } from '../data/supabaseSetup';
+import { copyToClipboard } from '../utils/clipboard';
 import { Rocket, Copy, Check, Database, Github, Globe, Smartphone, CheckCircle, Terminal, HelpCircle } from 'lucide-react';
 
 export const DeploymentGuideView: React.FC = () => {
   const [copiedSql, setCopiedSql] = useState(false);
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
 
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(SUPABASE_SQL_SCRIPT);
+  const handleCopySql = async () => {
+    await copyToClipboard(SUPABASE_SQL_SCRIPT);
     setCopiedSql(true);
     setTimeout(() => setCopiedSql(false), 2500);
   };
 
-  const handleCopyCommand = (cmd: string) => {
-    navigator.clipboard.writeText(cmd);
+  const handleCopyCommand = async (cmd: string) => {
+    await copyToClipboard(cmd);
     setCopiedCmd(cmd);
     setTimeout(() => setCopiedCmd(null), 2000);
   };

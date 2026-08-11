@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '../types';
 import { UstadAiLogo } from './UstadAiLogo';
 import { formatArabicText, getArabicFontFamily, getBengaliFontFamily } from '../utils/arabic';
+import { copyToClipboard } from '../utils/clipboard';
 import { 
   Send, 
   Sparkles, 
@@ -164,8 +165,8 @@ export const UstadAiView: React.FC<UstadAiViewProps> = ({
     }
   };
 
-  const handleCopyText = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopyText = async (id: string, text: string) => {
+    await copyToClipboard(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { copyToClipboard } from '../utils/clipboard';
 import { 
   X, 
   Clock, 
@@ -298,8 +299,8 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
   const progressPercentage = Math.round(((currentIdx + 1) / totalQuestions) * 100);
 
   // Copy Explanation to Clipboard with Toast
-  const handleCopyExplanation = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopyExplanation = async (text: string) => {
+    await copyToClipboard(text);
     setCopiedToastText('Copied Successfully ✓');
     setTimeout(() => {
       setCopiedToastText(null);
@@ -962,11 +963,9 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
               </button>
 
               <button
-                onClick={() => {
+                onClick={async () => {
                   const shareUrl = `${window.location.origin}${window.location.pathname}?examId=${exam.id}`;
-                  if (navigator.clipboard) {
-                    navigator.clipboard.writeText(shareUrl);
-                  }
+                  await copyToClipboard(shareUrl);
                   setShowShareToast(true);
                   setTimeout(() => setShowShareToast(false), 3000);
                 }}

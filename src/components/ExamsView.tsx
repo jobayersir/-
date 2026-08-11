@@ -3,6 +3,7 @@ import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
 import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
 import { fetchExamsFromSupabase, getSupabaseClient } from '../lib/supabase';
+import { copyToClipboard } from '../utils/clipboard';
 import { 
   FileCheck2, 
   Clock, 
@@ -290,13 +291,11 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     try {
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        await copyToClipboard(shareUrl);
       }
     } catch (err) {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(shareUrl);
-      }
+      await copyToClipboard(shareUrl);
     }
   };
 
