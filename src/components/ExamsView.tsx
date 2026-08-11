@@ -378,9 +378,10 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       loadSupabaseExams();
     }, 10000);
 
-    // Auto refresh when tab gets focused
-    const handleFocus = () => loadSupabaseExams();
-    window.addEventListener('focus', handleFocus);
+    // Auto refresh when tab gets focused or network switches (Wifi / Mobile Data)
+    const handleFocusOrOnline = () => loadSupabaseExams();
+    window.addEventListener('focus', handleFocusOrOnline);
+    window.addEventListener('online', handleFocusOrOnline);
 
     // Supabase Realtime postgres_changes listener
     const client = getSupabaseClient();
@@ -400,7 +401,8 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('focus', handleFocusOrOnline);
+      window.removeEventListener('online', handleFocusOrOnline);
       if (client && channel) {
         try {
           client.removeChannel(channel);

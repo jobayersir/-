@@ -49,6 +49,9 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
+let cachedClient: SupabaseClient | null = null;
+let cachedCredentialsKey = '';
+
 export function getSupabaseClient(): SupabaseClient | null {
   const { url, anonKey } = getSupabaseCredentials();
   if (
@@ -57,7 +60,23 @@ export function getSupabaseClient(): SupabaseClient | null {
     url !== 'https://your-supabase-project.supabase.co' &&
     url.startsWith('https://')
   ) {
-    return createClient(url, anonKey);
+    const key = `${url}:${anonKey}`;
+    if (!cachedClient || cachedCredentialsKey !== key) {
+      cachedClient = createClient(url, anonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: false,
+        },
+        global: {
+          headers: {
+            'x-client-info': 'tamreen-app-mobile-wifi-sync',
+          },
+        },
+      });
+      cachedCredentialsKey = key;
+    }
+    return cachedClient;
   }
   return null;
 }

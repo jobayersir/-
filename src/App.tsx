@@ -177,12 +177,25 @@ export default function App() {
       console.error('Failed to parse local storage', e);
     }
 
-    // Load MCQs from Supabase if configured
-    fetchMcqQuestionsFromSupabase().then((remoteQuestions) => {
-      if (remoteQuestions && remoteQuestions.length > 0) {
-        setMcqQuestions(remoteQuestions);
-      }
-    });
+    // Load MCQs from Supabase if configured & auto re-sync on network switch (WiFi / Mobile Data)
+    const syncData = () => {
+      fetchMcqQuestionsFromSupabase().then((remoteQuestions) => {
+        if (remoteQuestions && remoteQuestions.length > 0) {
+          setMcqQuestions(remoteQuestions);
+        }
+      });
+    };
+
+    syncData();
+
+    const handleOnline = () => {
+      syncData();
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
   }, []);
 
   // Sync dark mode class on documentElement
