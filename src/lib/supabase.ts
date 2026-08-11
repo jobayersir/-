@@ -68,11 +68,6 @@ export function getSupabaseClient(): SupabaseClient | null {
           autoRefreshToken: true,
           detectSessionInUrl: false,
         },
-        global: {
-          headers: {
-            'x-client-info': 'tamreen-app-mobile-wifi-sync',
-          },
-        },
       });
       cachedCredentialsKey = key;
     }
@@ -84,7 +79,7 @@ export function getSupabaseClient(): SupabaseClient | null {
 export const supabase = getSupabaseClient();
 
 /**
- * Fetch MCQ Questions from Supabase if configured (with timeout & offline cache for mobile data)
+ * Fetch MCQ Questions from Supabase if configured (with parallel queries & offline cache for mobile data)
  */
 export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | null> {
   // Check local cache first for instant mobile load
@@ -98,52 +93,50 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
     }
   }
 
-  // If strictly offline, return cached immediately
-  if (typeof navigator !== 'undefined' && !navigator.onLine) {
-    return cached;
-  }
-
   const client = getSupabaseClient();
   if (!client) return cached;
 
   const tablesToTry = ['mcq_questions', 'questions', 'question_bank'];
-  for (const table of tablesToTry) {
-    try {
-      const queryPromise = client
-        .from(table)
-        .select('*')
-        .order('created_at', { ascending: false });
+  
+  // Parallel fetch across tables for mobile data speed
+  const results = await Promise.allSettled(
+    tablesToTry.map(table =>
+      withTimeout(
+        client
+          .from(table)
+          .select('*')
+          .order('created_at', { ascending: false }),
+        5000
+      )
+    )
+  );
 
-      const { data, error } = await withTimeout(queryPromise, 3000);
+  for (const res of results) {
+    if (res.status === 'fulfilled' && !res.value.error && Array.isArray(res.value.data) && res.value.data.length > 0) {
+      const formatted: MCQQuestion[] = res.value.data.map((q: any) => ({
+        id: String(q.id || Math.random()),
+        question: q.question || q.title || q.question_text || '',
+        questionArabic: q.question_arabic || q.questionArabic || undefined,
+        options: Array.isArray(q.options) ? q.options : (q.options ? JSON.parse(q.options) : []),
+        optionsArabic: q.options_arabic || q.optionsArabic || undefined,
+        correctAnswer: typeof q.correct_answer === 'number' ? q.correct_answer : (typeof q.correctAnswer === 'number' ? q.correctAnswer : 0),
+        explanation: q.explanation || q.answer_explanation || '',
+        explanationArabic: q.explanation_arabic || q.explanationArabic || undefined,
+        subject: q.subject || q.subject_id || 'quran_hadith',
+        cadre: Array.isArray(q.cadre) ? q.cadre : ['all'],
+        yearTag: q.year_tag || q.yearTag || undefined,
+        difficulty: q.difficulty || 'medium',
+      }));
 
-      if (!error && data && data.length > 0) {
-        const formatted: MCQQuestion[] = data.map((q: any) => ({
-          id: String(q.id || Math.random()),
-          question: q.question || q.title || q.question_text || '',
-          questionArabic: q.question_arabic || q.questionArabic || undefined,
-          options: Array.isArray(q.options) ? q.options : (q.options ? JSON.parse(q.options) : []),
-          optionsArabic: q.options_arabic || q.optionsArabic || undefined,
-          correctAnswer: typeof q.correct_answer === 'number' ? q.correct_answer : (typeof q.correctAnswer === 'number' ? q.correctAnswer : 0),
-          explanation: q.explanation || q.answer_explanation || '',
-          explanationArabic: q.explanation_arabic || q.explanationArabic || undefined,
-          subject: q.subject || q.subject_id || 'quran_hadith',
-          cadre: Array.isArray(q.cadre) ? q.cadre : ['all'],
-          yearTag: q.year_tag || q.yearTag || undefined,
-          difficulty: q.difficulty || 'medium',
-        }));
-
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem('tamreen_cached_mcqs', JSON.stringify(formatted));
-          } catch (e) {
-            console.warn('Cache write failed:', e);
-          }
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('tamreen_cached_mcqs', JSON.stringify(formatted));
+        } catch (e) {
+          console.warn('Cache write failed:', e);
         }
-
-        return formatted;
       }
-    } catch (err) {
-      console.warn(`Fetch from ${table} notice (mobile timeout/error):`, err);
+
+      return formatted;
     }
   }
 
@@ -154,7 +147,7 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
  * Fetch Exams from Supabase (queries 'exams', 'model_tests', 'quizzes', 'tests', 'mock_tests', 'exam_list', 'mcq_exams')
  */
 export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
-  // Check local cache first (purge any old static mock defaults)
+  // Check local cache first
   let cached: ExamItem[] | null = null;
   if (typeof window !== 'undefined') {
     try {
@@ -179,11 +172,6 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
     }
   }
 
-  // If strictly offline, return non-legacy cached immediately
-  if (typeof navigator !== 'undefined' && !navigator.onLine) {
-    return cached || [];
-  }
-
   const client = getSupabaseClient();
   if (!client) return cached || [];
 
@@ -192,131 +180,87 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
   const seenIds = new Set<string>();
   let foundAnyTable = false;
 
-  for (const table of tablesToTry) {
-    try {
-      // 1st attempt: with created_at ordering and 2 second timeout
-      let res = await withTimeout(
+  // Execute queries in parallel for all candidate tables for mobile data speed
+  const tableResults = await Promise.allSettled(
+    tablesToTry.map(table =>
+      withTimeout(
         client.from(table).select('*').order('created_at', { ascending: false }),
-        2000
-      ).catch(() => null);
+        5000
+      ).catch(() =>
+        withTimeout(client.from(table).select('*'), 3000).catch(() => null)
+      )
+    )
+  );
 
-      // 2nd attempt fallback: if order('created_at') failed (e.g. column created_at missing), try select('*') without ordering
-      if (!res || res.error) {
-        res = await withTimeout(
-          client.from(table).select('*'),
-          2000
-        ).catch(() => null);
-      }
+  for (const res of tableResults) {
+    if (res.status === 'fulfilled' && res.value && !res.value.error && Array.isArray(res.value.data) && res.value.data.length > 0) {
+      foundAnyTable = true;
 
-      if (res && !res.error && Array.isArray(res.data)) {
-        foundAnyTable = true;
+      for (const e of res.value.data) {
+        const rawId = String(e.id || e.exam_id || Math.random());
+        if (seenIds.has(rawId)) continue;
+        seenIds.add(rawId);
 
-        for (const e of res.data) {
-          const rawId = String(e.id || e.exam_id || Math.random());
-          if (seenIds.has(rawId)) continue;
-          seenIds.add(rawId);
+        let rawCategory = (e.category || e.type || e.exam_type || e.exam_category || e.tag || 'free').toString().toLowerCase();
+        let normalizedCategory: any = 'free';
 
-          let rawCategory = (e.category || e.type || e.exam_type || e.exam_category || e.tag || 'free').toString().toLowerCase();
-          let normalizedCategory: any = 'free';
-
-          if (rawCategory.includes('daily') || rawCategory.includes('model') || rawCategory.includes('মডেল') || rawCategory.includes('দৈনিক')) {
-            normalizedCategory = 'daily';
-          } else if (rawCategory.includes('live') || rawCategory.includes('লাইভ')) {
-            normalizedCategory = 'live';
-          } else if (rawCategory.includes('premium') || rawCategory.includes('paid') || Boolean(e.is_premium || e.isPremium || e.paid)) {
-            normalizedCategory = 'premium';
-          } else {
-            normalizedCategory = 'free';
-          }
-
-          // Parse questions if attached directly to exam row
-          let questions: MCQQuestion[] | undefined = undefined;
-          const rawQuestions = e.questions || e.question_list || e.mcqs || e.question_data || e.questions_json;
-          if (rawQuestions) {
-            try {
-              const parsed = typeof rawQuestions === 'string' ? JSON.parse(rawQuestions) : rawQuestions;
-              if (Array.isArray(parsed)) {
-                questions = parsed.map((q: any) => ({
-                  id: String(q.id || Math.random()),
-                  question: q.question || q.title || q.question_text || q.text || '',
-                  options: Array.isArray(q.options) 
-                    ? q.options 
-                    : (typeof q.options === 'string' ? JSON.parse(q.options) : [q.option1, q.option2, q.option3, q.option4].filter(Boolean)),
-                  correctAnswer: typeof q.correct_answer === 'number' 
-                    ? q.correct_answer 
-                    : (typeof q.correctAnswer === 'number' ? q.correctAnswer : (typeof q.answer === 'number' ? q.answer : 0)),
-                  explanation: q.explanation || q.answer_explanation || q.explain || '',
-                  subject: q.subject || e.subject || 'সাধারণ বিষয়',
-                  cadre: ['all'],
-                  difficulty: q.difficulty || 'medium',
-                }));
-              }
-            } catch (err) {
-              console.warn('Failed parsing questions array from exam row:', err);
-            }
-          }
-
-          // If questions missing on row, attempt querying relational questions tables
-          if (!questions || questions.length === 0) {
-            const qTablesToTry = ['questions', 'mcq_questions', 'exam_questions', 'model_test_questions'];
-            for (const qTable of qTablesToTry) {
-              try {
-                const qTableRes = await withTimeout(
-                  client
-                    .from(qTable)
-                    .select('*')
-                    .or(`exam_id.eq.${e.id},test_id.eq.${e.id},model_test_id.eq.${e.id},exam_title.eq.${e.title},test_name.eq.${e.title}`),
-                  1200
-                ).catch(() => null);
-
-                if (qTableRes && !qTableRes.error && Array.isArray(qTableRes.data) && qTableRes.data.length > 0) {
-                  questions = qTableRes.data.map((q: any) => ({
-                    id: String(q.id || Math.random()),
-                    question: q.question || q.title || q.question_text || q.text || '',
-                    options: Array.isArray(q.options)
-                      ? q.options
-                      : (typeof q.options === 'string'
-                          ? (q.options.startsWith('[') ? JSON.parse(q.options) : q.options.split(','))
-                          : [q.option1 || q.option_1 || q.option_a, q.option2 || q.option_2 || q.option_b, q.option3 || q.option_3 || q.option_c, q.option4 || q.option_4 || q.option_d].filter(Boolean)),
-                    correctAnswer: typeof q.correct_answer === 'number'
-                      ? q.correct_answer
-                      : (typeof q.correctAnswer === 'number' ? q.correctAnswer : (typeof q.answer === 'number' ? q.answer : 0)),
-                    explanation: q.explanation || q.answer_explanation || q.explain || '',
-                    subject: q.subject || e.subject || 'সাধারণ বিষয়',
-                    cadre: ['all'],
-                    difficulty: q.difficulty || 'medium',
-                  }));
-                  break;
-                }
-              } catch (qErr) {
-                // Ignore if table doesn't exist
-              }
-            }
-          }
-
-          const actualQuestionCount = (questions && questions.length > 0)
-            ? questions.length
-            : Number(e.total_questions || e.totalQuestions || e.questions_count || e.question_count || 30);
-
-          aggregatedExams.push({
-            id: rawId,
-            title: e.title || e.name || e.test_name || e.exam_title || e.subject || 'মডেল টেস্ট',
-            titleArabic: e.title_arabic || e.titleArabic || undefined,
-            category: normalizedCategory,
-            durationMinutes: Number(e.duration_minutes || e.durationMinutes || e.duration || e.time_limit || e.time || 30),
-            totalQuestions: actualQuestionCount,
-            difficulty: e.difficulty || e.level || 'মাঝারি',
-            participantsCount: String(e.participants_count || e.participantsCount || e.participants || '০'),
-            subject: e.subject || e.subject_name || e.topic || 'সাধারণ বিষয়',
-            isPremium: Boolean(e.is_premium || e.isPremium || e.paid || normalizedCategory === 'premium'),
-            thumbnailUrl: e.thumbnail_url || e.thumbnailUrl || e.image || undefined,
-            scheduledTime: e.scheduled_time || e.scheduledTime || e.date || e.created_at || e.exam_date || undefined,
-            questions,
-          });
+        if (rawCategory.includes('daily') || rawCategory.includes('model') || rawCategory.includes('মডেল') || rawCategory.includes('দৈনিক')) {
+          normalizedCategory = 'daily';
+        } else if (rawCategory.includes('live') || rawCategory.includes('লাইভ')) {
+          normalizedCategory = 'live';
+        } else if (rawCategory.includes('premium') || rawCategory.includes('paid') || Boolean(e.is_premium || e.isPremium || e.paid)) {
+          normalizedCategory = 'premium';
+        } else {
+          normalizedCategory = 'free';
         }
+
+        // Parse questions if attached directly to exam row
+        let questions: MCQQuestion[] | undefined = undefined;
+        const rawQuestions = e.questions || e.question_list || e.mcqs || e.question_data || e.questions_json;
+        if (rawQuestions) {
+          try {
+            const parsed = typeof rawQuestions === 'string' ? JSON.parse(rawQuestions) : rawQuestions;
+            if (Array.isArray(parsed)) {
+              questions = parsed.map((q: any) => ({
+                id: String(q.id || Math.random()),
+                question: q.question || q.title || q.question_text || q.text || '',
+                options: Array.isArray(q.options) 
+                  ? q.options 
+                  : (typeof q.options === 'string' ? JSON.parse(q.options) : [q.option1, q.option2, q.option3, q.option4].filter(Boolean)),
+                correctAnswer: typeof q.correct_answer === 'number' 
+                  ? q.correct_answer 
+                  : (typeof q.correctAnswer === 'number' ? q.correctAnswer : (typeof q.answer === 'number' ? q.answer : 0)),
+                explanation: q.explanation || q.answer_explanation || q.explain || '',
+                subject: q.subject || e.subject || 'সাধারণ বিষয়',
+                cadre: ['all'],
+                difficulty: q.difficulty || 'medium',
+              }));
+            }
+          } catch (err) {
+            console.warn('Failed parsing questions array from exam row:', err);
+          }
+        }
+
+        const actualQuestionCount = (questions && questions.length > 0)
+          ? questions.length
+          : Number(e.total_questions || e.totalQuestions || e.questions_count || e.question_count || 30);
+
+        aggregatedExams.push({
+          id: rawId,
+          title: e.title || e.name || e.test_name || e.exam_title || e.subject || 'মডেল টেস্ট',
+          titleArabic: e.title_arabic || e.titleArabic || undefined,
+          category: normalizedCategory,
+          durationMinutes: Number(e.duration_minutes || e.durationMinutes || e.duration || e.time_limit || e.time || 30),
+          totalQuestions: actualQuestionCount,
+          difficulty: e.difficulty || e.level || 'মাঝারি',
+          participantsCount: String(e.participants_count || e.participantsCount || e.participants || '০'),
+          subject: e.subject || e.subject_name || e.topic || 'সাধারণ বিষয়',
+          isPremium: Boolean(e.is_premium || e.isPremium || e.paid || normalizedCategory === 'premium'),
+          thumbnailUrl: e.thumbnail_url || e.thumbnailUrl || e.image || undefined,
+          scheduledTime: e.scheduled_time || e.scheduledTime || e.date || e.created_at || e.exam_date || undefined,
+          questions,
+        });
       }
-    } catch (err) {
-      console.warn(`Fetch from ${table} error:`, err);
     }
   }
 
@@ -361,7 +305,7 @@ export async function fetchCoursesFromSupabase(): Promise<CourseItem[] | null> {
       .select('*')
       .order('created_at', { ascending: false });
 
-    const { data, error } = await withTimeout(queryPromise, 3000);
+    const { data, error } = await withTimeout(queryPromise, 5000);
 
     if (error || !data) return cached;
 
