@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UserProfileData, NavTab, PostCadre } from '../types';
 import { LeaderboardView } from './LeaderboardView';
 import { ProfileView } from './ProfileView';
@@ -134,40 +134,139 @@ export const SettingsView: React.FC<ViewProps> = ({
   onSelectCadre,
   darkMode,
   onToggleDarkMode,
-}) => (
-  <div className="max-w-xl mx-auto bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
-    <div className="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800 pb-4">
-      <Settings className="w-5 h-5 text-emerald-600" />
-      <h2 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
-        অ্যাপ সেটিংস ও পছন্দসমূহ
-      </h2>
-    </div>
+}) => {
+  const [sbUrl, setSbUrl] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('VITE_SUPABASE_URL') || (import.meta as any).env?.VITE_SUPABASE_URL || '';
+    }
+    return '';
+  });
+  const [sbKey, setSbKey] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('VITE_SUPABASE_ANON_KEY') || (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '';
+    }
+    return '';
+  });
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
-    <div className="space-y-4 text-xs">
-      <div>
-        <label className="block text-slate-500 font-semibold mb-1">পছন্দনীয় ক্যাডার পদ</label>
-        <select
-          value={selectedCadre}
-          onChange={(e) => onSelectCadre?.(e.target.value as PostCadre)}
-          className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold text-slate-800 dark:text-slate-200"
-        >
-          <option value="assistant_teacher_arabic">সহকারী শিক্ষক (আরবি)</option>
-          <option value="lecturer_arabic">প্রভাষক (আরবি/হাদিস/ফিকহ)</option>
-          <option value="assistant_maulvi">সহকারী মৌলভী</option>
-          <option value="ebtedayee_head">ইবতেদায়ী প্রধান ও ক্বারী</option>
-          <option value="general_subject">সাধারণ বিষয় (বাংলা, ইংরেজি, গণিত)</option>
-        </select>
+  const handleSaveSupabase = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      if (sbUrl.trim()) {
+        localStorage.setItem('VITE_SUPABASE_URL', sbUrl.trim());
+      } else {
+        localStorage.removeItem('VITE_SUPABASE_URL');
+      }
+
+      if (sbKey.trim()) {
+        localStorage.setItem('VITE_SUPABASE_ANON_KEY', sbKey.trim());
+      } else {
+        localStorage.removeItem('VITE_SUPABASE_ANON_KEY');
+      }
+
+      localStorage.removeItem('tamreen_cached_exams');
+      setSaveMessage('সুপাবেস কানেকশন সেটিংস সফলভাবে সংরক্ষিত হয়েছে!');
+      setTimeout(() => {
+        setSaveMessage(null);
+        window.location.reload();
+      }, 1200);
+    }
+  };
+
+  const isConfigured = Boolean(sbUrl && sbKey && sbUrl.startsWith('https://'));
+
+  return (
+    <div className="max-w-xl mx-auto bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
+      <div className="flex items-center space-x-2 border-b border-slate-100 dark:border-slate-800 pb-4">
+        <Settings className="w-5 h-5 text-emerald-600" />
+        <h2 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
+          অ্যাপ সেটিংস ও পছন্দসমূহ
+        </h2>
       </div>
 
-      <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700">
-        <span className="font-semibold text-slate-800 dark:text-slate-200">ডার্ক মোড / নাইট ভিশন</span>
-        <button
-          onClick={onToggleDarkMode}
-          className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold"
-        >
-          {darkMode ? 'সক্রিয়' : 'বন্ধ'}
-        </button>
+      <div className="space-y-4 text-xs">
+        <div>
+          <label className="block text-slate-500 font-semibold mb-1">পছন্দনীয় ক্যাডার পদ</label>
+          <select
+            value={selectedCadre}
+            onChange={(e) => onSelectCadre?.(e.target.value as PostCadre)}
+            className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-semibold text-slate-800 dark:text-slate-200"
+          >
+            <option value="assistant_teacher_arabic">সহকারী শিক্ষক (আরবি)</option>
+            <option value="lecturer_arabic">প্রভাষক (আরবি/হাদিস/ফিকহ)</option>
+            <option value="assistant_maulvi">সহকারী মৌলভী</option>
+            <option value="ebtedayee_head">ইবতেদায়ী প্রধান ও ক্বারী</option>
+            <option value="general_subject">সাধারণ বিষয় (বাংলা, ইংরেজি, গণিত)</option>
+          </select>
+        </div>
+
+        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700">
+          <span className="font-semibold text-slate-800 dark:text-slate-200">ডার্ক মোড / নাইট ভিশন</span>
+          <button
+            onClick={onToggleDarkMode}
+            className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold"
+          >
+            {darkMode ? 'সক্রিয়' : 'বন্ধ'}
+          </button>
+        </div>
+
+        {/* Supabase Connection Configuration */}
+        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 flex items-center space-x-2">
+              <span>সুপাবেস (Supabase) ডাটাবেইজ সিঙ্ক সেটিংস</span>
+            </h3>
+            <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isConfigured ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'}`}>
+              {isConfigured ? 'কানেক্টেড' : 'সেটআপ প্রয়োজন'}
+            </span>
+          </div>
+
+          <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+            এডমিন প্যানেল থেকে তৈরি নতুন পরীক্ষা সরাসরি অ্যাপে আনতে Supabase Project URL এবং Anon Key দিন। (Vercel-এ Environment Variables সেট থাকলে সরাসরি কাজ করবে)।
+          </p>
+
+          <form onSubmit={handleSaveSupabase} className="space-y-3 pt-2">
+            <div>
+              <label className="block text-slate-600 dark:text-slate-400 font-semibold mb-1">
+                Supabase Project URL (https://xxx.supabase.co)
+              </label>
+              <input
+                type="url"
+                value={sbUrl}
+                onChange={(e) => setSbUrl(e.target.value)}
+                placeholder="https://your-project.supabase.co"
+                className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-mono text-xs"
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-600 dark:text-slate-400 font-semibold mb-1">
+                Supabase Anon Key
+              </label>
+              <input
+                type="password"
+                value={sbKey}
+                onChange={(e) => setSbKey(e.target.value)}
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+                className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-mono text-xs"
+              />
+            </div>
+
+            {saveMessage && (
+              <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 font-bold text-center">
+                {saveMessage}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md transition-all active:scale-98"
+            >
+              কানেকশন সেভ করুন
+            </button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};

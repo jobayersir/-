@@ -48,11 +48,30 @@ CREATE TABLE IF NOT EXISTS public.user_notes (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 5. Create Exams / Model Tests table
+CREATE TABLE IF NOT EXISTS public.exams (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  title_arabic TEXT,
+  category TEXT DEFAULT 'free',
+  subject TEXT DEFAULT 'সাধারণ বিষয়',
+  duration_minutes INT DEFAULT 30,
+  total_questions INT DEFAULT 30,
+  difficulty TEXT DEFAULT 'মাঝারি',
+  participants_count TEXT DEFAULT '০',
+  is_premium BOOLEAN DEFAULT false,
+  thumbnail_url TEXT,
+  scheduled_time TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  questions JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.test_results ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bookmarks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.exams ENABLE ROW LEVEL SECURITY;
 
 -- Security Policies
 CREATE POLICY "Users can view own profile" ON public.profiles
@@ -72,6 +91,10 @@ CREATE POLICY "Users can manage bookmarks" ON public.bookmarks
 
 CREATE POLICY "Users can manage notes" ON public.user_notes
   FOR ALL USING (auth.uid() = user_id);
+
+-- Public Read Access for Exams (Allows students to view exams created by admin)
+CREATE POLICY "Public read access for exams" ON public.exams
+  FOR SELECT USING (true);
 `;
 
 export interface DeploymentStep {

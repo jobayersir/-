@@ -135,14 +135,13 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
  * Fetch Exams from Supabase (queries 'exams', 'model_tests', 'quizzes', 'tests', 'mock_tests', 'exam_list', 'mcq_exams')
  */
 export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
-  // Check local cache first
+  // Check local cache first (purge any old static mock defaults)
   let cached: ExamItem[] | null = null;
   if (typeof window !== 'undefined') {
     try {
       const saved = localStorage.getItem('tamreen_cached_exams');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Purge legacy hardcoded default mock exams from cache if present
         if (Array.isArray(parsed)) {
           const hasLegacyMocks = parsed.some((e: any) => 
             ['e1', 'e2', 'e3', 'e4', 'm1', 'm2', 'm3', 'm4', 'm5', 'l1', 'f1', 'f2'].includes(e.id) ||
@@ -190,7 +189,7 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
         ).catch(() => null);
       }
 
-      if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
+      if (res && !res.error && Array.isArray(res.data)) {
         foundAnyTable = true;
 
         for (const e of res.data) {
@@ -211,19 +210,23 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
             normalizedCategory = 'free';
           }
 
-          // Parse questions if attached directly to exam
+          // Parse questions if attached directly to exam row
           let questions: MCQQuestion[] | undefined = undefined;
-          const rawQuestions = e.questions || e.question_list || e.mcqs || e.question_data;
+          const rawQuestions = e.questions || e.question_list || e.mcqs || e.question_data || e.questions_json;
           if (rawQuestions) {
             try {
               const parsed = typeof rawQuestions === 'string' ? JSON.parse(rawQuestions) : rawQuestions;
               if (Array.isArray(parsed)) {
                 questions = parsed.map((q: any) => ({
                   id: String(q.id || Math.random()),
-                  question: q.question || q.title || q.question_text || '',
-                  options: Array.isArray(q.options) ? q.options : (typeof q.options === 'string' ? JSON.parse(q.options) : []),
-                  correctAnswer: typeof q.correct_answer === 'number' ? q.correct_answer : (typeof q.correctAnswer === 'number' ? q.correctAnswer : 0),
-                  explanation: q.explanation || q.answer_explanation || '',
+                  question: q.question || q.title || q.question_text || q.text || '',
+                  options: Array.isArray(q.options) 
+                    ? q.options 
+                    : (typeof q.options === 'string' ? JSON.parse(q.options) : [q.option1, q.option2, q.option3, q.option4].filter(Boolean)),
+                  correctAnswer: typeof q.correct_answer === 'number' 
+                    ? q.correct_answer 
+                    : (typeof q.correctAnswer === 'number' ? q.correctAnswer : (typeof q.answer === 'number' ? q.answer : 0)),
+                  explanation: q.explanation || q.answer_explanation || q.explain || '',
                   subject: q.subject || e.subject || 'সাধারণ বিষয়',
                   cadre: ['all'],
                   difficulty: q.difficulty || 'medium',
@@ -231,6 +234,38 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
               }
             } catch (err) {
               console.warn('Failed parsing questions array from exam row:', err);
+            }
+          }
+
+          // If questions missing on row, attempt querying relational 'questions' table
+          if (!questions || questions.length === 0) {
+            try {
+              const qTableRes = await withTimeout(
+                client
+                  .from('questions')
+                  .select('*')
+                  .or(`exam_id.eq.${e.id},test_id.eq.${e.id},model_test_id.eq.${e.id}`),
+                4000
+              ).catch(() => null);
+
+              if (qTableRes && !qTableRes.error && Array.isArray(qTableRes.data) && qTableRes.data.length > 0) {
+                questions = qTableRes.data.map((q: any) => ({
+                  id: String(q.id || Math.random()),
+                  question: q.question || q.title || q.question_text || q.text || '',
+                  options: Array.isArray(q.options)
+                    ? q.options
+                    : (typeof q.options === 'string' ? JSON.parse(q.options) : [q.option1, q.option2, q.option3, q.option4, q.option_a, q.option_b, q.option_c, q.option_d].filter(Boolean)),
+                  correctAnswer: typeof q.correct_answer === 'number'
+                    ? q.correct_answer
+                    : (typeof q.correctAnswer === 'number' ? q.correctAnswer : (typeof q.answer === 'number' ? q.answer : 0)),
+                  explanation: q.explanation || q.answer_explanation || q.explain || '',
+                  subject: q.subject || e.subject || 'সাধারণ বিষয়',
+                  cadre: ['all'],
+                  difficulty: q.difficulty || 'medium',
+                }));
+              }
+            } catch (qErr) {
+              // Ignore if questions table doesn't exist
             }
           }
 
@@ -256,7 +291,7 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
     }
   }
 
-  if (foundAnyTable || aggregatedExams.length > 0) {
+  if (foundAnyTable) {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem('tamreen_cached_exams', JSON.stringify(aggregatedExams));
