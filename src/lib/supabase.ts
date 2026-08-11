@@ -132,7 +132,7 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
 }
 
 /**
- * Fetch Exams from Supabase (tries 'exams', 'model_tests', 'quizzes', 'tests')
+ * Fetch Exams from Supabase (queries 'exams', 'model_tests', 'quizzes', 'tests', 'mock_tests', 'exam_list', 'mcq_exams')
  */
 export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
   // Check local cache first
@@ -169,35 +169,43 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
   const client = getSupabaseClient();
   if (!client) return cached || [];
 
-  const tablesToTry = ['exams', 'model_tests', 'quizzes', 'tests'];
-  let foundTable = false;
+  const tablesToTry = ['exams', 'model_tests', 'quizzes', 'tests', 'mock_tests', 'exam_list', 'mcq_exams', 'course_exams'];
+  const aggregatedExams: ExamItem[] = [];
+  const seenIds = new Set<string>();
+  let foundAnyTable = false;
 
   for (const table of tablesToTry) {
     try {
-      const queryPromise = client
-        .from(table)
-        .select('*')
-        .order('created_at', { ascending: false });
+      // 1st attempt: with created_at ordering and 8 second timeout
+      let res = await withTimeout(
+        client.from(table).select('*').order('created_at', { ascending: false }),
+        8000
+      ).catch(() => null);
 
-      const { data, error } = await withTimeout(queryPromise, 3000);
+      // 2nd attempt fallback: if order('created_at') failed (e.g. column created_at missing), try select('*') without ordering
+      if (!res || res.error) {
+        res = await withTimeout(
+          client.from(table).select('*'),
+          8000
+        ).catch(() => null);
+      }
 
-      if (!error && Array.isArray(data)) {
-        foundTable = true;
-        
-        if (data.length === 0 && table !== 'tests') {
-          // Try next table in case 'exams' table is empty but 'model_tests' exists
-          continue;
-        }
+      if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
+        foundAnyTable = true;
 
-        const formatted: ExamItem[] = data.map((e: any) => {
-          let rawCategory = (e.category || e.type || e.exam_type || 'free').toLowerCase();
+        for (const e of res.data) {
+          const rawId = String(e.id || e.exam_id || Math.random());
+          if (seenIds.has(rawId)) continue;
+          seenIds.add(rawId);
+
+          let rawCategory = (e.category || e.type || e.exam_type || e.exam_category || e.tag || 'free').toString().toLowerCase();
           let normalizedCategory: any = 'free';
 
-          if (rawCategory.includes('daily') || rawCategory.includes('model') || rawCategory.includes('মডেল')) {
+          if (rawCategory.includes('daily') || rawCategory.includes('model') || rawCategory.includes('মডেল') || rawCategory.includes('দৈনিক')) {
             normalizedCategory = 'daily';
           } else if (rawCategory.includes('live') || rawCategory.includes('লাইভ')) {
             normalizedCategory = 'live';
-          } else if (rawCategory.includes('premium') || rawCategory.includes('paid') || Boolean(e.is_premium || e.isPremium)) {
+          } else if (rawCategory.includes('premium') || rawCategory.includes('paid') || Boolean(e.is_premium || e.isPremium || e.paid)) {
             normalizedCategory = 'premium';
           } else {
             normalizedCategory = 'free';
@@ -205,16 +213,17 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
 
           // Parse questions if attached directly to exam
           let questions: MCQQuestion[] | undefined = undefined;
-          if (e.questions) {
+          const rawQuestions = e.questions || e.question_list || e.mcqs || e.question_data;
+          if (rawQuestions) {
             try {
-              const parsed = typeof e.questions === 'string' ? JSON.parse(e.questions) : e.questions;
+              const parsed = typeof rawQuestions === 'string' ? JSON.parse(rawQuestions) : rawQuestions;
               if (Array.isArray(parsed)) {
                 questions = parsed.map((q: any) => ({
                   id: String(q.id || Math.random()),
-                  question: q.question || q.title || '',
-                  options: Array.isArray(q.options) ? q.options : [],
-                  correctAnswer: typeof q.correct_answer === 'number' ? q.correct_answer : (q.correctAnswer || 0),
-                  explanation: q.explanation || '',
+                  question: q.question || q.title || q.question_text || '',
+                  options: Array.isArray(q.options) ? q.options : (typeof q.options === 'string' ? JSON.parse(q.options) : []),
+                  correctAnswer: typeof q.correct_answer === 'number' ? q.correct_answer : (typeof q.correctAnswer === 'number' ? q.correctAnswer : 0),
+                  explanation: q.explanation || q.answer_explanation || '',
                   subject: q.subject || e.subject || 'সাধারণ বিষয়',
                   cadre: ['all'],
                   difficulty: q.difficulty || 'medium',
@@ -225,44 +234,37 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
             }
           }
 
-          return {
-            id: String(e.id),
-            title: e.title || e.name || e.test_name || e.exam_title || 'মডেল টেস্ট',
+          aggregatedExams.push({
+            id: rawId,
+            title: e.title || e.name || e.test_name || e.exam_title || e.subject || 'মডেল টেস্ট',
             titleArabic: e.title_arabic || e.titleArabic || undefined,
             category: normalizedCategory,
-            durationMinutes: Number(e.duration_minutes || e.durationMinutes || e.duration || e.time_limit || 30),
-            totalQuestions: Number(e.total_questions || e.totalQuestions || e.questions_count || (questions ? questions.length : 30)),
+            durationMinutes: Number(e.duration_minutes || e.durationMinutes || e.duration || e.time_limit || e.time || 30),
+            totalQuestions: Number(e.total_questions || e.totalQuestions || e.questions_count || e.question_count || (questions ? questions.length : 30)),
             difficulty: e.difficulty || e.level || 'মাঝারি',
-            participantsCount: e.participants_count || e.participantsCount || e.participants || '০',
-            subject: e.subject || e.subject_name || 'সাধারণ বিষয়',
+            participantsCount: String(e.participants_count || e.participantsCount || e.participants || '০'),
+            subject: e.subject || e.subject_name || e.topic || 'সাধারণ বিষয়',
             isPremium: Boolean(e.is_premium || e.isPremium || e.paid || normalizedCategory === 'premium'),
-            thumbnailUrl: e.thumbnail_url || e.thumbnailUrl || undefined,
-            scheduledTime: e.scheduled_time || e.scheduledTime || e.date || e.created_at || undefined,
+            thumbnailUrl: e.thumbnail_url || e.thumbnailUrl || e.image || undefined,
+            scheduledTime: e.scheduled_time || e.scheduledTime || e.date || e.created_at || e.exam_date || undefined,
             questions,
-          };
-        });
-
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem('tamreen_cached_exams', JSON.stringify(formatted));
-          } catch (e) {
-            console.warn('Cache write failed:', e);
-          }
+          });
         }
-
-        return formatted;
       }
     } catch (err) {
-      console.warn(`Fetch from ${table} notice (mobile timeout/error):`, err);
+      console.warn(`Fetch from ${table} error:`, err);
     }
   }
 
-  // If tables checked and empty, cache empty array and return []
-  if (foundTable) {
+  if (foundAnyTable || aggregatedExams.length > 0) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('tamreen_cached_exams', JSON.stringify([]));
+      try {
+        localStorage.setItem('tamreen_cached_exams', JSON.stringify(aggregatedExams));
+      } catch (e) {
+        console.warn('Cache write failed:', e);
+      }
     }
-    return [];
+    return aggregatedExams;
   }
 
   return cached || [];
