@@ -5,6 +5,7 @@ import { LeaderboardView } from './LeaderboardView';
 import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints, getRegisteredUserInfo, saveRegisteredUserInfo, getRealLeaderboardEntries } from '../utils/examStorage';
 import { fetchExamsFromSupabase, getSupabaseClient } from '../lib/supabase';
 import { copyToClipboard } from '../utils/clipboard';
+import { QUESTION_BANK } from '../data/questionBank';
 import { 
   FileCheck2, 
   Clock, 
@@ -305,23 +306,26 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map((e: any) => ({
-              id: e.id,
-              title: e.title,
-              titleArabic: e.titleArabic,
-              category: (e.category as any) || 'free',
-              durationMinutes: e.durationMinutes || 30,
-              totalQuestions: e.totalQuestions || 30,
-              totalMarks: e.totalQuestions || 30,
-              difficulty: e.difficulty || 'মাঝারি',
-              participantsCount: e.participantsCount || '১,০০০+',
-              subject: e.subject || 'সাধারণ বিষয়',
-              isPremium: Boolean(e.isPremium),
-              date: e.scheduledTime || 'এখনই লঞ্চ করা',
-              scheduledTime: e.scheduledTime,
-              subjectIcon: 'general',
-              questions: e.questions,
-            }));
+            return parsed.map((e: any) => {
+              const qCount = (e.questions && e.questions.length > 0) ? e.questions.length : (e.totalQuestions || 30);
+              return {
+                id: e.id,
+                title: e.title,
+                titleArabic: e.titleArabic,
+                category: (e.category as any) || 'free',
+                durationMinutes: e.durationMinutes || 30,
+                totalQuestions: qCount,
+                totalMarks: qCount,
+                difficulty: e.difficulty || 'মাঝারি',
+                participantsCount: e.participantsCount || '১,০০০+',
+                subject: e.subject || 'সাধারণ বিষয়',
+                isPremium: Boolean(e.isPremium),
+                date: e.scheduledTime || 'এখনই লঞ্চ করা',
+                scheduledTime: e.scheduledTime,
+                subjectIcon: 'general',
+                questions: e.questions,
+              };
+            });
           }
         }
       } catch (e) {
@@ -336,23 +340,26 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     try {
       const remote = await fetchExamsFromSupabase();
       if (remote && remote.length > 0) {
-        const formatted: ExtendedExamItem[] = remote.map((e) => ({
-          id: e.id,
-          title: e.title,
-          titleArabic: e.titleArabic,
-          category: (e.category as any) || 'free',
-          durationMinutes: e.durationMinutes || 30,
-          totalQuestions: e.totalQuestions || 30,
-          totalMarks: e.totalQuestions || 30,
-          difficulty: e.difficulty || 'মাঝারি',
-          participantsCount: e.participantsCount || '১,০০০+',
-          subject: e.subject || 'সাধারণ বিষয়',
-          isPremium: Boolean(e.isPremium),
-          date: e.scheduledTime || 'এখনই লঞ্চ করা',
-          scheduledTime: e.scheduledTime,
-          subjectIcon: 'general',
-          questions: e.questions,
-        }));
+        const formatted: ExtendedExamItem[] = remote.map((e) => {
+          const qCount = (e.questions && e.questions.length > 0) ? e.questions.length : (e.totalQuestions || 30);
+          return {
+            id: e.id,
+            title: e.title,
+            titleArabic: e.titleArabic,
+            category: (e.category as any) || 'free',
+            durationMinutes: e.durationMinutes || 30,
+            totalQuestions: qCount,
+            totalMarks: qCount,
+            difficulty: e.difficulty || 'মাঝারি',
+            participantsCount: e.participantsCount || '১,০০০+',
+            subject: e.subject || 'সাধারণ বিষয়',
+            isPremium: Boolean(e.isPremium),
+            date: e.scheduledTime || 'এখনই লঞ্চ করা',
+            scheduledTime: e.scheduledTime,
+            subjectIcon: 'general',
+            questions: e.questions,
+          };
+        });
 
         setExamsList(formatted);
       } else {
@@ -611,9 +618,22 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
   // If an exam is currently active/running
   if (activeExam) {
-    const questionsForThisExam = (activeExam.questions && activeExam.questions.length > 0)
+    let questionsForThisExam = (activeExam.questions && activeExam.questions.length > 0)
       ? activeExam.questions
-      : mcqQuestions.slice(0, activeExam.totalQuestions || 20);
+      : [];
+
+    if (questionsForThisExam.length === 0) {
+      const matched = mcqQuestions.filter(
+        q => q.subject && activeExam.subject && (q.subject.toLowerCase().includes(activeExam.subject.toLowerCase()) || activeExam.subject.toLowerCase().includes(q.subject.toLowerCase()))
+      );
+      if (matched.length > 0) {
+        questionsForThisExam = matched.slice(0, activeExam.totalQuestions || 10);
+      } else if (mcqQuestions.length > 0) {
+        questionsForThisExam = mcqQuestions.slice(0, activeExam.totalQuestions || 10);
+      } else {
+        questionsForThisExam = QUESTION_BANK.slice(0, activeExam.totalQuestions || 10);
+      }
+    }
 
     return (
       <CbtExamRunner

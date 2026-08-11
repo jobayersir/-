@@ -36,8 +36,8 @@ export default function App() {
   const [harakatVisible, setHarakatVisible] = useState<boolean>(true);
   const [isProfileSideSheetOpen, setIsProfileSideSheetOpen] = useState<boolean>(false);
 
-  // Dynamic MCQ questions state synced with Supabase
-  const [mcqQuestions, setMcqQuestions] = useState<MCQQuestion[]>([]);
+  // Dynamic MCQ questions state synced with Supabase, defaulting to QUESTION_BANK
+  const [mcqQuestions, setMcqQuestions] = useState<MCQQuestion[]>(QUESTION_BANK);
 
   // User persistent state
   const [examResults, setExamResults] = useState<ExamResult[]>([]);
