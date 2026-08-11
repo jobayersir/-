@@ -72,7 +72,7 @@ const toBnDigits = (num: number | string): string => {
 const bnMonths = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
 const bnDays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
 
-export const formatBengaliDateAndDay = (rawDateStr?: string, rawScheduledTime?: string): string => {
+export const formatBengaliDateAndDay = (rawDateStr?: string, rawScheduledTime?: string, includeTime: boolean = false): string => {
   let dateObj: Date | null = null;
 
   if (rawScheduledTime && !isNaN(Date.parse(rawScheduledTime))) {
@@ -89,6 +89,10 @@ export const formatBengaliDateAndDay = (rawDateStr?: string, rawScheduledTime?: 
   const monthName = bnMonths[dateObj.getMonth()];
   const yearNum = toBnDigits(dateObj.getFullYear());
   const dayOfWeek = bnDays[dateObj.getDay()];
+
+  if (!includeTime) {
+    return `${dayNum} ${monthName} ${yearNum}, ${dayOfWeek}`;
+  }
 
   let hours = dateObj.getHours();
   const minutes = dateObj.getMinutes();
@@ -517,7 +521,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     );
 
     if (isUpcoming) {
-      alert(`এই পরীক্ষাটি এখনও শুরু হয়নি। প্রকাশের নির্ধারিত সময়ে (${formatBengaliDateAndDay(exam.date, exam.scheduledTime)}) পরীক্ষাটি উন্মুক্ত হবে।`);
+      alert(`এই পরীক্ষাটি এখনও শুরু হয়নি। প্রকাশের নির্ধারিত সময়ে (${formatBengaliDateAndDay(exam.date, exam.scheduledTime, true)}) পরীক্ষাটি উন্মুক্ত হবে।`);
       return;
     }
 
@@ -1216,7 +1220,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         </div>
                         <div className="flex items-center space-x-1 text-amber-700 dark:text-amber-300 font-bold">
                           <Calendar className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-                          <span className="truncate">{formatBengaliDateAndDay(exam.date, exam.scheduledTime)}</span>
+                          <span className="truncate">{formatBengaliDateAndDay(exam.date, exam.scheduledTime, true)}</span>
                         </div>
                       </div>
                     </div>
