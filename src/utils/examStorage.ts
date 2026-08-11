@@ -10,8 +10,95 @@ export interface StoredExamResult {
   timestamp: number;
 }
 
+export interface RegisteredUserInfo {
+  name: string;
+  phone: string;
+}
+
+export interface RealLeaderboardEntry {
+  id: string;
+  examId: string;
+  examTitle: string;
+  userName: string;
+  userPhone: string;
+  score: number;
+  maxScore: number;
+  correctCount: number;
+  wrongCount: number;
+  accuracyPercentage: number;
+  timeSpentMinutes: number;
+  timestamp: number;
+}
+
 const RESULTS_KEY = 'tamreen_exam_results';
 const USER_POINTS_KEY = 'tamreen_user_total_points';
+const REGISTERED_USER_KEY = 'tamreen_registered_user';
+const LEADERBOARD_RECORDS_KEY = 'tamreen_real_leaderboard_records';
+
+export const getRegisteredUserInfo = (): RegisteredUserInfo | null => {
+  try {
+    const data = localStorage.getItem(REGISTERED_USER_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (parsed && parsed.name && parsed.phone) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Error reading registered user info:', e);
+  }
+  return null;
+};
+
+export const saveRegisteredUserInfo = (info: RegisteredUserInfo): void => {
+  try {
+    localStorage.setItem(REGISTERED_USER_KEY, JSON.stringify(info));
+    // Also sync to tamreen_user_profile if present
+    const existingProfile = localStorage.getItem('tamreen_user_profile');
+    let profile = existingProfile ? JSON.parse(existingProfile) : {};
+    profile.name = info.name;
+    profile.phone = info.phone;
+    localStorage.setItem('tamreen_user_profile', JSON.stringify(profile));
+  } catch (e) {
+    console.error('Error saving registered user info:', e);
+  }
+};
+
+export const getRealLeaderboardEntries = (): RealLeaderboardEntry[] => {
+  try {
+    const data = localStorage.getItem(LEADERBOARD_RECORDS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    console.error('Error reading real leaderboard entries:', e);
+    return [];
+  }
+};
+
+export const saveRealLeaderboardEntry = (entry: Omit<RealLeaderboardEntry, 'id'>): RealLeaderboardEntry => {
+  const entries = getRealLeaderboardEntries();
+  const id = `lb_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+  const fullEntry: RealLeaderboardEntry = {
+    ...entry,
+    id
+  };
+
+  // Check if entry for same exam and phone already exists -> update or append
+  const existingIdx = entries.findIndex(e => e.examId === entry.examId && (e.userPhone === entry.userPhone || e.userName === entry.userName));
+  if (existingIdx !== -1) {
+    // Keep highest score or latest attempt
+    entries[existingIdx] = fullEntry;
+  } else {
+    entries.push(fullEntry);
+  }
+
+  try {
+    localStorage.setItem(LEADERBOARD_RECORDS_KEY, JSON.stringify(entries));
+  } catch (e) {
+    console.error('Error saving leaderboard entry:', e);
+  }
+
+  return fullEntry;
+};
 
 export const getStoredExamResults = (): Record<string, StoredExamResult> => {
   try {

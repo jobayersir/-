@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
-import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
+import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints, getRegisteredUserInfo, saveRegisteredUserInfo, getRealLeaderboardEntries } from '../utils/examStorage';
 import { fetchExamsFromSupabase, getSupabaseClient } from '../lib/supabase';
 import { copyToClipboard } from '../utils/clipboard';
 import { 
@@ -203,6 +203,22 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
   // State for Premium Upgrade Modal
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
+  // Registration Popup Modal States
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [userRegName, setUserRegName] = useState('');
+  const [userRegPhone, setUserRegPhone] = useState('');
+  const [pendingExamToStart, setPendingExamToStart] = useState<ExtendedExamItem | null>(null);
+  const [regError, setRegError] = useState<string | null>(null);
+
+  // Sync existing reg info on mount
+  useEffect(() => {
+    const regUser = getRegisteredUserInfo();
+    if (regUser) {
+      setUserRegName(regUser.name);
+      setUserRegPhone(regUser.phone);
+    }
+  }, []);
+
   // Dynamic exams list state synced with Supabase (no static mock defaults)
   const [examsList, setExamsList] = useState<ExtendedExamItem[]>([]);
 
@@ -380,18 +396,58 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     return () => window.removeEventListener('popstate', handlePopState);
   }, [activeExam, viewingReportExam, viewingLeaderboardExam, showPremiumModal]);
 
-  const handleStartExam = (exam: ExtendedExamItem) => {
-    if (exam.isPremium) {
-      setShowPremiumModal(true);
-      window.history.pushState({ tab: 'exams', subview: 'premiumModal' }, '', '#exams-premium');
-      return;
-    }
+  const launchExamDirectly = (exam: ExtendedExamItem) => {
     setActiveExam(exam);
     setCurrentQuestionIdx(0);
     setUserAnswers({});
     setIsExamSubmitted(false);
     window.history.pushState({ tab: 'exams', subview: 'activeExam', examId: exam.id }, '', `#exams-runner-${exam.id}`);
   };
+
+  const handleStartExam = (exam: ExtendedExamItem, bypassRegCheck = false) => {
+    if (exam.isPremium) {
+      setShowPremiumModal(true);
+      window.history.pushState({ tab: 'exams', subview: 'premiumModal' }, '', '#exams-premium');
+      return;
+    }
+
+    const regUser = getRegisteredUserInfo();
+    if (!bypassRegCheck && (!regUser || !regUser.name.trim() || !regUser.phone.trim())) {
+      setPendingExamToStart(exam);
+      setShowRegisterModal(true);
+      return;
+    }
+
+    launchExamDirectly(exam);
+  };
+
+  const handleRegisterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userRegName.trim() || !userRegPhone.trim()) {
+      setRegError('অনুগ্রহ করে আপনার নাম ও মোবাইল নাম্বার সঠিক ভাবে দিন');
+      return;
+    }
+    setRegError(null);
+    saveRegisteredUserInfo({ name: userRegName.trim(), phone: userRegPhone.trim() });
+    setShowRegisterModal(false);
+
+    if (pendingExamToStart) {
+      launchExamDirectly(pendingExamToStart);
+      setPendingExamToStart(null);
+    }
+  };
+
+  // Direct exam link listener ?examId=...
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const directExamId = urlParams.get('examId');
+    if (directExamId && examsList.length > 0 && !activeExam) {
+      const targetExam = examsList.find(e => e.id === directExamId);
+      if (targetExam) {
+        handleStartExam(targetExam);
+      }
+    }
+  }, [examsList]);
 
   const handleSelectOption = (questionIdx: number, optionIdx: number) => {
     setUserAnswers((prev) => ({
@@ -647,7 +703,8 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
         /* Exam Cards List */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredExams.map((exam) => {
-            const isCompleted = exam.category === 'completed';
+            const userStoredResult = getStoredExamResult(exam.id);
+            const isCompleted = exam.category === 'completed' || Boolean(userStoredResult);
             const isLive = exam.category === 'live';
             const isDaily = exam.category === 'daily';
             const isPremium = exam.isPremium;
@@ -762,8 +819,8 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                     <LiveCardTicker />
                   ) : isCompleted ? (
                     <div className="bg-slate-100 dark:bg-slate-800 p-2.5 rounded-2xl flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 font-bold">
-                      <span>প্রাপ্ত স্কোর: <strong className="text-emerald-600 text-sm font-extrabold">{exam.score}/{exam.totalMarks}</strong></span>
-                      <span className="text-amber-600 dark:text-amber-400 font-extrabold">{exam.accuracy}% নির্ভুলতা</span>
+                      <span>প্রাপ্ত স্কোর: <strong className="text-emerald-600 text-sm font-extrabold">{userStoredResult ? userStoredResult.score : (exam.score || 0)}/{userStoredResult ? userStoredResult.totalQuestions : exam.totalMarks}</strong></span>
+                      <span className="text-amber-600 dark:text-amber-400 font-extrabold">{userStoredResult ? userStoredResult.percentage : (exam.accuracy || 100)}% নির্ভুলতা</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-between text-xs text-slate-500 font-medium pt-1">
@@ -782,7 +839,13 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => {
-                          setViewingReportExam(exam);
+                          setViewingReportExam({
+                            ...exam,
+                            score: userStoredResult ? userStoredResult.score : (exam.score || 0),
+                            correctAnswers: userStoredResult ? userStoredResult.correctCount : (exam.correctAnswers || 0),
+                            wrongAnswers: userStoredResult ? userStoredResult.wrongCount : (exam.wrongAnswers || 0),
+                            accuracy: userStoredResult ? userStoredResult.percentage : (exam.accuracy || 100)
+                          });
                           window.history.pushState({ tab: 'exams', subview: 'report' }, '', '#exams-report');
                         }}
                         className="py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center space-x-1.5 transition-all active:scale-95"
@@ -798,7 +861,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
                         className="py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-black text-xs sm:text-sm shadow-md flex items-center justify-center space-x-1.5 transition-all active:scale-95"
                       >
                         <Trophy className="w-4 h-4 text-slate-950" />
-                        <span>মেধা তালিকা</span>
+                        <span>লিডারবোর্ড</span>
                       </button>
                     </div>
                   ) : (
@@ -1435,6 +1498,89 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
               <Crown className="w-4 h-4 text-slate-950" />
               <span>এখনই আনলক করুন</span>
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* USER REGISTRATION POPUP MODAL */}
+      {showRegisterModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-emerald-500/30 relative space-y-6">
+            
+            {/* Header Icon */}
+            <div className="flex flex-col items-center text-center space-y-3">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                <UserCheck className="w-8 h-8" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
+                  পরীক্ষা দিতে আপনার তথ্য দিন
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                  পরীক্ষা শুরু করতে অনুগ্রহ করে আপনার নাম ও মোবাইল নম্বর দিন।
+                </p>
+              </div>
+            </div>
+
+            {regError && (
+              <div className="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/80 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-bold text-center">
+                {regError}
+              </div>
+            )}
+
+            <form onSubmit={handleRegisterSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 flex items-center space-x-1">
+                  <span>আপনার নাম</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    value={userRegName}
+                    onChange={(e) => setUserRegName(e.target.value)}
+                    placeholder="যেমন: মোঃ আব্দুল্লাহ"
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 flex items-center space-x-1">
+                  <span>মোবাইল নম্বর</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    required
+                    value={userRegPhone}
+                    onChange={(e) => setUserRegPhone(e.target.value)}
+                    placeholder="যেমন: 01712345678"
+                    className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterModal(false)}
+                  className="w-1/3 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm transition-all"
+                >
+                  বাতিল
+                </button>
+                <button
+                  type="submit"
+                  className="w-2/3 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center space-x-2"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  <span>পরীক্ষা শুরু করুন</span>
+                </button>
+              </div>
+            </form>
+
           </div>
         </div>
       )}

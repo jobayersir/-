@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
+import { 
+  getLatestExamResult, 
+  getStoredUserTotalPoints, 
+  getRealLeaderboardEntries, 
+  getRegisteredUserInfo,
+  getStoredExamResults 
+} from '../utils/examStorage';
 import { 
   Trophy, 
   Crown, 
@@ -134,223 +140,114 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   // Fetch stored exam results and user accumulated points
   const latestResult = getLatestExamResult();
   const storedTotalPoints = getStoredUserTotalPoints();
+  const realEntries = getRealLeaderboardEntries();
+  const regUser = getRegisteredUserInfo();
+  const currentUserName = user?.name || regUser?.name || 'পরীক্ষার্থী';
 
-  // Dynamic candidate list & score/rank calculation per filter tab
+  // Dynamic candidate list built strictly from real exam submissions
   let rawCandidates: LeaderboardUser[] = [];
 
-  const currentUserAvatar = user?.avatarUrl || '';
-  const currentUserName = user?.name || 'মাওলানা মোঃ আব্দুল্লাহ';
+  let filteredEntries = realEntries;
 
-  if (isCourseContext) {
-    // Course Leaderboard System
-    const userExams = 18 + Math.floor((storedTotalPoints - 840) / 20);
-    const userAvg = Math.min(30, Number((27.5 + (storedTotalPoints > 840 ? 1.5 : 0)).toFixed(1)));
-    const userTotalPoints = Math.round(userExams * userAvg);
+  if (filterPeriod === 'thisExam') {
+    if (examTitle) {
+      filteredEntries = realEntries.filter(
+        e => e.examTitle === examTitle || e.examId === examTitle
+      );
+    }
 
-    const userObj: LeaderboardUser = {
+    rawCandidates = filteredEntries.map((entry) => ({
       rank: 1,
-      name: currentUserName,
-      avatar: currentUserAvatar,
-      score: userTotalPoints,
-      maxScore: userExams * 30,
-      accuracyPercentage: Math.round((userAvg / 30) * 100),
-      totalExamsTaken: userExams,
-      avgPoints: userAvg,
-      timeSpentMinutes: userExams * 20,
+      name: entry.userName,
+      avatar: '',
+      score: entry.score,
+      maxScore: entry.maxScore,
+      accuracyPercentage: entry.accuracyPercentage,
+      correctCount: entry.correctCount,
+      wrongCount: entry.wrongCount,
+      timeSpentMinutes: entry.timeSpentMinutes,
       avgTimePerQuestionSec: 24,
-      streakDays: user?.streakDays || 14,
-      isCurrentUser: true
-    };
+      totalExamsTaken: 1,
+      avgPoints: entry.score,
+      streakDays: 1,
+      isCurrentUser: Boolean((regUser && entry.userPhone === regUser.phone) || entry.userName === currentUserName)
+    }));
 
-    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
-      const exams = Math.max(8, 32 - i);
-      const avgP = Number((29.5 - i * 0.15).toFixed(1));
-      const sc = Math.round(exams * avgP);
-      return {
-        rank: i + 1,
-        name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
-        score: sc,
-        maxScore: exams * 30,
-        accuracyPercentage: Math.min(100, Math.max(70, Math.round((avgP / 30) * 100))),
-        totalExamsTaken: exams,
-        avgPoints: avgP,
-        timeSpentMinutes: exams * 18,
-        avgTimePerQuestionSec: 22 + (i % 6),
-        streakDays: Math.max(3, 30 - i)
-      };
-    });
-
-    rawCandidates = [...mockOthers, userObj];
-
-  } else if (filterPeriod === 'thisExam') {
-    const examQuestions = userMaxScore !== undefined ? userMaxScore : (latestResult ? latestResult.totalQuestions : 16);
-    const uScore = userScore !== undefined ? userScore : (latestResult ? latestResult.score : Math.min(15, examQuestions));
-    const uCorrect = uScore;
-    const uWrong = Math.max(0, examQuestions - uScore);
-    const uAcc = examQuestions > 0 ? Math.round((uScore / examQuestions) * 100) : 94;
-
-    const userObj: LeaderboardUser = {
-      rank: 1,
-      name: currentUserName,
-      avatar: currentUserAvatar,
-      score: uScore,
-      maxScore: examQuestions,
-      accuracyPercentage: uAcc,
-      correctCount: uCorrect,
-      wrongCount: uWrong,
-      timeSpentMinutes: 25,
-      avgTimePerQuestionSec: 24,
-      totalExamsTaken: 16,
-      avgPoints: Number((uScore * 2).toFixed(1)),
-      streakDays: user?.streakDays || 14,
-      isCurrentUser: true
-    };
-
-    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
-      const wrong = Math.min(examQuestions, Math.floor(i / 4));
-      const correct = Math.max(0, examQuestions - wrong);
-      const acc = Math.round((correct / examQuestions) * 100);
-      const exams = Math.max(10, 28 - Math.floor(i / 2));
-      return {
-        rank: i + 1,
-        name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
-        score: correct,
-        maxScore: examQuestions,
-        accuracyPercentage: acc,
-        correctCount: correct,
-        wrongCount: wrong,
-        totalExamsTaken: exams,
-        avgPoints: Number((28.5 - i * 0.2).toFixed(1)),
-        timeSpentMinutes: 30 + i,
-        avgTimePerQuestionSec: 20 + (i % 8),
-        streakDays: Math.max(2, 25 - i)
-      };
-    });
-
-    rawCandidates = [...mockOthers, userObj];
-
-  } else if (filterPeriod === 'weekly') {
-    const userWeeklyPoints = Math.min(500, Math.max(450, 460 + Math.round((storedTotalPoints - 840) / 10)));
-    const userObj: LeaderboardUser = {
-      rank: 1,
-      name: currentUserName,
-      avatar: currentUserAvatar,
-      score: userWeeklyPoints,
-      maxScore: 500,
-      accuracyPercentage: 96,
-      correctCount: userWeeklyPoints,
-      wrongCount: 10,
-      timeSpentMinutes: 180,
-      avgTimePerQuestionSec: 25,
-      totalExamsTaken: 14 + Math.floor((storedTotalPoints - 840) / 20),
-      avgPoints: 28.2,
-      streakDays: user?.streakDays || 14,
-      isCurrentUser: true
-    };
-
-    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
-      const sc = Math.max(120, 490 - i * 11);
-      const exams = Math.max(6, 18 - Math.floor(i / 2));
-      const avgP = Number((29.0 - i * 0.15).toFixed(1));
-      return {
-        rank: i + 1,
-        name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
-        score: sc,
-        maxScore: 500,
-        accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),
-        totalExamsTaken: exams,
-        avgPoints: avgP,
-        timeSpentMinutes: 150 + i * 5,
-        avgTimePerQuestionSec: 22 + (i % 5),
-        streakDays: Math.max(1, 28 - i)
-      };
-    });
-
-    rawCandidates = [...mockOthers, userObj];
-
-  } else if (filterPeriod === 'monthly') {
-    const userMonthlyPoints = Math.min(2000, Math.max(1800, 1860 + Math.round((storedTotalPoints - 840) / 5)));
-    const userObj: LeaderboardUser = {
-      rank: 1,
-      name: currentUserName,
-      avatar: currentUserAvatar,
-      score: userMonthlyPoints,
-      maxScore: 2000,
-      accuracyPercentage: 95,
-      correctCount: userMonthlyPoints,
-      wrongCount: 30,
-      timeSpentMinutes: 720,
-      avgTimePerQuestionSec: 25,
-      totalExamsTaken: 42 + Math.floor((storedTotalPoints - 840) / 20),
-      avgPoints: 28.0,
-      streakDays: user?.streakDays || 14,
-      isCurrentUser: true
-    };
-
-    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
-      const sc = Math.max(450, 1950 - i * 42);
-      const exams = Math.max(15, 50 - i);
-      const avgP = Number((28.8 - i * 0.12).toFixed(1));
-      return {
-        rank: i + 1,
-        name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
-        score: sc,
-        maxScore: 2000,
-        accuracyPercentage: Math.min(100, Math.max(60, 97 - i)),
-        totalExamsTaken: exams,
-        avgPoints: avgP,
-        timeSpentMinutes: 600 + i * 15,
-        avgTimePerQuestionSec: 21 + (i % 6),
-        streakDays: Math.max(2, 45 - i)
-      };
-    });
-
-    rawCandidates = [...mockOthers, userObj];
-
+    // If current user completed exam, ensure present
+    if (latestResult && rawCandidates.length === 0 && (!examTitle || latestResult.examTitle === examTitle || latestResult.examId === examTitle)) {
+      const uScore = userScore !== undefined ? userScore : latestResult.score;
+      const uMax = userMaxScore !== undefined ? userMaxScore : latestResult.totalQuestions;
+      rawCandidates.push({
+        rank: 1,
+        name: currentUserName,
+        avatar: user?.avatarUrl || '',
+        score: uScore,
+        maxScore: uMax,
+        accuracyPercentage: latestResult.percentage,
+        correctCount: latestResult.correctCount,
+        wrongCount: latestResult.wrongCount,
+        timeSpentMinutes: 20,
+        avgTimePerQuestionSec: 24,
+        totalExamsTaken: 1,
+        avgPoints: uScore,
+        streakDays: user?.streakDays || 1,
+        isCurrentUser: true
+      });
+    }
   } else {
-    // allTime
-    const userAllTimePoints = Math.min(5600, Math.max(5100, 5250 + Math.round((storedTotalPoints - 840) / 2)));
-    const userObj: LeaderboardUser = {
-      rank: 1,
-      name: currentUserName,
-      avatar: currentUserAvatar,
-      score: userAllTimePoints,
-      maxScore: 5600,
-      accuracyPercentage: 96,
-      correctCount: userAllTimePoints,
-      wrongCount: 90,
-      timeSpentMinutes: 2100,
-      avgTimePerQuestionSec: 24,
-      totalExamsTaken: 112 + Math.floor((storedTotalPoints - 840) / 10),
-      avgPoints: 28.5,
-      streakDays: user?.streakDays || 14,
-      isCurrentUser: true
-    };
+    // For weekly, monthly, allTime: aggregate real entries by user
+    const userMap: Record<string, LeaderboardUser> = {};
 
-    const mockOthers: LeaderboardUser[] = MOCK_CANDIDATE_NAMES.map((name, i) => {
-      const sc = Math.max(1200, 5500 - i * 120);
-      const exams = Math.max(30, 125 - i * 2);
-      const avgP = Number((29.2 - i * 0.1).toFixed(1));
-      return {
-        rank: i + 1,
-        name,
-        avatar: PRESET_MOCK_AVATARS[i % PRESET_MOCK_AVATARS.length],
-        score: sc,
-        maxScore: 5600,
-        accuracyPercentage: Math.min(100, Math.max(65, 98 - i)),
-        totalExamsTaken: exams,
-        avgPoints: avgP,
-        timeSpentMinutes: 2000 + i * 30,
-        avgTimePerQuestionSec: 20 + (i % 7),
-        streakDays: Math.max(5, 120 - i * 3)
-      };
+    realEntries.forEach((entry) => {
+      const key = entry.userPhone || entry.userName;
+      if (!userMap[key]) {
+        userMap[key] = {
+          rank: 1,
+          name: entry.userName,
+          avatar: '',
+          score: 0,
+          maxScore: 0,
+          accuracyPercentage: 0,
+          correctCount: 0,
+          wrongCount: 0,
+          timeSpentMinutes: 0,
+          totalExamsTaken: 0,
+          avgPoints: 0,
+          streakDays: 1,
+          isCurrentUser: Boolean((regUser && entry.userPhone === regUser.phone) || entry.userName === currentUserName)
+        };
+      }
+      const u = userMap[key];
+      u.score += entry.score;
+      u.maxScore += entry.maxScore;
+      u.correctCount = (u.correctCount || 0) + entry.correctCount;
+      u.wrongCount = (u.wrongCount || 0) + entry.wrongCount;
+      u.timeSpentMinutes += entry.timeSpentMinutes;
+      u.totalExamsTaken = (u.totalExamsTaken || 0) + 1;
+      u.accuracyPercentage = u.maxScore > 0 ? Math.round((u.score / u.maxScore) * 100) : 0;
+      u.avgPoints = Number((u.score / u.totalExamsTaken).toFixed(1));
     });
 
-    rawCandidates = [...mockOthers, userObj];
+    rawCandidates = Object.values(userMap);
+
+    const currentUserInMap = rawCandidates.some(c => c.isCurrentUser);
+    if (!currentUserInMap && latestResult) {
+      rawCandidates.push({
+        rank: 1,
+        name: currentUserName,
+        avatar: user?.avatarUrl || '',
+        score: latestResult.score,
+        maxScore: latestResult.totalQuestions,
+        accuracyPercentage: latestResult.percentage,
+        correctCount: latestResult.correctCount,
+        wrongCount: latestResult.wrongCount,
+        timeSpentMinutes: 20,
+        totalExamsTaken: Object.keys(getStoredExamResults()).length || 1,
+        avgPoints: latestResult.score,
+        streakDays: user?.streakDays || 1,
+        isCurrentUser: true
+      });
+    }
   }
 
   // Sort candidates by score descending, accuracy descending
@@ -530,6 +427,30 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         )}
       </div>
 
+      {rawCandidates.length === 0 ? (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 text-center space-y-4 shadow-sm my-6">
+          <div className="w-16 h-16 bg-amber-100 dark:bg-amber-950/80 rounded-2xl flex items-center justify-center mx-auto text-amber-500">
+            <Trophy className="w-8 h-8" />
+          </div>
+          <div className="space-y-1 max-w-md mx-auto">
+            <h3 className="font-extrabold text-lg text-slate-900 dark:text-slate-100">
+              এখনো কোনো পরীক্ষার্থী পরীক্ষা সম্পন্ন করেনি
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+              ডিফল্ট তালিকা অপসারণ করা হয়েছে। প্রথম পরীক্ষার্থী হিসেবে আপনি পরীক্ষা দিন এবং মেধা তালিকায় আপনার নাম যুক্ত করুন!
+            </p>
+          </div>
+          {onBackToExam && (
+            <button
+              onClick={onBackToExam}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs sm:text-sm shadow-md transition-all active:scale-95"
+            >
+              পরীক্ষায় অংশ নিন
+            </button>
+          )}
+        </div>
+      ) : (
+        <>
       {/* TOP 3 WINNERS PODIUM DESIGN */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-6">
         <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-slate-100 text-center flex items-center justify-center space-x-2">
@@ -871,6 +792,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
         )}
 
       </div>
+        </>
+      )}
 
     </div>
   );

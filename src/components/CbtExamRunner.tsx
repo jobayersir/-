@@ -31,7 +31,7 @@ import { ExtendedExamItem } from './ExamsView';
 import { MCQQuestion } from '../types';
 import { formatArabicText } from '../utils/arabic';
 
-import { saveExamResult } from '../utils/examStorage';
+import { saveExamResult, saveRealLeaderboardEntry, getRegisteredUserInfo } from '../utils/examStorage';
 import { saveExamResultToSupabase } from '../lib/supabase';
 
 interface CbtExamRunnerProps {
@@ -224,6 +224,25 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       timestamp: Date.now()
     });
 
+    // Save real leaderboard entry for registered user
+    const regUser = getRegisteredUserInfo();
+    const currentUserName = regUser?.name || 'পরীক্ষার্থী';
+    const currentUserPhone = regUser?.phone || 'অজানা';
+
+    saveRealLeaderboardEntry({
+      examId: exam.id,
+      examTitle: exam.title,
+      userName: currentUserName,
+      userPhone: currentUserPhone,
+      score: cCount,
+      maxScore: questions.length,
+      correctCount: cCount,
+      wrongCount: wCount,
+      accuracyPercentage: pct,
+      timeSpentMinutes: Math.max(1, Math.round(usedSecs / 60)),
+      timestamp: Date.now()
+    });
+
     // Also sync result to Supabase if connected
     saveExamResultToSupabase({
       examId: exam.id,
@@ -235,6 +254,7 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
       timeTakenSeconds: usedSecs,
       cadre: 'all',
       subjectFilter: exam.subject || 'all',
+      userEmail: currentUserPhone || 'guest@tamreen.com'
     });
 
     setUserRank(saved.rank);
