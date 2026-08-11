@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
 import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints } from '../utils/examStorage';
-import { fetchExamsFromSupabase } from '../lib/supabase';
+import { fetchExamsFromSupabase, getSupabaseClient } from '../lib/supabase';
 import { 
   FileCheck2, 
   Clock, 
@@ -239,6 +239,43 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
   useEffect(() => {
     loadSupabaseExams();
+
+    // Background auto-polling every 10 seconds
+    const interval = setInterval(() => {
+      loadSupabaseExams();
+    }, 10000);
+
+    // Auto refresh when tab gets focused
+    const handleFocus = () => loadSupabaseExams();
+    window.addEventListener('focus', handleFocus);
+
+    // Supabase Realtime postgres_changes listener
+    const client = getSupabaseClient();
+    let channel: any = null;
+    if (client) {
+      try {
+        channel = client
+          .channel('public-exams-auto-sync')
+          .on('postgres_changes', { event: '*', schema: 'public' }, () => {
+            loadSupabaseExams();
+          })
+          .subscribe();
+      } catch (e) {
+        console.warn('Supabase realtime error:', e);
+      }
+    }
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      if (client && channel) {
+        try {
+          client.removeChannel(channel);
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
   }, []);
 
   // Handle Share Exam Deep Link
@@ -468,28 +505,6 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       {/* 2. SEARCH & FILTER CONTROLS                               */}
       {/* ========================================================= */}
       <div className="space-y-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg">
-        
-        {/* Supabase Live Sync Status Indicator */}
-        <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs font-semibold text-emerald-900 dark:text-emerald-200 shadow-2xs">
-          <div className="flex items-center space-x-2 min-w-0">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span className="truncate">
-              সুপাবেজ রিয়েল-টাইম সিঙ্ক: <strong className="font-bold text-emerald-700 dark:text-emerald-300">এডমিন প্যানেলে তৈরি নতুন মডেল টেস্ট স্বয়ংক্রিয়ভাবে অ্যাপে যুক্ত হচ্ছে</strong>
-            </span>
-          </div>
-          <div className="flex items-center space-x-2 shrink-0">
-            <span className="bg-emerald-200/80 dark:bg-emerald-900/80 px-2.5 py-0.5 rounded-full text-[11px] font-bold text-emerald-900 dark:text-emerald-100">
-              মোট পরীক্ষা: {examsList.length}টি
-            </span>
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="text-emerald-700 dark:text-emerald-300 underline text-xs font-bold hover:text-emerald-900 dark:hover:text-emerald-100 flex items-center space-x-1"
-            >
-              <span>{isRefreshing ? 'সিঙ্ক হচ্ছে...' : 'এখনই রিফ্রেশ'}</span>
-            </button>
-          </div>
-        </div>
 
         {/* Large Search Bar */}
         <div className="relative">
