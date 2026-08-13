@@ -33,7 +33,7 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
   }, [mcqQuestions]);
 
   const filteredQuestions = questionsList.filter((q) => {
-    const matchesCadre = selectedCadre === 'all' || q.cadre.includes('all') || q.cadre.includes(selectedCadre);
+    const matchesCadre = selectedCadre === 'all' || !q.cadre || q.cadre.length === 0 || q.cadre.includes('all') || q.cadre.includes(selectedCadre);
     const matchesYear = selectedYear === 'all' || (q.yearTag && q.yearTag.includes(selectedYear));
     const matchesSearch =
       q.question.includes(searchQuery) ||

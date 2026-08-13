@@ -77,7 +77,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
     let filtered = allMcqs;
 
     if (selectedCadre !== 'all') {
-      filtered = filtered.filter(q => q.cadre.includes('all') || q.cadre.includes(selectedCadre));
+      filtered = filtered.filter(q => !q.cadre || q.cadre.length === 0 || q.cadre.includes('all') || q.cadre.includes(selectedCadre));
     }
 
     if (selectedSubject !== 'all') {

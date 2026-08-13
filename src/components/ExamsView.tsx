@@ -340,7 +340,10 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       const remote = await fetchExamsFromSupabase();
       if (remote && remote.length > 0) {
         const formatted: ExtendedExamItem[] = remote.map((e) => {
-          const qCount = (e.questions && e.questions.length > 0) ? e.questions.length : (e.totalQuestions || 0);
+          const qCount = (e.questions && e.questions.length > 0)
+            ? e.questions.length
+            : (e.totalQuestions && e.totalQuestions > 0 ? e.totalQuestions : 30);
+
           return {
             id: e.id,
             title: e.title,
@@ -361,6 +364,8 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
         });
 
         setExamsList(formatted);
+      } else if (remote === null) {
+        // Do not erase existing exam list if fetch failed due to network timeout
       } else {
         setExamsList([]);
       }
