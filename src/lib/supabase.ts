@@ -144,6 +144,116 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
 }
 
 /**
+ * Helper to robustly parse raw question objects from Supabase (Admin Panel or DB) into MCQQuestion
+ */
+export function parseQuestionObject(q: any): MCQQuestion {
+  const id = String(q.id || Math.random());
+  const question = q.question || q.title || q.question_text || q.text || q.question_bn || q.question_en || q.stem || q.mcq || q.qs || '';
+  const questionArabic = q.question_arabic || q.questionArabic || undefined;
+
+  let options: string[] = [];
+  if (Array.isArray(q.options)) {
+    options = q.options.map((opt: any) => typeof opt === 'string' ? opt : (opt?.text || opt?.option || opt?.title || String(opt)));
+  } else if (typeof q.options === 'string') {
+    try {
+      const trimmed = q.options.trim();
+      if (trimmed.startsWith('[')) {
+        const parsedOpts = JSON.parse(trimmed);
+        if (Array.isArray(parsedOpts)) {
+          options = parsedOpts.map((opt: any) => typeof opt === 'string' ? opt : (opt?.text || opt?.option || opt?.title || String(opt)));
+        }
+      } else {
+        options = trimmed.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    } catch (e) {
+      options = [q.options];
+    }
+  } else if (q.choices && Array.isArray(q.choices)) {
+    options = q.choices.map((c: any) => typeof c === 'string' ? c : (c?.text || c?.choice || String(c)));
+  } else {
+    const candidateOpts = [
+      q.option1 || q.option_1 || q.option_a || q.a || q.opt1,
+      q.option2 || q.option_2 || q.option_b || q.b || q.opt2,
+      q.option3 || q.option_3 || q.option_c || q.c || q.opt3,
+      q.option4 || q.option_4 || q.option_d || q.d || q.opt4,
+    ].filter(Boolean);
+    options = candidateOpts.map(String);
+  }
+
+  const optionsArabic = q.options_arabic || q.optionsArabic || undefined;
+
+  let correctAnswer = 0;
+  const rawAns = q.correct_answer ?? q.correctAnswer ?? q.answer ?? q.correct_option ?? q.right_answer ?? q.correct ?? q.ans ?? q.correct_ans ?? q.answer_index ?? q.correctIndex;
+
+  if (typeof rawAns === 'number') {
+    correctAnswer = rawAns;
+  } else if (typeof rawAns === 'string') {
+    const cleanAns = rawAns.trim().toLowerCase();
+    if (['a', '1', 'ক', 'option1', 'option_1', 'option_a'].includes(cleanAns)) correctAnswer = 0;
+    else if (['b', '2', 'খ', 'option2', 'option_2', 'option_b'].includes(cleanAns)) correctAnswer = 1;
+    else if (['c', '3', 'গ', 'option3', 'option_3', 'option_c'].includes(cleanAns)) correctAnswer = 2;
+    else if (['d', '4', 'ঘ', 'option4', 'option_4', 'option_d'].includes(cleanAns)) correctAnswer = 3;
+    else if (!isNaN(Number(cleanAns))) {
+      const num = Number(cleanAns);
+      correctAnswer = num >= 1 && num <= 4 ? num - 1 : num;
+    } else {
+      const foundIdx = options.findIndex(opt => opt.trim().toLowerCase() === cleanAns);
+      if (foundIdx >= 0) correctAnswer = foundIdx;
+    }
+  }
+
+  const explanation = q.explanation || q.answer_explanation || q.explain || q.explanation_bn || q.exp || q.details || '';
+  const explanationArabic = q.explanation_arabic || q.explanationArabic || undefined;
+
+  return {
+    id,
+    question,
+    questionArabic,
+    options,
+    optionsArabic,
+    correctAnswer: Math.max(0, Math.min(Math.max(0, options.length - 1), correctAnswer)),
+    explanation,
+    explanationArabic,
+    subject: q.subject || 'সাধারণ বিষয়',
+    cadre: ['all'],
+    difficulty: q.difficulty || 'medium',
+  };
+}
+
+/**
+ * Fetch Questions for a specific exam from relational tables
+ */
+export async function fetchQuestionsForExam(examId: string, examTitle?: string): Promise<MCQQuestion[] | null> {
+  const client = getSupabaseClient();
+  if (!client) return null;
+
+  const qTablesToTry = ['questions', 'mcq_questions', 'exam_questions', 'model_test_questions', 'quiz_questions', 'test_questions', 'mcqs', 'question_bank'];
+
+  for (const qTable of qTablesToTry) {
+    try {
+      let filterOr = `exam_id.eq.${examId},test_id.eq.${examId},model_test_id.eq.${examId},quiz_id.eq.${examId}`;
+      if (examTitle && examTitle.trim()) {
+        const cleanTitle = examTitle.trim();
+        filterOr += `,exam_title.eq.${cleanTitle},test_name.eq.${cleanTitle}`;
+      }
+
+      const qTableRes = await withTimeout(
+        client.from(qTable).select('*').or(filterOr),
+        2500
+      ).catch(() => null);
+
+      if (qTableRes && !qTableRes.error && Array.isArray(qTableRes.data) && qTableRes.data.length > 0) {
+        return qTableRes.data.map((q: any) => parseQuestionObject(q));
+      }
+    } catch (err) {
+      // Ignore if table query fails
+    }
+  }
+
+  return null;
+}
+
+/**
  * Fetch Exams from Supabase (queries 'exams', 'model_tests', 'quizzes', 'tests', 'mock_tests', 'exam_list', 'mcq_exams')
  */
 export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
@@ -216,28 +326,27 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
 
         // Parse questions if attached directly to exam row
         let questions: MCQQuestion[] | undefined = undefined;
-        const rawQuestions = e.questions || e.question_list || e.mcqs || e.question_data || e.questions_json;
+        const rawQuestions = e.questions || e.question_list || e.mcqs || e.question_data || e.questions_json || e.mcq_list || e.question_bank || e.items || e.quiz_questions || e.data || e.questions_data || e.mcq_data || e.all_questions;
         if (rawQuestions) {
           try {
             const parsed = typeof rawQuestions === 'string' ? JSON.parse(rawQuestions) : rawQuestions;
-            if (Array.isArray(parsed)) {
-              questions = parsed.map((q: any) => ({
-                id: String(q.id || Math.random()),
-                question: q.question || q.title || q.question_text || q.text || '',
-                options: Array.isArray(q.options) 
-                  ? q.options 
-                  : (typeof q.options === 'string' ? JSON.parse(q.options) : [q.option1, q.option2, q.option3, q.option4].filter(Boolean)),
-                correctAnswer: typeof q.correct_answer === 'number' 
-                  ? q.correct_answer 
-                  : (typeof q.correctAnswer === 'number' ? q.correctAnswer : (typeof q.answer === 'number' ? q.answer : 0)),
-                explanation: q.explanation || q.answer_explanation || q.explain || '',
-                subject: q.subject || e.subject || 'সাধারণ বিষয়',
-                cadre: ['all'],
-                difficulty: q.difficulty || 'medium',
-              }));
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              questions = parsed.map((q: any) => parseQuestionObject(q));
             }
           } catch (err) {
             console.warn('Failed parsing questions array from exam row:', err);
+          }
+        }
+
+        // If no direct questions on exam row, attempt fetching relational questions from DB
+        if (!questions || questions.length === 0) {
+          try {
+            const relQuestions = await fetchQuestionsForExam(rawId, e.title || e.name || e.test_name || e.exam_title);
+            if (relQuestions && relQuestions.length > 0) {
+              questions = relQuestions;
+            }
+          } catch (relErr) {
+            console.warn('Failed fetching relational questions for exam:', relErr);
           }
         }
 

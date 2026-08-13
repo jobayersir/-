@@ -3,7 +3,7 @@ import { ExamCategory, ExamItem, MCQQuestion } from '../types';
 import { CbtExamRunner } from './CbtExamRunner';
 import { LeaderboardView } from './LeaderboardView';
 import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints, getRegisteredUserInfo, saveRegisteredUserInfo, getRealLeaderboardEntries } from '../utils/examStorage';
-import { fetchExamsFromSupabase, getSupabaseClient } from '../lib/supabase';
+import { fetchExamsFromSupabase, getSupabaseClient, fetchQuestionsForExam } from '../lib/supabase';
 import { copyToClipboard } from '../utils/clipboard';
 import { QUESTION_BANK } from '../data/questionBank';
 import { 
@@ -514,8 +514,34 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
     return () => window.removeEventListener('popstate', handlePopState);
   }, [activeExam, viewingReportExam, viewingLeaderboardExam, showPremiumModal]);
 
-  const launchExamDirectly = (exam: ExtendedExamItem) => {
-    setActiveExam(exam);
+  // Auto-fetch questions if activeExam is missing questions
+  useEffect(() => {
+    if (activeExam && (!activeExam.questions || activeExam.questions.length === 0)) {
+      fetchQuestionsForExam(activeExam.id, activeExam.title).then((qList) => {
+        if (qList && qList.length > 0) {
+          setActiveExam((prev) => prev ? {
+            ...prev,
+            questions: qList,
+            totalQuestions: qList.length,
+            totalMarks: qList.length,
+          } : null);
+        }
+      });
+    }
+  }, [activeExam?.id]);
+
+  const launchExamDirectly = async (exam: ExtendedExamItem) => {
+    let examToLaunch = { ...exam };
+    if (!examToLaunch.questions || examToLaunch.questions.length === 0) {
+      const fetched = await fetchQuestionsForExam(exam.id, exam.title);
+      if (fetched && fetched.length > 0) {
+        examToLaunch.questions = fetched;
+        examToLaunch.totalQuestions = fetched.length;
+        examToLaunch.totalMarks = fetched.length;
+      }
+    }
+
+    setActiveExam(examToLaunch);
     setCurrentQuestionIdx(0);
     setUserAnswers({});
     setIsExamSubmitted(false);
