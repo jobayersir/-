@@ -21,7 +21,6 @@ import {
   PremiumView, 
   SettingsView 
 } from './components/SecondaryViews';
-import { QUESTION_BANK } from './data/questionBank';
 import { fetchMcqQuestionsFromSupabase } from './lib/supabase';
 import { MCQQuestion } from './types';
 import { Logo } from './components/Logo';
@@ -36,8 +35,8 @@ export default function App() {
   const [harakatVisible, setHarakatVisible] = useState<boolean>(true);
   const [isProfileSideSheetOpen, setIsProfileSideSheetOpen] = useState<boolean>(false);
 
-  // Dynamic MCQ questions state synced with Supabase, defaulting to QUESTION_BANK
-  const [mcqQuestions, setMcqQuestions] = useState<MCQQuestion[]>(QUESTION_BANK);
+  // Dynamic MCQ questions state synced with Supabase
+  const [mcqQuestions, setMcqQuestions] = useState<MCQQuestion[]>([]);
 
   // User persistent state
   const [examResults, setExamResults] = useState<ExamResult[]>([]);

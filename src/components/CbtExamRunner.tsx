@@ -51,6 +51,28 @@ export const CbtExamRunner: React.FC<CbtExamRunnerProps> = ({
   onComplete,
   harakatVisible = true
 }) => {
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 max-w-md w-full border border-slate-200 dark:border-slate-800 text-center space-y-4 shadow-2xl">
+          <AlertCircle className="w-12 h-12 text-amber-500 mx-auto" />
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+            প্রশ্ন পাওয়া যায়নি
+          </h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            এই মডেল টেস্টের জন্য কোনো প্রশ্ন যুক্ত করা হয়নি। অনুগ্রহ করে এডমিন প্যানেল থেকে প্রশ্নসমূহ যুক্ত করুন।
+          </p>
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md"
+          >
+            ফিরে যান
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Active Question Index
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   

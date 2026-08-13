@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MCQQuestion, PostCadre } from '../types';
-import { QUESTION_BANK } from '../data/questionBank';
+import { fetchMcqQuestionsFromSupabase } from '../lib/supabase';
 import { BookOpen, CheckCircle, Search, Sparkles, Filter, Bookmark } from 'lucide-react';
 
 interface QuestionBankViewProps {
@@ -8,6 +8,7 @@ interface QuestionBankViewProps {
   arabicFont: string;
   onBookmark: (id: string, type: 'mcq') => void;
   bookmarkedIds: string[];
+  mcqQuestions?: MCQQuestion[];
 }
 
 export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
@@ -15,11 +16,23 @@ export const QuestionBankView: React.FC<QuestionBankViewProps> = ({
   arabicFont,
   onBookmark,
   bookmarkedIds,
+  mcqQuestions = [],
 }) => {
   const [selectedYear, setSelectedYear] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [questionsList, setQuestionsList] = useState<MCQQuestion[]>(mcqQuestions);
 
-  const filteredQuestions = QUESTION_BANK.filter((q) => {
+  useEffect(() => {
+    if (mcqQuestions && mcqQuestions.length > 0) {
+      setQuestionsList(mcqQuestions);
+    } else {
+      fetchMcqQuestionsFromSupabase().then((data) => {
+        if (data) setQuestionsList(data);
+      });
+    }
+  }, [mcqQuestions]);
+
+  const filteredQuestions = questionsList.filter((q) => {
     const matchesCadre = selectedCadre === 'all' || q.cadre.includes('all') || q.cadre.includes(selectedCadre);
     const matchesYear = selectedYear === 'all' || (q.yearTag && q.yearTag.includes(selectedYear));
     const matchesSearch =

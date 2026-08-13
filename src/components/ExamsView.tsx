@@ -5,7 +5,6 @@ import { LeaderboardView } from './LeaderboardView';
 import { getStoredExamResult, getLatestExamResult, getStoredUserTotalPoints, getRegisteredUserInfo, saveRegisteredUserInfo, getRealLeaderboardEntries } from '../utils/examStorage';
 import { fetchExamsFromSupabase, getSupabaseClient, fetchQuestionsForExam } from '../lib/supabase';
 import { copyToClipboard } from '../utils/clipboard';
-import { QUESTION_BANK } from '../data/questionBank';
 import { 
   FileCheck2, 
   Clock, 
@@ -646,22 +645,9 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
 
   // If an exam is currently active/running
   if (activeExam) {
-    let questionsForThisExam = (activeExam.questions && activeExam.questions.length > 0)
+    const questionsForThisExam = (activeExam.questions && activeExam.questions.length > 0)
       ? activeExam.questions
       : [];
-
-    if (questionsForThisExam.length === 0) {
-      const matched = mcqQuestions.filter(
-        q => q.subject && activeExam.subject && (q.subject.toLowerCase().includes(activeExam.subject.toLowerCase()) || activeExam.subject.toLowerCase().includes(q.subject.toLowerCase()))
-      );
-      if (matched.length > 0) {
-        questionsForThisExam = matched.slice(0, activeExam.totalQuestions || 10);
-      } else if (mcqQuestions.length > 0) {
-        questionsForThisExam = mcqQuestions.slice(0, activeExam.totalQuestions || 10);
-      } else {
-        questionsForThisExam = QUESTION_BANK.slice(0, activeExam.totalQuestions || 10);
-      }
-    }
 
     return (
       <CbtExamRunner

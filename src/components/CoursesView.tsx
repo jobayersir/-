@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CourseItem, PostCadre, CourseContentItem, MCQQuestion } from '../types';
 import { getStoredCourses, saveCoursesToStorage } from '../data/coursesData';
-import { QUESTION_BANK } from '../data/questionBank';
 import { Logo } from './Logo';
 import { LeaderboardView } from './LeaderboardView';
 import { CbtExamRunner } from './CbtExamRunner';
@@ -124,11 +123,8 @@ export const CoursesView: React.FC = () => {
     exam: CourseContentItem;
   } | null>(null);
 
-  const getExamQuestions = (examItem: CourseContentItem): MCQQuestion[] => {
-    if (QUESTION_BANK.length === 0) return [];
-    const charSum = examItem.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    const startIdx = charSum % Math.max(1, QUESTION_BANK.length - 8);
-    return QUESTION_BANK.slice(startIdx, startIdx + 10);
+  const getExamQuestions = (_examItem: CourseContentItem): MCQQuestion[] => {
+    return [];
   };
 
   const handleFinishCourseExam = (

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MCQQuestion, PostCadre, SubjectCategory } from '../types';
-import { QUESTION_BANK } from '../data/questionBank';
+import { fetchMcqQuestionsFromSupabase } from '../lib/supabase';
 import { formatArabicText, getArabicFontFamily } from '../utils/arabic';
 import { 
   CheckCircle2, 
@@ -25,6 +25,7 @@ interface McqPracticeViewProps {
   onSaveResult: (correct: number, total: number, timeTakenSeconds: number) => void;
   onBookmark: (id: string, type: 'mcq') => void;
   bookmarkedIds: string[];
+  mcqQuestions?: MCQQuestion[];
 }
 
 export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
@@ -34,10 +35,12 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
   onSaveResult,
   onBookmark,
   bookmarkedIds,
+  mcqQuestions = [],
 }) => {
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [mode, setMode] = useState<'practice' | 'exam'>('practice');
   const [viewType, setViewType] = useState<'scroll' | 'single'>('scroll'); // Default to bottom-to-top scroll feed
+  const [allMcqs, setAllMcqs] = useState<MCQQuestion[]>(mcqQuestions);
   const [questions, setQuestions] = useState<MCQQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
@@ -58,9 +61,20 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
   const [aiExplainText, setAiExplainText] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
 
+  // Load questions from props or Supabase
+  useEffect(() => {
+    if (mcqQuestions && mcqQuestions.length > 0) {
+      setAllMcqs(mcqQuestions);
+    } else {
+      fetchMcqQuestionsFromSupabase().then((data) => {
+        if (data) setAllMcqs(data);
+      });
+    }
+  }, [mcqQuestions]);
+
   // Filter questions on subject or cadre change
   useEffect(() => {
-    let filtered = QUESTION_BANK;
+    let filtered = allMcqs;
 
     if (selectedCadre !== 'all') {
       filtered = filtered.filter(q => q.cadre.includes('all') || q.cadre.includes(selectedCadre));
@@ -77,7 +91,7 @@ export const McqPracticeView: React.FC<McqPracticeViewProps> = ({
     setExamSubmitted(false);
     setTimeLeft(filtered.length * 60 || 600);
     setTimerActive(mode === 'exam');
-  }, [selectedCadre, selectedSubject, mode]);
+  }, [selectedCadre, selectedSubject, mode, allMcqs]);
 
   // Exam Countdown Timer
   useEffect(() => {

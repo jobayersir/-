@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfileData, NavTab, MCQQuestion } from '../types';
-import { QUESTION_BANK } from '../data/questionBank';
 import { CbtExamRunner } from './CbtExamRunner';
 import { ExtendedExamItem } from './ExamsView';
 import { formatArabicText } from '../utils/arabic';
@@ -28,30 +27,6 @@ interface WrongQuestionsViewProps {
   harakatVisible?: boolean;
 }
 
-// Sample initial wrong questions derived from Question Bank
-const INITIAL_WRONG_QUESTIONS: (MCQQuestion & { userWrongAnswer: number })[] = [
-  {
-    ...QUESTION_BANK[0],
-    userWrongAnswer: 1, // User picked option 1 (wrong) instead of correct answer
-  },
-  {
-    ...QUESTION_BANK[1] || QUESTION_BANK[0],
-    userWrongAnswer: 2,
-  },
-  {
-    ...QUESTION_BANK[2] || QUESTION_BANK[0],
-    userWrongAnswer: 0,
-  },
-  {
-    ...QUESTION_BANK[3] || QUESTION_BANK[0],
-    userWrongAnswer: 3,
-  },
-  {
-    ...QUESTION_BANK[4] || QUESTION_BANK[0],
-    userWrongAnswer: 1,
-  },
-];
-
 const optionBadges = ['ক', 'খ', 'গ', 'ঘ'];
 
 export const WrongQuestionsView: React.FC<WrongQuestionsViewProps> = ({
@@ -59,6 +34,19 @@ export const WrongQuestionsView: React.FC<WrongQuestionsViewProps> = ({
   onTabChange,
   harakatVisible = true
 }) => {
+  const [wrongQuestions, setWrongQuestions] = useState<(MCQQuestion & { userWrongAnswer: number })[]>(() => {
+    try {
+      const saved = localStorage.getItem('tamreen_wrong_questions');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn('Failed to parse wrong questions:', e);
+    }
+    return [];
+  });
+
   const [isRunningExam, setIsRunningExam] = useState<boolean>(false);
   const [activeTabFilter, setActiveTabFilter] = useState<'all' | 'arabic' | 'general'>('all');
   const [expandedExplanation, setExpandedExplanation] = useState<Record<string, boolean>>({});
@@ -109,13 +97,13 @@ export const WrongQuestionsView: React.FC<WrongQuestionsViewProps> = ({
     subject: 'সকল বিষয় (রিভিশন)',
     category: 'daily',
     durationMinutes: 15,
-    totalQuestions: INITIAL_WRONG_QUESTIONS.length,
+    totalQuestions: wrongQuestions.length,
     difficulty: 'মাঝারি',
     participantsCount: '১,৮৪০ জন',
     isPremium: false,
     scheduledTime: 'যেকোনো সময়',
     date: 'আজকের সিবিটি',
-    totalMarks: INITIAL_WRONG_QUESTIONS.length,
+    totalMarks: wrongQuestions.length,
     subjectIcon: 'quran',
   };
 
@@ -144,7 +132,7 @@ export const WrongQuestionsView: React.FC<WrongQuestionsViewProps> = ({
 
             <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-rose-200 font-bold">
               <span className="bg-rose-900/50 px-3 py-1 rounded-xl border border-rose-700/50">
-                🎯 সংরক্ষিত ভুল প্রশ্ন: {INITIAL_WRONG_QUESTIONS.length} টি
+                🎯 সংরক্ষিত ভুল প্রশ্ন: {wrongQuestions.length} টি
               </span>
               <span className="bg-indigo-900/50 px-3 py-1 rounded-xl border border-indigo-700/50">
                 ⏱️ রিভিশন সিবিটি সময়: ১৫ মিনিট
@@ -210,7 +198,14 @@ export const WrongQuestionsView: React.FC<WrongQuestionsViewProps> = ({
 
       {/* 4. Neumorphic Question Cards */}
       <div className="space-y-4 sm:space-y-5">
-        {INITIAL_WRONG_QUESTIONS.map((q, idx) => {
+        {wrongQuestions.length === 0 ? (
+          <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 space-y-2">
+            <AlertTriangle className="w-10 h-10 text-emerald-500 mx-auto" />
+            <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">কোনো ভুল প্রশ্নের রেকর্ড নেই</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">পরীক্ষা দেওয়ার সময় ভুল করা প্রশ্নসমূহ এখানে স্বয়ংক্রিয়ভাবে সংরক্ষিত হবে।</p>
+          </div>
+        ) : (
+          wrongQuestions.map((q, idx) => {
           const isExpOpen = expandedExplanation[q.id];
 
           return (
@@ -351,7 +346,7 @@ export const WrongQuestionsView: React.FC<WrongQuestionsViewProps> = ({
               )}
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* 5. Bottom Neumorphic CBT Retake Banner */}
@@ -378,7 +373,7 @@ export const WrongQuestionsView: React.FC<WrongQuestionsViewProps> = ({
         <div className="fixed inset-0 z-50 bg-slate-950 overflow-y-auto">
           <CbtExamRunner
             exam={wrongExamData}
-            questions={INITIAL_WRONG_QUESTIONS}
+            questions={wrongQuestions}
             harakatVisible={harakatVisible}
             onClose={() => setIsRunningExam(false)}
             onComplete={(res) => {

@@ -22,9 +22,11 @@ function withTimeout<T>(promiseLike: PromiseLike<T>, timeoutMs: number = 3500): 
 
 // Helper to get active Supabase credentials
 export function getSupabaseCredentials(): { url: string; anonKey: string } {
-  const env = (import.meta as any).env || {};
-  let url = env.VITE_SUPABASE_URL || '';
-  let anonKey = env.VITE_SUPABASE_ANON_KEY || '';
+  const metaEnv = (import.meta as any)?.env || {};
+  const procEnv = (typeof process !== 'undefined' && process?.env) ? process.env : {};
+
+  let url = metaEnv.VITE_SUPABASE_URL || procEnv.VITE_SUPABASE_URL || '';
+  let anonKey = metaEnv.VITE_SUPABASE_ANON_KEY || procEnv.VITE_SUPABASE_ANON_KEY || '';
 
   // Fallback to localStorage if configured via UI
   if (typeof window !== 'undefined') {
@@ -36,7 +38,7 @@ export function getSupabaseCredentials(): { url: string; anonKey: string } {
     }
   }
 
-  return { url, anonKey };
+  return { url: url.trim(), anonKey: anonKey.trim() };
 }
 
 export function isSupabaseConfigured(): boolean {
@@ -257,6 +259,9 @@ export async function fetchQuestionsForExam(examId: string, examTitle?: string):
  * Fetch Exams from Supabase (queries 'exams', 'model_tests', 'quizzes', 'tests', 'mock_tests', 'exam_list', 'mcq_exams')
  */
 export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
+  const { url } = getSupabaseCredentials();
+  console.log(`[Supabase Production Sync] Fetching published exams from project URL: "${url || 'NOT_CONFIGURED'}"`);
+
   // Check local cache first
   let cached: ExamItem[] | null = null;
   if (typeof window !== 'undefined') {
@@ -283,12 +288,14 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
   }
 
   const client = getSupabaseClient();
-  if (!client) return cached || [];
+  if (!client) {
+    console.warn(`[Supabase Production Sync] Client not initialized. Returning cached or empty list.`);
+    return cached || [];
+  }
 
   const tablesToTry = ['exams', 'model_tests', 'quizzes', 'tests', 'mock_tests', 'exam_list', 'mcq_exams', 'course_exams'];
   const aggregatedExams: ExamItem[] = [];
   const seenIds = new Set<string>();
-  let foundAnyTable = false;
 
   // Execute queries in parallel for all candidate tables for mobile data speed
   const tableResults = await Promise.allSettled(
@@ -304,11 +311,26 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
 
   for (const res of tableResults) {
     if (res.status === 'fulfilled' && res.value && !res.value.error && Array.isArray(res.value.data) && res.value.data.length > 0) {
-      foundAnyTable = true;
-
       for (const e of res.value.data) {
         const rawId = String(e.id || e.exam_id || Math.random());
         if (seenIds.has(rawId)) continue;
+
+        // Requirement 7: Only show exams with status = 'published'
+        const rawStatus = (e.status || e.exam_status || e.publish_status || e.state || '').toString().trim().toLowerCase();
+        const isPublishedBool = e.is_published ?? e.published ?? e.isPublished;
+
+        // If status field is present in the record, it must equal 'published' (or 'active'/'live' for legacy compatibility)
+        if (rawStatus && rawStatus !== 'published' && rawStatus !== 'active' && rawStatus !== 'live') {
+          console.log(`[Supabase Production Sync] Excluded exam ID "${rawId}" (title: "${e.title || 'Untitled'}") because status="${rawStatus}" (not 'published')`);
+          continue;
+        }
+
+        // If explicit boolean is_published is false, filter out
+        if (isPublishedBool === false) {
+          console.log(`[Supabase Production Sync] Excluded exam ID "${rawId}" (title: "${e.title || 'Untitled'}") because is_published=false`);
+          continue;
+        }
+
         seenIds.add(rawId);
 
         let rawCategory = (e.category || e.type || e.exam_type || e.exam_category || e.tag || 'free').toString().toLowerCase();
@@ -373,18 +395,18 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
     }
   }
 
-  if (foundAnyTable) {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('tamreen_cached_exams', JSON.stringify(aggregatedExams));
-      } catch (e) {
-        console.warn('Cache write failed:', e);
-      }
+  const fetchedIds = aggregatedExams.map(e => e.id);
+  console.log(`[Supabase Production Sync] Successfully fetched ${aggregatedExams.length} published exam(s) from project URL: "${url}". Exam IDs:`, fetchedIds);
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('tamreen_cached_exams', JSON.stringify(aggregatedExams));
+    } catch (e) {
+      console.warn('Cache write failed:', e);
     }
-    return aggregatedExams;
   }
 
-  return cached || [];
+  return aggregatedExams;
 }
 
 /**
