@@ -306,7 +306,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
             return parsed.map((e: any) => {
-              const qCount = (e.questions && e.questions.length > 0) ? e.questions.length : (e.totalQuestions || 30);
+              const qCount = (e.questions && e.questions.length > 0) ? e.questions.length : (e.totalQuestions || 0);
               return {
                 id: e.id,
                 title: e.title,
@@ -340,7 +340,7 @@ export const ExamsView: React.FC<ExamsViewProps> = ({ mcqQuestions, onOpenLeader
       const remote = await fetchExamsFromSupabase();
       if (remote && remote.length > 0) {
         const formatted: ExtendedExamItem[] = remote.map((e) => {
-          const qCount = (e.questions && e.questions.length > 0) ? e.questions.length : (e.totalQuestions || 30);
+          const qCount = (e.questions && e.questions.length > 0) ? e.questions.length : (e.totalQuestions || 0);
           return {
             id: e.id,
             title: e.title,

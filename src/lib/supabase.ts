@@ -149,35 +149,39 @@ export async function fetchMcqQuestionsFromSupabase(): Promise<MCQQuestion[] | n
  * Helper to robustly parse raw question objects from Supabase (Admin Panel or DB) into MCQQuestion
  */
 export function parseQuestionObject(q: any): MCQQuestion {
-  const id = String(q.id || Math.random());
-  const question = q.question || q.title || q.question_text || q.text || q.question_bn || q.question_en || q.stem || q.mcq || q.qs || '';
+  const id = String(q.id || q.question_id || q.mcq_id || Math.random());
+  const question = q.question || q.title || q.question_text || q.text || q.question_bn || q.question_en || q.stem || q.mcq || q.qs || q.question_title || q.question_name || '';
   const questionArabic = q.question_arabic || q.questionArabic || undefined;
 
   let options: string[] = [];
-  if (Array.isArray(q.options)) {
-    options = q.options.map((opt: any) => typeof opt === 'string' ? opt : (opt?.text || opt?.option || opt?.title || String(opt)));
-  } else if (typeof q.options === 'string') {
+  const rawOpts = q.options || q.options_json || q.option_list || q.choices || q.answers;
+
+  if (Array.isArray(rawOpts)) {
+    options = rawOpts.map((opt: any) => typeof opt === 'string' ? opt : (opt?.text || opt?.option || opt?.title || opt?.choice || String(opt)));
+  } else if (typeof rawOpts === 'string') {
     try {
-      const trimmed = q.options.trim();
-      if (trimmed.startsWith('[')) {
+      const trimmed = rawOpts.trim();
+      if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
         const parsedOpts = JSON.parse(trimmed);
         if (Array.isArray(parsedOpts)) {
-          options = parsedOpts.map((opt: any) => typeof opt === 'string' ? opt : (opt?.text || opt?.option || opt?.title || String(opt)));
+          options = parsedOpts.map((opt: any) => typeof opt === 'string' ? opt : (opt?.text || opt?.option || opt?.title || opt?.choice || String(opt)));
+        } else if (typeof parsedOpts === 'object' && parsedOpts !== null) {
+          options = Object.values(parsedOpts).map((val: any) => typeof val === 'string' ? val : (val?.text || val?.option || String(val)));
         }
       } else {
         options = trimmed.split(',').map(s => s.trim()).filter(Boolean);
       }
     } catch (e) {
-      options = [q.options];
+      options = [rawOpts];
     }
-  } else if (q.choices && Array.isArray(q.choices)) {
-    options = q.choices.map((c: any) => typeof c === 'string' ? c : (c?.text || c?.choice || String(c)));
+  } else if (typeof rawOpts === 'object' && rawOpts !== null) {
+    options = Object.values(rawOpts).map((val: any) => typeof val === 'string' ? val : (val?.text || val?.option || String(val)));
   } else {
     const candidateOpts = [
-      q.option1 || q.option_1 || q.option_a || q.a || q.opt1,
-      q.option2 || q.option_2 || q.option_b || q.b || q.opt2,
-      q.option3 || q.option_3 || q.option_c || q.c || q.opt3,
-      q.option4 || q.option_4 || q.option_d || q.d || q.opt4,
+      q.option1 || q.option_1 || q.option_a || q.a || q.opt1 || q.op1,
+      q.option2 || q.option_2 || q.option_b || q.b || q.opt2 || q.op2,
+      q.option3 || q.option_3 || q.option_c || q.c || q.opt3 || q.op3,
+      q.option4 || q.option_4 || q.option_d || q.d || q.opt4 || q.op4,
     ].filter(Boolean);
     options = candidateOpts.map(String);
   }
@@ -223,32 +227,69 @@ export function parseQuestionObject(q: any): MCQQuestion {
 }
 
 /**
- * Fetch Questions for a specific exam from relational tables
+ * Fetch Questions for a specific exam from relational tables without 400 Bad Request errors
  */
 export async function fetchQuestionsForExam(examId: string, examTitle?: string): Promise<MCQQuestion[] | null> {
   const client = getSupabaseClient();
   if (!client) return null;
 
   const qTablesToTry = ['questions', 'mcq_questions', 'exam_questions', 'model_test_questions', 'quiz_questions', 'test_questions', 'mcqs', 'question_bank'];
+  const numExamId = !isNaN(Number(examId)) ? Number(examId) : null;
 
   for (const qTable of qTablesToTry) {
     try {
-      let filterOr = `exam_id.eq.${examId},test_id.eq.${examId},model_test_id.eq.${examId},quiz_id.eq.${examId}`;
+      // 1. Query column-specific matches individually to avoid 400 Bad Request if a column is missing
+      const idFields = ['exam_id', 'test_id', 'model_test_id', 'quiz_id'];
+      for (const field of idFields) {
+        let res = await withTimeout(client.from(qTable).select('*').eq(field, examId), 2500).catch(() => null);
+        if (!res || res.error || !Array.isArray(res.data) || res.data.length === 0) {
+          if (numExamId !== null) {
+            res = await withTimeout(client.from(qTable).select('*').eq(field, numExamId), 2000).catch(() => null);
+          }
+        }
+        if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
+          console.log(`[Supabase Question Fetch] Loaded ${res.data.length} question(s) from table "${qTable}" using field "${field}=${examId}"`);
+          return res.data.map((q: any) => parseQuestionObject(q));
+        }
+      }
+
+      // 2. Query title fields individually if examTitle is provided
       if (examTitle && examTitle.trim()) {
         const cleanTitle = examTitle.trim();
-        filterOr += `,exam_title.eq.${cleanTitle},test_name.eq.${cleanTitle}`;
+        const titleFields = ['exam_title', 'test_name', 'exam_name', 'subject', 'model_test_title'];
+        for (const tField of titleFields) {
+          const res = await withTimeout(client.from(qTable).select('*').eq(tField, cleanTitle), 2000).catch(() => null);
+          if (res && !res.error && Array.isArray(res.data) && res.data.length > 0) {
+            console.log(`[Supabase Question Fetch] Loaded ${res.data.length} question(s) from table "${qTable}" using title field "${tField}=${cleanTitle}"`);
+            return res.data.map((q: any) => parseQuestionObject(q));
+          }
+        }
       }
 
-      const qTableRes = await withTimeout(
-        client.from(qTable).select('*').or(filterOr),
-        2500
-      ).catch(() => null);
+      // 3. Fallback: Select all rows from table and filter in JS
+      const allRes = await withTimeout(client.from(qTable).select('*').limit(500), 2500).catch(() => null);
+      if (allRes && !allRes.error && Array.isArray(allRes.data) && allRes.data.length > 0) {
+        const filtered = allRes.data.filter((q: any) => {
+          const qExamId = String(q.exam_id ?? q.test_id ?? q.model_test_id ?? q.quiz_id ?? q.examId ?? '');
+          if (qExamId && (qExamId === String(examId) || (numExamId !== null && Number(qExamId) === numExamId))) {
+            return true;
+          }
+          if (examTitle) {
+            const qTitle = String(q.exam_title ?? q.test_name ?? q.exam_name ?? q.model_test_title ?? '').trim();
+            if (qTitle && qTitle.toLowerCase() === examTitle.trim().toLowerCase()) {
+              return true;
+            }
+          }
+          return false;
+        });
 
-      if (qTableRes && !qTableRes.error && Array.isArray(qTableRes.data) && qTableRes.data.length > 0) {
-        return qTableRes.data.map((q: any) => parseQuestionObject(q));
+        if (filtered.length > 0) {
+          console.log(`[Supabase Question Fetch] Loaded ${filtered.length} question(s) from table "${qTable}" via in-memory filter`);
+          return filtered.map((q: any) => parseQuestionObject(q));
+        }
       }
     } catch (err) {
-      // Ignore if table query fails
+      // Continue trying next candidate table
     }
   }
 
@@ -372,9 +413,10 @@ export async function fetchExamsFromSupabase(): Promise<ExamItem[] | null> {
           }
         }
 
+        const recordQCount = Number(e.total_questions || e.totalQuestions || e.questions_count || e.question_count || 0);
         const actualQuestionCount = (questions && questions.length > 0)
           ? questions.length
-          : Number(e.total_questions || e.totalQuestions || e.questions_count || e.question_count || 30);
+          : (recordQCount > 0 ? recordQCount : 0);
 
         aggregatedExams.push({
           id: rawId,
